@@ -1,0 +1,1619 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    min-height:100%;
+}
+
+body{
+    min-height:100vh;
+    background:url("nn.jpg") center/cover no-repeat;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:"Share Tech Mono",monospace;
+    padding:20px;
+}
+
+
+/* =====================================================
+   LOGIN CONTAINER
+   ===================================================== */
+
+.container{
+    position:relative;
+    z-index:10;
+    width:94%;
+    max-width:650px;
+    min-height:60vh;
+    text-align:center;
+    background:rgba(255,255,255,.302);
+    padding:45px 35px;
+    border-radius:30px;
+    border:1px solid rgba(255,255,255,.35);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    overflow:hidden;
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+
+
+/* =====================================================
+   LOGIN TITLE
+   ===================================================== */
+
+h1{
+    color:#ffffff70;
+    font-family:"Orbitron",sans-serif;
+    font-size:38px;
+    font-weight:900;
+    letter-spacing:2px;
+    white-space:nowrap;
+    margin-bottom:20px;
+}
+
+p{
+    color:#fff;
+    font-family:"Rajdhani",sans-serif;
+    font-weight:700;
+    font-size:18px;
+    letter-spacing:5px;
+    margin-bottom:35px;
+}
+
+
+/* =====================================================
+   INPUT
+   ===================================================== */
+
+input{
+    width:100%;
+    height:60px;
+    padding:15px 20px;
+    margin-bottom:20px;
+    background:rgba(246,246,246,.113);
+    color:#00ff00;
+    border:2px solid #00ff00;
+    border-radius:15px;
+    outline:none;
+    font-family:"Share Tech Mono",monospace;
+    font-size:17px;
+    transition:.3s;
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+}
+
+input:focus{
+    border-color:#00ff00;
+    background:rgba(0,255,0,.08);
+}
+
+input::placeholder{
+    color:#000;
+    font-family:"Share Tech Mono",monospace;
+}
+
+
+/* =====================================================
+   BUTTON
+   ===================================================== */
+
+button{
+    width:100%;
+    height:60px;
+    margin-bottom:15px;
+    background:rgba(0,0,0,.20);
+    color:#00ff00;
+    border:2px solid #00ff00;
+    border-radius:15px;
+    font-family:"Oxanium",sans-serif;
+    font-weight:700;
+    font-size:17px;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:.25s;
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+
+button:hover{
+    background:rgba(0,255,0,.12);
+    color:#00ff00;
+}
+
+button:active{
+    background:rgba(255,0,0,.28);
+    color:#ff3030;
+    border-color:#ff3030;
+    transform:scale(.98);
+}
+
+
+/* =====================================================
+   HIDDEN LOGIN
+   ===================================================== */
+
+#otpBox,
+#passwordBox,
+#loginBox{
+    display:none;
+}
+
+
+/* =====================================================
+   TIMER
+   ===================================================== */
+
+#timer{
+    color:#00ff00;
+    font-family:"Chakra Petch",sans-serif;
+    font-weight:700;
+    font-size:16px;
+    margin-bottom:15px;
+}
+
+
+/* =====================================================
+   PASSWORD
+   ===================================================== */
+
+h2{
+    color:#00ff00;
+    font-family:"Audiowide",sans-serif;
+    font-size:20px;
+    margin-bottom:20px;
+}
+
+
+/* =====================================================
+   OTP
+   ===================================================== */
+
+.otp-inputs{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    margin-bottom:20px;
+}
+
+.otp-digit{
+    width:50px !important;
+    height:60px !important;
+    padding:5px !important;
+    margin:0 !important;
+    text-align:center;
+    font-family:"VT323",monospace;
+    font-size:30px;
+    letter-spacing:0;
+}
+
+
+/* =====================================================
+   MESSAGE
+   ===================================================== */
+
+#message{
+    margin-top:10px;
+    min-height:22px;
+    color:#00ff00;
+    font-family:"Share Tech Mono",monospace;
+    font-size:15px;
+    word-break:break-word;
+}
+
+
+/* =====================================================
+   SOCIAL LOGIN SECTION
+   ===================================================== */
+
+.social-login-section{
+    width:100%;
+    margin-top:2px;
+    margin-bottom:4px;
+    padding:14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.10),
+            rgba(0,0,0,.22)
+        );
+
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:22px;
+
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+}
+
+
+/* =====================================================
+   SOCIAL OR DIVIDER
+   ===================================================== */
+
+.social-divider{
+    width:100%;
+    height:25px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:12px;
+
+    margin:0 0 10px;
+}
+
+.social-divider span{
+    flex:1;
+    height:1px;
+    background:rgba(255,255,255,.38);
+}
+
+.social-or{
+    color:rgba(255,255,255,.78);
+    font-family:"Chakra Petch",sans-serif;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:2px;
+    white-space:nowrap;
+}
+
+
+/* =====================================================
+   GOOGLE + GITHUB BUTTON
+   ===================================================== */
+
+.social-login-btn{
+    position:relative;
+
+    width:100%;
+    height:58px;
+
+    margin:0 0 10px;
+    padding:0 55px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.24),
+            rgba(255,255,255,.08)
+        ) !important;
+
+    color:#fff !important;
+
+    border:1px solid rgba(255,255,255,.48) !important;
+    border-radius:16px !important;
+
+    font-family:"Chakra Petch",sans-serif;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:.5px;
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    overflow:hidden;
+
+    transition:
+        background .25s ease,
+        border-color .25s ease,
+        transform .25s ease;
+}
+
+.social-login-btn:last-child{
+    margin-bottom:0;
+}
+
+.social-login-btn:hover{
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.32),
+            rgba(255,255,255,.14)
+        ) !important;
+
+    color:#fff !important;
+
+    border-color:rgba(255,255,255,.70) !important;
+}
+
+.social-login-btn:active{
+    background:rgba(255,255,255,.20) !important;
+    color:#fff !important;
+    border-color:rgba(255,255,255,.75) !important;
+    transform:scale(.98);
+}
+
+
+/* =====================================================
+   SOCIAL LOGO WRAPPER
+   ===================================================== */
+
+.social-logo-wrapper{
+    position:absolute;
+    left:17px;
+
+    width:30px;
+    height:30px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#fff;
+    border-radius:50%;
+
+    flex-shrink:0;
+
+    overflow:hidden;
+}
+
+
+/* =====================================================
+   SOCIAL SVG LOGO
+   ===================================================== */
+
+.social-logo{
+    width:20px !important;
+    height:20px !important;
+
+    min-width:20px !important;
+    min-height:20px !important;
+
+    max-width:20px !important;
+    max-height:20px !important;
+
+    display:block;
+
+    flex:none;
+
+    margin:0 !important;
+    padding:0 !important;
+
+    background:transparent !important;
+    border:0 !important;
+    outline:0 !important;
+
+    object-fit:contain;
+}
+
+
+/* =====================================================
+   GOOGLE LOGO
+   ===================================================== */
+
+.google-logo{
+    width:20px !important;
+    height:20px !important;
+}
+
+
+/* =====================================================
+   GITHUB LOGO
+   ===================================================== */
+
+.github-logo{
+    width:20px !important;
+    height:20px !important;
+}
+
+
+/* =====================================================
+   SOCIAL LOGIN TEXT
+   ===================================================== */
+
+.social-login-text{
+    display:block;
+
+    color:#fff !important;
+
+    font-family:"Chakra Petch",sans-serif;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:.5px;
+
+    white-space:nowrap;
+
+    line-height:1;
+}
+
+
+/* =====================================================
+   SOCIAL LOGIN ARROW
+   ===================================================== */
+
+.social-button-arrow{
+    position:absolute;
+    right:18px;
+
+    color:rgba(255,255,255,.75);
+
+    font-family:"Rajdhani",sans-serif;
+    font-size:27px;
+    font-weight:400;
+
+    line-height:1;
+}
+
+
+/* =====================================================
+   SOCIAL DISABLED
+   ===================================================== */
+
+.social-login-btn:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+    transform:none;
+}
+
+
+/* =====================================================
+   DASHBOARD
+   ===================================================== */
+
+#dashboard{
+    position:fixed !important;
+    inset:0 !important;
+    width:100vw !important;
+    height:100vh !important;
+    min-width:100vw !important;
+    min-height:100vh !important;
+    margin:0 !important;
+    padding:0 !important;
+    border-radius:0 !important;
+
+    background-image:
+        linear-gradient(
+            rgba(0,0,0,.20),
+            rgba(0,0,0,.50)
+        ),
+        url("dashboard 1.jpg") !important;
+
+    background-position:center center !important;
+    background-repeat:no-repeat !important;
+    background-size:cover !important;
+
+    overflow:hidden !important;
+    z-index:999999 !important;
+    display:none;
+}
+
+
+/* =====================================================
+   SYSTEM ONLINE
+   ===================================================== */
+
+.dashboard-badge{
+    position:absolute;
+    top:20px;
+    left:20px;
+    z-index:1000005;
+    display:block;
+    width:max-content;
+    padding:8px 18px;
+    border:1px solid #00ff00;
+    border-radius:30px;
+    color:#00ff00;
+    font-family:"Orbitron",sans-serif;
+    font-size:11px;
+    letter-spacing:3px;
+    background:rgba(0,0,0,.35);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+
+
+/* =====================================================
+   DASHBOARD CONTENT
+   ===================================================== */
+
+.dashboard-content{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    padding:90px 20px 110px;
+    overflow:hidden;
+    animation:dashboardIn .7s ease;
+}
+
+@keyframes dashboardIn{
+
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+
+/* =====================================================
+   DASHBOARD PAGE
+   ===================================================== */
+
+#dashboardPage{
+    position:absolute;
+    top:80px;
+    left:15px;
+    right:15px;
+    bottom:95px;
+    display:block;
+    overflow:hidden;
+    z-index:1000001;
+}
+
+.dashboard-page{
+    display:none;
+    width:100%;
+    height:100%;
+    padding:10px;
+    background:transparent;
+    border:0;
+    border-radius:0;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    animation:pageMagic .35s ease;
+}
+
+.dashboard-page.active-page{
+    display:block;
+}
+
+@keyframes pageMagic{
+
+    from{
+        opacity:0;
+        transform:scale(.96) translateY(8px);
+    }
+
+    to{
+        opacity:1;
+        transform:scale(1) translateY(0);
+    }
+
+}
+
+
+/* =====================================================
+   HOME SCROLL
+   ===================================================== */
+
+.home-scroll{
+    width:100%;
+    height:100%;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:5px 5px 30px;
+    scroll-behavior:smooth;
+}
+
+.home-scroll::-webkit-scrollbar{
+    width:4px;
+}
+
+.home-scroll::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+.home-scroll::-webkit-scrollbar-thumb{
+    background:rgba(0,255,0,.45);
+    border-radius:10px;
+}
+
+
+/* =====================================================
+   HOME GLASS
+   ===================================================== */
+
+.home-glass-box{
+    width:100%;
+    margin-bottom:18px;
+    padding:20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.13),
+            rgba(0,0,0,.42)
+        );
+
+    border:1px solid rgba(0,255,0,.45);
+    border-radius:22px;
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+}
+
+.home-box-title{
+    color:#00ff00;
+    font-family:"Orbitron",sans-serif;
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-align:left;
+}
+
+.home-box-line{
+    width:100%;
+    height:1px;
+    margin:10px 0 12px;
+    background:rgba(0,255,0,.35);
+}
+
+.home-box-text{
+    color:#fff;
+    font-family:"Chakra Petch",sans-serif;
+    font-size:13px;
+    line-height:1.6;
+    text-align:left;
+}
+
+.database-status-text{
+    margin-top:8px;
+    color:#00ff00;
+    font-size:10px;
+    letter-spacing:1px;
+    text-align:left;
+}
+
+
+/* =====================================================
+   HOME BUTTON
+   ===================================================== */
+
+.home-glass-button{
+    width:100%;
+    height:60px;
+    margin-bottom:18px;
+    padding:0 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.13),
+            rgba(0,0,0,.42)
+        ) !important;
+
+    border:1px solid rgba(0,255,0,.45) !important;
+    border-radius:20px !important;
+    color:#00ff00 !important;
+
+    font-family:"Oxanium",sans-serif;
+    font-size:14px;
+    letter-spacing:2px;
+
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+}
+
+.home-button-icon{
+    width:28px;
+    text-align:center;
+    font-size:18px;
+}
+
+.home-button-arrow{
+    font-size:25px;
+    line-height:1;
+}
+
+
+/* =====================================================
+   SMALL BUTTON
+   ===================================================== */
+
+.small-glass-button{
+    width:100%;
+    height:45px;
+    margin-top:15px;
+    margin-bottom:0;
+    font-size:11px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(0,255,0,.45);
+    border-radius:14px;
+}
+
+
+/* =====================================================
+   EXPANDABLE
+   ===================================================== */
+
+.expandable-box{
+    display:none;
+}
+
+.expandable-box.show-box{
+    display:block;
+}
+
+
+/* =====================================================
+   LOGIN HISTORY
+   ===================================================== */
+
+.history-green,
+.history-item,
+.history-number{
+    color:#00ff00 !important;
+}
+
+.history-item{
+    padding:12px 0;
+    border-bottom:1px solid rgba(0,255,0,.25);
+    font-family:"Share Tech Mono",monospace;
+    font-size:12px;
+    line-height:1.7;
+}
+
+.history-item:last-child{
+    border-bottom:0;
+}
+
+
+/* =====================================================
+   VIDEO
+   ===================================================== */
+
+.video-card{
+    padding-bottom:18px;
+}
+
+.account-video{
+    width:100%;
+    max-height:240px;
+    display:block;
+    margin-top:15px;
+    border-radius:15px;
+    border:1px solid rgba(0,255,0,.45);
+    background:#000;
+}
+
+
+/* =====================================================
+   DASHBOARD INPUT
+   ===================================================== */
+
+.dashboard-input{
+    width:100% !important;
+    height:50px !important;
+    margin-bottom:12px !important;
+    font-size:13px !important;
+    background:rgba(255,255,255,.08) !important;
+}
+
+
+/* =====================================================
+   INNER MESSAGE
+   ===================================================== */
+
+.inner-message{
+    min-height:18px;
+    margin-top:10px;
+    color:#00ff00;
+    font-size:11px;
+    text-align:center;
+}
+
+
+/* =====================================================
+   STORAGE
+   ===================================================== */
+
+.storage-info{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    color:#fff;
+    font-size:11px;
+    letter-spacing:1px;
+}
+
+.storage-info strong{
+    color:#00ff00;
+    white-space:nowrap;
+}
+
+.storage-bar{
+    width:100%;
+    height:8px;
+    margin-top:15px;
+    overflow:hidden;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(0,255,0,.35);
+    border-radius:10px;
+}
+
+.storage-progress{
+    width:0%;
+    height:100%;
+    background:#00ff00;
+    border-radius:10px;
+    transition:width .4s ease;
+}
+
+.storage-details{
+    margin-top:10px;
+    color:#aaa;
+    font-size:10px;
+    line-height:1.5;
+}
+
+
+/* =====================================================
+   OTHER PAGES
+   ===================================================== */
+
+.page-title{
+    color:#00ff00;
+    font-family:"Orbitron",sans-serif;
+    font-size:14px;
+    letter-spacing:2px;
+    margin-bottom:8px;
+}
+
+.page-text{
+    color:#fff;
+    font-size:12px;
+    letter-spacing:1px;
+}
+
+
+/* =====================================================
+   REMOVE ACCOUNT
+   ===================================================== */
+
+.remove-account-btn{
+    width:100%;
+    height:50px;
+    margin-top:18px;
+    margin-bottom:0;
+    background:rgba(255,255,255,.08);
+    color:#ff0000;
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:15px;
+    font-family:"Oxanium",sans-serif;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:2px;
+}
+
+.remove-account-btn:hover{
+    background:rgba(255,255,255,.12);
+    color:#ff0000;
+    border-color:rgba(255,255,255,.45);
+}
+
+.remove-account-btn:active{
+    background:rgba(255,255,255,.20);
+    color:#ff0000;
+    border-color:rgba(255,255,255,.65);
+    transform:scale(.97);
+}
+
+
+/* =====================================================
+   PROFILE
+   ===================================================== */
+
+.profile-scroll{
+    width:100%;
+    height:100%;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:5px 5px 30px;
+}
+
+.profile-scroll::-webkit-scrollbar{
+    width:4px;
+}
+
+.profile-scroll::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+.profile-scroll::-webkit-scrollbar-thumb{
+    background:rgba(0,255,0,.45);
+    border-radius:10px;
+}
+
+
+/* =====================================================
+   PROFILE GLASS BOX
+   ===================================================== */
+
+.profile-glass-box{
+    width:100%;
+    margin-bottom:18px;
+    padding:20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.13),
+            rgba(0,0,0,.42)
+        );
+
+    border:1px solid rgba(0,255,0,.45);
+    border-radius:22px;
+
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+}
+
+.profile-box-title{
+    color:#00ff00;
+    font-family:"Orbitron",sans-serif;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-align:left;
+}
+
+.profile-box-line{
+    width:100%;
+    height:1px;
+    margin:10px 0 15px;
+    background:rgba(0,255,0,.35);
+}
+
+
+/* =====================================================
+   PROFILE VALUES - WHITE
+   ===================================================== */
+
+.profile-value{
+    color:#fff !important;
+    font-family:"Chakra Petch",sans-serif;
+    font-size:14px;
+    font-weight:600;
+    text-align:left;
+    word-break:break-word;
+}
+
+.profile-box-text-small{
+    color:#fff;
+    font-family:"Chakra Petch",sans-serif;
+    font-size:11px;
+    line-height:1.6;
+    text-align:left;
+}
+
+
+/* =====================================================
+   PROFILE EDIT
+   ===================================================== */
+
+.profile-edit-label{
+    width:100%;
+    margin:4px 0 8px;
+    color:#fff;
+    font-family:"Chakra Petch",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:1px;
+    text-align:left;
+}
+
+.birthday-input{
+    color:#fff !important;
+    color-scheme:dark;
+}
+
+
+/* =====================================================
+   PROFILE PICTURE
+   ===================================================== */
+
+.profile-picture-box{
+    text-align:center;
+}
+
+.profile-picture-wrapper{
+    width:115px;
+    height:115px;
+    margin:10px auto 15px;
+
+    border:2px solid #00ff00;
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+    background:rgba(0,0,0,.30);
+}
+
+#profilePicture{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:none;
+}
+
+#profilePicturePlaceholder{
+    color:#00ff00;
+    font-size:48px;
+}
+
+.profile-upload-button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    min-width:180px;
+    height:45px;
+    padding:0 15px;
+
+    color:#00ff00;
+
+    border:1px solid rgba(0,255,0,.45);
+    border-radius:14px;
+
+    background:rgba(255,255,255,.08);
+
+    font-family:"Oxanium",sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:1px;
+
+    cursor:pointer;
+}
+
+
+/* =====================================================
+   PROFILE BUTTON
+   ===================================================== */
+
+.profile-glass-button{
+    width:100%;
+    height:60px;
+    margin-bottom:18px;
+    padding:0 18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.13),
+            rgba(0,0,0,.42)
+        ) !important;
+
+    border:1px solid rgba(0,255,0,.45) !important;
+    border-radius:20px !important;
+
+    color:#00ff00 !important;
+
+    font-family:"Oxanium",sans-serif;
+    font-size:13px;
+    letter-spacing:2px;
+
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+}
+
+.profile-arrow{
+    font-size:25px;
+}
+
+
+/* =====================================================
+   ACCOUNT LIST
+   ===================================================== */
+
+.account-list{
+    width:100%;
+    margin-top:15px;
+}
+
+.account-item{
+    width:100%;
+    min-height:60px;
+    margin-bottom:10px;
+    padding:10px 12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+
+    background:rgba(255,255,255,.07);
+
+    border:1px solid rgba(0,255,0,.35);
+    border-radius:15px;
+}
+
+.account-item-info{
+    min-width:0;
+    text-align:left;
+}
+
+.account-item-name{
+    color:#00ff00;
+    font-size:12px;
+    margin-bottom:4px;
+}
+
+.account-item-email{
+    color:#fff;
+    font-size:10px;
+    word-break:break-all;
+}
+
+.account-switch-button{
+    width:auto;
+    min-width:85px;
+    height:38px;
+    margin:0;
+    padding:0 10px;
+    font-size:9px;
+    border-radius:12px;
+}
+
+.current-account-label{
+    color:#00ff00;
+    font-size:9px;
+    white-space:nowrap;
+}
+
+
+/* =====================================================
+   NAVIGATION
+   ===================================================== */
+
+.magic-nav{
+    position:fixed !important;
+    left:10px !important;
+    right:10px !important;
+    bottom:10px !important;
+    width:auto !important;
+    height:72px !important;
+
+    display:flex !important;
+    align-items:center;
+    justify-content:space-around;
+
+    padding:6px !important;
+    margin:0 !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.13),
+            rgba(0,0,0,.45)
+        ) !important;
+
+    border:1px solid rgba(0,255,0,.65) !important;
+    border-radius:22px !important;
+
+    z-index:1000002 !important;
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+}
+
+
+/* =====================================================
+   NAV BUTTON
+   ===================================================== */
+
+.magic-nav .nav-item{
+    position:relative;
+
+    width:20% !important;
+    height:60px !important;
+
+    margin:0 !important;
+    padding:3px !important;
+
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    gap:4px;
+
+    background:transparent !important;
+    border:0 !important;
+
+    color:#777 !important;
+
+    border-radius:15px !important;
+
+    font-family:"Chakra Petch",sans-serif;
+
+    transition:
+        transform .25s ease,
+        color .25s ease,
+        background .25s ease;
+}
+
+.magic-nav .nav-item:hover{
+    background:rgba(0,255,0,.08) !important;
+    color:#00ff00 !important;
+}
+
+.magic-nav .nav-item:active{
+    background:rgba(255,0,0,.28) !important;
+    color:#ff3030 !important;
+}
+
+.magic-nav .nav-item.active{
+    color:#00ff00 !important;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,255,0,.22),
+            transparent 70%
+        ) !important;
+
+    transform:translateY(-5px);
+}
+
+
+/* =====================================================
+   NAV ICON
+   ===================================================== */
+
+.nav-icon{
+    width:34px;
+    height:34px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:transparent !important;
+    border:0 !important;
+    border-radius:50% !important;
+}
+
+.nav-icon img{
+    width:29px;
+    height:29px;
+
+    display:block;
+    object-fit:contain;
+
+    background:transparent !important;
+
+    border:2px solid rgba(0,255,0,.65) !important;
+    border-radius:50% !important;
+
+    outline:0 !important;
+    padding:4px !important;
+    margin:0 !important;
+
+    box-shadow:none !important;
+    filter:none;
+
+    transition:
+        transform .3s ease,
+        opacity .3s ease,
+        border-color .3s ease;
+}
+
+.magic-nav .nav-item.active .nav-icon img{
+    transform:scale(1.15);
+    border-color:#00ff00 !important;
+}
+
+.magic-nav .nav-item:active .nav-icon img{
+    border-color:#ff3030 !important;
+}
+
+.nav-label{
+    display:block;
+    font-size:8px;
+    letter-spacing:1px;
+    white-space:nowrap;
+}
+
+.magic-nav .nav-item.active .nav-label{
+    color:#00ff00;
+}
+
+.magic-nav .nav-item.active::after{
+    content:"";
+
+    position:absolute;
+    bottom:1px;
+
+    width:6px;
+    height:6px;
+
+    border-radius:50%;
+
+    background:#00ff00;
+
+    animation:magicDot .4s ease;
+}
+
+@keyframes magicDot{
+
+    from{
+        transform:scale(0);
+        opacity:0;
+    }
+
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media(max-width:500px){
+
+    body{
+        padding:12px;
+    }
+
+    .container{
+        width:96%;
+        min-height:60vh;
+        padding:35px 22px;
+        border-radius:25px;
+    }
+
+    h1{
+        font-size:32px;
+        letter-spacing:1px;
+    }
+
+    p{
+        font-size:13px;
+        letter-spacing:3px;
+        margin-bottom:30px;
+    }
+
+    input{
+        height:55px;
+        font-size:15px;
+    }
+
+    button{
+        height:55px;
+        font-size:15px;
+    }
+
+
+    /* SOCIAL LOGIN MOBILE */
+
+    .social-login-section{
+        padding:11px;
+        border-radius:19px;
+    }
+
+    .social-divider{
+        margin-top:0;
+        margin-bottom:8px;
+    }
+
+    .social-login-btn{
+        height:55px;
+        border-radius:15px !important;
+        padding-left:50px;
+        padding-right:50px;
+    }
+
+    .social-logo-wrapper{
+        left:15px;
+
+        width:28px;
+        height:28px;
+    }
+
+    .social-logo,
+    .google-logo,
+    .github-logo{
+        width:19px !important;
+        height:19px !important;
+
+        min-width:19px !important;
+        min-height:19px !important;
+
+        max-width:19px !important;
+        max-height:19px !important;
+    }
+
+    .social-login-text{
+        font-size:13px;
+    }
+
+    .social-button-arrow{
+        right:15px;
+        font-size:25px;
+    }
+
+
+    .otp-inputs{
+        gap:5px;
+    }
+
+    .otp-digit{
+        width:43px !important;
+        height:55px !important;
+        font-size:26px;
+    }
+
+    #dashboard{
+        width:100vw !important;
+        height:100dvh !important;
+        min-width:100vw !important;
+        min-height:100dvh !important;
+    }
+
+    .dashboard-badge{
+        top:15px;
+        left:15px;
+        padding:7px 13px;
+        font-size:9px;
+        letter-spacing:2px;
+    }
+
+    .dashboard-content{
+        width:100vw;
+        height:100dvh;
+        padding:70px 10px 100px;
+    }
+
+    #dashboardPage{
+        top:65px;
+        left:8px;
+        right:8px;
+        bottom:90px;
+    }
+
+    .home-scroll,
+    .profile-scroll{
+        padding:5px 3px 25px;
+    }
+
+    .home-glass-box,
+    .profile-glass-box{
+        padding:17px;
+        border-radius:20px;
+    }
+
+    .home-box-title,
+    .profile-box-title{
+        font-size:13px;
+    }
+
+    .home-box-text{
+        font-size:12px;
+    }
+
+    .home-glass-button,
+    .profile-glass-button{
+        height:55px;
+        font-size:12px;
+        border-radius:18px;
+    }
+
+    .account-video{
+        max-height:220px;
+    }
+
+    .magic-nav{
+        left:7px !important;
+        right:7px !important;
+        bottom:7px !important;
+        height:70px !important;
+        border-radius:20px !important;
+    }
+
+    .magic-nav .nav-item{
+        width:20% !important;
+        height:58px !important;
+    }
+
+    .nav-icon{
+        width:31px;
+        height:31px;
+    }
+
+    .nav-icon img{
+        width:26px;
+        height:26px;
+        padding:3px !important;
+    }
+
+    .nav-label{
+        font-size:7px;
+    }
+
+    .profile-picture-wrapper{
+        width:100px;
+        height:100px;
+    }
+
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+   ===================================================== */
+
+@media(max-width:360px){
+
+    .otp-inputs{
+        gap:3px;
+    }
+
+    .otp-digit{
+        width:38px !important;
+        height:50px !important;
+        font-size:24px;
+    }
+
+    .dashboard-badge{
+        top:12px;
+        left:12px;
+        font-size:8px;
+    }
+
+    .magic-nav{
+        left:5px !important;
+        right:5px !important;
+        bottom:5px !important;
+    }
+
+    .nav-icon{
+        width:28px;
+        height:28px;
+    }
+
+    .nav-icon img{
+        width:23px;
+        height:23px;
+        padding:3px !important;
+    }
+
+    .nav-label{
+        font-size:6px;
+    }
+
+    .account-item{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .account-switch-button{
+        width:100%;
+    }
+
+}
