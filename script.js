@@ -61,13 +61,6 @@ var STORAGE_REFERENCE_GB =
    OAUTH CONFIG
    ===================================================== */
 
-/*
-   IMPORTANT:
-   This is the real GitHub Pages URL of Cyber Core.
-   Do not use window.location.origin here because
-   GitHub Pages project sites use /cyber-core/.
-*/
-
 var OAUTH_REDIRECT_URL =
     "https://diluka-ui.github.io/cyber-core/";
 
@@ -99,6 +92,17 @@ var currentAccountPhone = "";
 var googleOAuthLogin = false;
 
 var githubOAuthLogin = false;
+
+
+/*
+   Prevent duplicate OAuth handling.
+*/
+
+var oauthHandling =
+    false;
+
+var oauthCallbackHandled =
+    false;
 
 
 /* =====================================================
@@ -2072,6 +2076,32 @@ function isOAuthUser(
 
 
 /* =====================================================
+   OAUTH CALLBACK DETECTION
+   ===================================================== */
+
+function isOAuthCallback() {
+
+    var hash =
+        window.location.hash || "";
+
+    var search =
+        window.location.search || "";
+
+    return (
+        hash.indexOf(
+            "access_token="
+        ) !== -1 ||
+        hash.indexOf(
+            "refresh_token="
+        ) !== -1 ||
+        search.indexOf(
+            "code="
+        ) !== -1
+    );
+}
+
+
+/* =====================================================
    OAUTH REDIRECT OPTIONS
    ===================================================== */
 
@@ -2088,6 +2118,146 @@ function getOAuthOptions() {
             OAUTH_REDIRECT_URL
 
     };
+}
+
+
+/* =====================================================
+   HANDLE OAUTH USER
+   ===================================================== */
+
+async function handleOAuthUser(
+    user,
+    provider
+) {
+
+    if (
+        !user ||
+        oauthHandling
+    ) {
+        return;
+    }
+
+    oauthHandling =
+        true;
+
+    currentUser =
+        user;
+
+    currentAccountEmail =
+        user.email || "";
+
+    currentAccountPhone =
+        "";
+
+    verifiedEmail =
+        currentAccountEmail;
+
+    verifiedPhone =
+        "";
+
+    googleOAuthLogin =
+        provider === "google";
+
+    githubOAuthLogin =
+        provider === "github";
+
+
+    if (
+        currentAccountEmail
+    ) {
+
+        rememberAccount(
+            currentAccountEmail,
+            ""
+        );
+    }
+
+
+    await createOrUpdateProfile(
+        currentUser,
+        ""
+    );
+
+
+    addLoginHistory(
+        currentAccountEmail ||
+        provider.toUpperCase() +
+        " ACCOUNT"
+    );
+
+
+    if (loginEmail) {
+
+        loginEmail.value =
+            currentAccountEmail;
+    }
+
+
+    if (loginPhone) {
+
+        loginPhone.value =
+            "";
+    }
+
+
+    if (loginPassword) {
+
+        loginPassword.value =
+            "";
+    }
+
+
+    if (provider === "google") {
+
+        message.textContent =
+            "✔️ GOOGLE LOGIN SUCCESSFUL❗";
+
+    } else if (
+        provider === "github"
+    ) {
+
+        message.textContent =
+            "✔️ GITHUB LOGIN SUCCESSFUL❗";
+    }
+
+
+    await showDashboard();
+
+    oauthCallbackHandled =
+        true;
+
+    oauthHandling =
+        false;
+}
+
+
+/* =====================================================
+   HANDLE GOOGLE USER
+   ===================================================== */
+
+async function handleGoogleUser(
+    user
+) {
+
+    await handleOAuthUser(
+        user,
+        "google"
+    );
+}
+
+
+/* =====================================================
+   HANDLE GITHUB USER
+   ===================================================== */
+
+async function handleGithubUser(
+    user
+) {
+
+    await handleOAuthUser(
+        user,
+        "github"
+    );
 }
 
 
@@ -2254,139 +2424,6 @@ if (githubLoginBtn) {
                 );
             }
         };
-}
-
-
-/* =====================================================
-   HANDLE OAUTH USER
-   ===================================================== */
-
-async function handleOAuthUser(
-    user,
-    provider
-) {
-
-    if (!user) {
-        return;
-    }
-
-    currentUser =
-        user;
-
-    currentAccountEmail =
-        user.email || "";
-
-    currentAccountPhone =
-        "";
-
-    verifiedEmail =
-        currentAccountEmail;
-
-    verifiedPhone =
-        "";
-
-    googleOAuthLogin =
-        provider === "google";
-
-    githubOAuthLogin =
-        provider === "github";
-
-
-    /*
-       Save the OAuth account only when
-       an email address is available.
-    */
-
-    if (
-        currentAccountEmail
-    ) {
-
-        rememberAccount(
-            currentAccountEmail,
-            ""
-        );
-    }
-
-
-    await createOrUpdateProfile(
-        currentUser,
-        ""
-    );
-
-
-    addLoginHistory(
-        currentAccountEmail ||
-        provider.toUpperCase() +
-        " ACCOUNT"
-    );
-
-
-    if (loginEmail) {
-
-        loginEmail.value =
-            currentAccountEmail;
-    }
-
-
-    if (loginPhone) {
-
-        loginPhone.value =
-            "";
-    }
-
-
-    if (loginPassword) {
-
-        loginPassword.value =
-            "";
-    }
-
-
-    if (provider === "google") {
-
-        message.textContent =
-            "✔️ GOOGLE LOGIN SUCCESSFUL❗";
-
-    } else if (
-        provider === "github"
-    ) {
-
-        message.textContent =
-            "✔️ GITHUB LOGIN SUCCESSFUL❗";
-    }
-
-
-    await showDashboard();
-}
-
-
-/* =====================================================
-   HANDLE GOOGLE USER
-   ===================================================== */
-
-async function handleGoogleUser(
-    user
-) {
-
-    await handleOAuthUser(
-        user,
-        "google"
-    );
-}
-
-
-/* =====================================================
-   HANDLE GITHUB USER
-   ===================================================== */
-
-async function handleGithubUser(
-    user
-) {
-
-    await handleOAuthUser(
-        user,
-        "github"
-    );
 }
 
 
@@ -3023,10 +3060,6 @@ if (saveChangedPasswordBtn) {
             }
 
 
-            /* =========================================
-               GOOGLE ACCOUNT
-               ========================================= */
-
             if (
                 isGoogleUser(
                     currentUser
@@ -3039,10 +3072,6 @@ if (saveChangedPasswordBtn) {
                 return;
             }
 
-
-            /* =========================================
-               GITHUB ACCOUNT
-               ========================================= */
 
             if (
                 isGithubUser(
@@ -3703,6 +3732,148 @@ if (removeAccountBtn) {
 
 
 /* =====================================================
+   OAUTH CALLBACK SESSION HANDLER
+   ===================================================== */
+
+async function handleOAuthCallbackSession() {
+
+    if (!supabaseClient) {
+        return false;
+    }
+
+    if (
+        !isOAuthCallback()
+    ) {
+        return false;
+    }
+
+    /*
+       Give Supabase Auth a short moment to
+       exchange the OAuth callback for a session.
+    */
+
+    var waitCount = 0;
+
+    var session = null;
+
+    while (
+        waitCount < 20
+    ) {
+
+        var result =
+            await supabaseClient.auth
+                .getSession();
+
+        if (
+            result.data &&
+            result.data.session
+        ) {
+
+            session =
+                result.data.session;
+
+            break;
+        }
+
+        await new Promise(
+            function (resolve) {
+
+                setTimeout(
+                    resolve,
+                    250
+                );
+
+            }
+        );
+
+        waitCount++;
+    }
+
+
+    if (
+        !session ||
+        !session.user
+    ) {
+
+        return false;
+    }
+
+
+    var provider =
+        getOAuthProvider(
+            session.user
+        );
+
+
+    if (
+        provider !== "google" &&
+        provider !== "github"
+    ) {
+
+        return false;
+    }
+
+
+    /*
+       This is the OAuth session created by
+       the current callback. Handle it first.
+    */
+
+    if (
+        provider === "google"
+    ) {
+
+        googleOAuthLogin =
+            true;
+
+        githubOAuthLogin =
+            false;
+
+        await handleGoogleUser(
+            session.user
+        );
+
+    } else {
+
+        githubOAuthLogin =
+            true;
+
+        googleOAuthLogin =
+            false;
+
+        await handleGithubUser(
+            session.user
+        );
+    }
+
+
+    /*
+       Remove OAuth parameters from the
+       browser address bar after processing.
+    */
+
+    try {
+
+        window.history.replaceState(
+            {},
+            document.title,
+            OAUTH_REDIRECT_URL
+        );
+
+    } catch (error) {
+
+        console.log(
+            "OAuth URL cleanup skipped:",
+            error
+        );
+    }
+
+
+    return true;
+}
+
+
+/* =====================================================
    SUPABASE SESSION
    ===================================================== */
 
@@ -3718,6 +3889,33 @@ async function checkExistingSession() {
         return;
     }
 
+
+    /*
+       IMPORTANT:
+       OAuth callback must be processed BEFORE
+       normal existing-session logic.
+    */
+
+    if (
+        isOAuthCallback()
+    ) {
+
+        var callbackHandled =
+            await handleOAuthCallbackSession();
+
+        if (
+            callbackHandled
+        ) {
+
+            return;
+        }
+    }
+
+
+    /*
+       No OAuth callback:
+       check the existing Supabase session.
+    */
 
     var sessionResult =
         await supabaseClient.auth
@@ -3750,7 +3948,7 @@ async function checkExistingSession() {
 
 
     /* =================================================
-       OAUTH SESSION
+       OAUTH EXISTING SESSION
        ================================================= */
 
     if (
@@ -3774,6 +3972,9 @@ async function checkExistingSession() {
             googleOAuthLogin =
                 true;
 
+            githubOAuthLogin =
+                false;
+
             await handleGoogleUser(
                 session.user
             );
@@ -3790,6 +3991,9 @@ async function checkExistingSession() {
             githubOAuthLogin =
                 true;
 
+            googleOAuthLogin =
+                false;
+
             await handleGithubUser(
                 session.user
             );
@@ -3800,10 +4004,7 @@ async function checkExistingSession() {
 
 
     /* =================================================
-       NORMAL EMAIL/PASSWORD SESSION
-
-       Auto-login remains disabled for
-       normal accounts.
+       NORMAL SESSION
        ================================================= */
 
     if (session) {
@@ -3881,6 +4082,13 @@ if (supabaseClient) {
                 session
             ) {
 
+                /*
+                   During OAuth callback the main
+                   callback handler controls routing.
+                   This listener only keeps the
+                   current user synchronized.
+                */
+
                 if (
                     session &&
                     session.user
@@ -3894,6 +4102,7 @@ if (supabaseClient) {
                     currentUser =
                         null;
                 }
+
             }
         );
 }
