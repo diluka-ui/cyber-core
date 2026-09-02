@@ -58,6 +58,21 @@ var STORAGE_REFERENCE_GB =
 
 
 /* =====================================================
+   OAUTH CONFIG
+   ===================================================== */
+
+/*
+   IMPORTANT:
+   This is the real GitHub Pages URL of Cyber Core.
+   Do not use window.location.origin here because
+   GitHub Pages project sites use /cyber-core/.
+*/
+
+var OAUTH_REDIRECT_URL =
+    "https://diluka-ui.github.io/cyber-core/";
+
+
+/* =====================================================
    VARIABLES
    ===================================================== */
 
@@ -1956,7 +1971,7 @@ if (loginBtn) {
             message.textContent =
                 "✔️ LOGIN SUCCESSFUL❗";
 
-            showDashboard();
+            await showDashboard();
         };
 }
 
@@ -2062,27 +2077,17 @@ function isOAuthUser(
 
 function getOAuthOptions() {
 
-    var options = {
+    return {
 
         queryParams: {
             prompt:
                 "select_account"
-        }
+        },
+
+        redirectTo:
+            OAUTH_REDIRECT_URL
 
     };
-
-    if (
-        window.location.protocol ===
-            "http:" ||
-        window.location.protocol ===
-            "https:"
-    ) {
-
-        options.redirectTo =
-            window.location.origin;
-    }
-
-    return options;
 }
 
 
@@ -2107,6 +2112,7 @@ if (googleLoginBtn) {
                 true;
 
             if (githubLoginBtn) {
+
                 githubLoginBtn.disabled =
                     true;
             }
@@ -2133,6 +2139,7 @@ if (googleLoginBtn) {
                         false;
 
                     if (githubLoginBtn) {
+
                         githubLoginBtn.disabled =
                             false;
                     }
@@ -2150,6 +2157,7 @@ if (googleLoginBtn) {
                     false;
 
                 if (githubLoginBtn) {
+
                     githubLoginBtn.disabled =
                         false;
                 }
@@ -2187,6 +2195,7 @@ if (githubLoginBtn) {
                 true;
 
             if (googleLoginBtn) {
+
                 googleLoginBtn.disabled =
                     true;
             }
@@ -2213,6 +2222,7 @@ if (githubLoginBtn) {
                         false;
 
                     if (googleLoginBtn) {
+
                         googleLoginBtn.disabled =
                             false;
                     }
@@ -2230,6 +2240,7 @@ if (githubLoginBtn) {
                     false;
 
                 if (googleLoginBtn) {
+
                     googleLoginBtn.disabled =
                         false;
                 }
@@ -3790,7 +3801,6 @@ async function checkExistingSession() {
 
     /* =================================================
        NORMAL EMAIL/PASSWORD SESSION
-       =================================================
 
        Auto-login remains disabled for
        normal accounts.
