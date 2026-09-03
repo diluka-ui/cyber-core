@@ -4,6 +4,7 @@
 /* =====================================================
 CYBER CORE - SUPABASE VERSION
 GOOGLE + GITHUB OAUTH
+BACKBLAZE B2 VIDEO STORAGE
 ===================================================== */
 
 /* =====================================================
@@ -66,6 +67,22 @@ var CLOUDINARY_UPLOAD_PRESET =
 "cyber_core_upload";
 
 /* =====================================================
+BACKBLAZE B2 CONFIG
+===================================================== */
+
+var B2_FUNCTION_UPLOAD =
+"b2-video-upload";
+
+var B2_FUNCTION_DELETE =
+"b2-video-delete";
+
+var B2_ENDPOINT =
+"s3.us-east-005.backblazeb2.com";
+
+var B2_BUCKET_NAME =
+"cyber-core-videos";
+
+/* =====================================================
 OAUTH CONFIG
 ===================================================== */
 
@@ -99,10 +116,6 @@ var currentAccountPhone = "";
 var googleOAuthLogin = false;
 
 var githubOAuthLogin = false;
-
-/*
-Prevent duplicate OAuth handling.
-*/
 
 var oauthHandling =
 false;
@@ -3555,6 +3568,83 @@ function formatFileSize(
 }
 
 /* =====================================================
+BACKBLAZE B2 URL HELPERS
+===================================================== */
+
+function isBackblazeB2FilePath(
+    filePath
+) {
+
+    var value =
+        String(filePath || "");
+
+    var prefix =
+        "https://" +
+        B2_ENDPOINT +
+        "/" +
+        B2_BUCKET_NAME +
+        "/";
+
+    return (
+        value.indexOf(prefix) ===
+        0
+    );
+}
+
+function isCloudinaryFilePath(
+    filePath
+) {
+
+    var value =
+        String(filePath || "");
+
+    return (
+        value.indexOf(
+            "https://res.cloudinary.com/" +
+            CLOUDINARY_CLOUD_NAME +
+            "/"
+        ) === 0
+    );
+}
+
+function getB2ObjectKeyFromUrl(
+    fileUrl
+) {
+
+    if (
+        !isBackblazeB2FilePath(
+            fileUrl
+        )
+    ) {
+
+        return "";
+    }
+
+    var prefix =
+        "https://" +
+        B2_ENDPOINT +
+        "/" +
+        B2_BUCKET_NAME +
+        "/";
+
+    var objectKey =
+        String(fileUrl).slice(
+            prefix.length
+        );
+
+    try {
+
+        return decodeURIComponent(
+            objectKey
+        );
+
+    } catch (error) {
+
+        return objectKey;
+    }
+}
+
+/* =====================================================
 ADD PAGE - LOAD SAVED SECURITY ITEMS
 ===================================================== */
 
@@ -3634,10 +3724,6 @@ async function loadSecurityItems() {
 }
 
 /* =====================================================
-ADD PAGE - VIEW FILE
-===================================================== */
-
-/* =====================================================
 ADD PAGE - IMAGE FILE CHECK
 ===================================================== */
 
@@ -3698,10 +3784,15 @@ async function viewSecurityItem(
             item.file_path
         );
 
+    var isB2File =
+        isBackblazeB2FilePath(
+            item.file_path
+        );
+
     var isCloudinaryFile =
-        item.file_path.indexOf(
-            "http"
-        ) === 0;
+        isCloudinaryFilePath(
+            item.file_path
+        );
 
     var viewWindow =
         null;
@@ -3744,7 +3835,10 @@ async function viewSecurityItem(
     var signedUrl =
         "";
 
-    if (isCloudinaryFile) {
+    if (
+        isB2File ||
+        isCloudinaryFile
+    ) {
 
         signedUrl =
             item.file_path;
@@ -4131,71 +4225,167 @@ if (saveFileBtn) {
             saveFileBtn.disabled =
                 true;
 
-            setAddFileMessage(
-                "Uploading file to Cloudinary...",
-                true
-            );
-
             try {
 
-                var cloudinaryFormData =
-                    new FormData();
+                var filePath =
+                    "";
 
-                cloudinaryFormData.append(
-                    "file",
-                    file
-                );
-
-                cloudinaryFormData.append(
-                    "upload_preset",
-                    CLOUDINARY_UPLOAD_PRESET
-                );
-
-                cloudinaryFormData.append(
-                    "folder",
-                    "cyber-core"
-                );
-
-                var cloudinaryResponse =
-                    await fetch(
-                        "https://api.cloudinary.com/v1_1/" +
-                        CLOUDINARY_CLOUD_NAME +
-                        "/auto/upload",
-                        {
-                            method:
-                                "POST",
-                            body:
-                                cloudinaryFormData
-                        }
-                    );
-
-                var cloudinaryData =
-                    await cloudinaryResponse.json();
+                /* =====================================
+                   VIDEO → BACKBLAZE B2
+                   ===================================== */
 
                 if (
-                    !cloudinaryResponse.ok ||
-                    !cloudinaryData.secure_url
+                    file.type &&
+                    file.type.startsWith(
+                        "video/"
+                    )
                 ) {
 
-                    saveFileBtn.disabled =
-                        false;
-
                     setAddFileMessage(
-                        "❌ Cloudinary upload failed: " +
-                        (
-                            cloudinaryData.error &&
-                            cloudinaryData.error.message
-                                ? cloudinaryData.error.message
-                                : "Unknown error"
-                        ),
-                        false
+                        "Uploading video to Backblaze B2...",
+                        true
                     );
 
-                    return;
+                    var b2FormData =
+                        new FormData();
+
+                    b2FormData.append(
+                        "file",
+                        file
+                    );
+
+                    b2FormData.append(
+                        "userId",
+                        currentUser.id
+                    );
+
+                    var b2Result =
+                        await supabaseClient
+                            .functions
+                            .invoke(
+                                B2_FUNCTION_UPLOAD,
+                                {
+                                    body:
+                                        b2FormData
+                                }
+                            );
+
+                    if (
+                        b2Result.error
+                    ) {
+
+                        saveFileBtn.disabled =
+                            false;
+
+                        setAddFileMessage(
+                            "❌ B2 upload failed: " +
+                            b2Result.error.message,
+                            false
+                        );
+
+                        return;
+                    }
+
+                    var b2Data =
+                        b2Result.data || {};
+
+                    if (
+                        !b2Data.success ||
+                        !b2Data.url
+                    ) {
+
+                        saveFileBtn.disabled =
+                            false;
+
+                        setAddFileMessage(
+                            "❌ B2 video upload failed: " +
+                            (
+                                b2Data.error ||
+                                "Unknown error"
+                            ),
+                            false
+                        );
+
+                        return;
+                    }
+
+                    filePath =
+                        b2Data.url;
+
+                } else {
+
+                    /* =================================
+                       OTHER FILES → CLOUDINARY
+                       ================================= */
+
+                    setAddFileMessage(
+                        "Uploading file to Cloudinary...",
+                        true
+                    );
+
+                    var cloudinaryFormData =
+                        new FormData();
+
+                    cloudinaryFormData.append(
+                        "file",
+                        file
+                    );
+
+                    cloudinaryFormData.append(
+                        "upload_preset",
+                        CLOUDINARY_UPLOAD_PRESET
+                    );
+
+                    cloudinaryFormData.append(
+                        "folder",
+                        "cyber-core"
+                    );
+
+                    var cloudinaryResponse =
+                        await fetch(
+                            "https://api.cloudinary.com/v1_1/" +
+                            CLOUDINARY_CLOUD_NAME +
+                            "/auto/upload",
+                            {
+                                method:
+                                    "POST",
+                                body:
+                                    cloudinaryFormData
+                            }
+                        );
+
+                    var cloudinaryData =
+                        await cloudinaryResponse.json();
+
+                    if (
+                        !cloudinaryResponse.ok ||
+                        !cloudinaryData.secure_url
+                    ) {
+
+                        saveFileBtn.disabled =
+                            false;
+
+                        setAddFileMessage(
+                            "❌ Cloudinary upload failed: " +
+                            (
+                                cloudinaryData.error &&
+                                cloudinaryData.error.message
+                                    ? cloudinaryData.error.message
+                                    : "Unknown error"
+                            ),
+                            false
+                        );
+
+                        return;
+                    }
+
+                    filePath =
+                        cloudinaryData.secure_url;
                 }
 
-                var filePath =
-                    cloudinaryData.secure_url;
+                /* =====================================
+                   SAVE DATABASE INFORMATION
+                   ===================================== */
 
                 setAddFileMessage(
                     "Saving file information...",
@@ -4235,6 +4425,7 @@ if (saveFileBtn) {
                 }
 
                 if (addFileInput) {
+
                     addFileInput.value =
                         "";
                 }
@@ -4246,11 +4437,13 @@ if (saveFileBtn) {
                 }
 
                 if (addTitle) {
+
                     addTitle.value =
                         "";
                 }
 
                 if (addCategory) {
+
                     addCategory.value =
                         "";
                 }
@@ -4450,19 +4643,96 @@ async function deleteSecurityItem(
         return;
     }
 
-    var deleteButton =
-        null;
-
-    /*
-    Storage file deletion.
-    */
+    /* ================================================
+       BACKBLAZE B2 VIDEO
+       ================================================ */
 
     if (
         item.file_path &&
-        item.file_path.indexOf(
-            "http"
-        ) === 0
+        isBackblazeB2FilePath(
+            item.file_path
+        )
     ) {
+
+        var objectKey =
+            getB2ObjectKeyFromUrl(
+                item.file_path
+            );
+
+        if (!objectKey) {
+
+            alert(
+                "❌ B2 object key could not be detected."
+            );
+
+            return;
+        }
+
+        var b2DeleteResult =
+            await supabaseClient
+                .functions
+                .invoke(
+                    B2_FUNCTION_DELETE,
+                    {
+                        body: {
+                            objectKey:
+                                objectKey,
+                            userId:
+                                currentUser.id
+                        }
+                    }
+                );
+
+        if (
+            b2DeleteResult.error
+        ) {
+
+            console.log(
+                "B2 delete error:",
+                b2DeleteResult.error.message
+            );
+
+            var continueB2Delete =
+                window.confirm(
+                    "The B2 video could not be removed.\n\n" +
+                    "Do you still want to remove its saved information?"
+                );
+
+            if (!continueB2Delete) {
+                return;
+            }
+        } else {
+
+            var b2DeleteData =
+                b2DeleteResult.data || {};
+
+            if (
+                b2DeleteData.success ===
+                false
+            ) {
+
+                var continueB2Delete2 =
+                    window.confirm(
+                        "The B2 video could not be removed.\n\n" +
+                        "Do you still want to remove its saved information?"
+                    );
+
+                if (!continueB2Delete2) {
+                    return;
+                }
+            }
+        }
+
+    } else if (
+        item.file_path &&
+        isCloudinaryFilePath(
+            item.file_path
+        )
+    ) {
+
+        /* ============================================
+           CLOUDINARY FILE
+           ============================================ */
 
         var cloudinaryDeleteResult =
             await supabaseClient
@@ -4486,13 +4756,13 @@ async function deleteSecurityItem(
                 cloudinaryDeleteResult.error.message
             );
 
-            var continueDelete =
+            var continueCloudinaryDelete =
                 window.confirm(
                     "The cloud file could not be removed.\n\n" +
                     "Do you still want to remove its saved information?"
                 );
 
-            if (!continueDelete) {
+            if (!continueCloudinaryDelete) {
                 return;
             }
         }
@@ -4500,6 +4770,10 @@ async function deleteSecurityItem(
     } else if (
         item.file_path
     ) {
+
+        /* ============================================
+           SUPABASE STORAGE FILE
+           ============================================ */
 
         var storageResult =
             await supabaseClient
@@ -4520,21 +4794,21 @@ async function deleteSecurityItem(
                 storageResult.error.message
             );
 
-            var continueDelete =
+            var continueStorageDelete =
                 window.confirm(
                     "The cloud file could not be removed.\n\n" +
                     "Do you still want to remove its saved information?"
                 );
 
-            if (!continueDelete) {
+            if (!continueStorageDelete) {
                 return;
             }
         }
     }
 
-    /*
-    Database metadata deletion.
-    */
+    /* ================================================
+       DATABASE METADATA DELETE
+       ================================================ */
 
     var databaseResult =
         await supabaseClient
@@ -4925,11 +5199,6 @@ async function handleOAuthCallbackSession() {
         return false;
     }
 
-    /*
-       Give Supabase Auth a short moment to
-       exchange the OAuth callback for a session.
-    */
-
     var waitCount = 0;
 
     var session = null;
@@ -4988,11 +5257,6 @@ async function handleOAuthCallbackSession() {
         return false;
     }
 
-    /*
-       This is the OAuth session created by
-       the current callback. Handle it first.
-    */
-
     if (
         provider === "google"
     ) {
@@ -5019,11 +5283,6 @@ async function handleOAuthCallbackSession() {
             session.user
         );
     }
-
-    /*
-       Remove OAuth parameters from the
-       browser address bar after processing.
-    */
 
     try {
 
@@ -5060,12 +5319,6 @@ async function checkExistingSession() {
         return;
     }
 
-    /*
-       IMPORTANT:
-       OAuth callback must be processed BEFORE
-       normal existing-session logic.
-    */
-
     if (
         isOAuthCallback()
     ) {
@@ -5080,11 +5333,6 @@ async function checkExistingSession() {
             return;
         }
     }
-
-    /*
-       No OAuth callback:
-       check the existing Supabase session.
-    */
 
     var sessionResult =
         await supabaseClient.auth
@@ -5243,13 +5491,6 @@ if (supabaseClient) {
                 session
             ) {
 
-                /*
-                   During OAuth callback the main
-                   callback handler controls routing.
-                   This listener only keeps the
-                   current user synchronized.
-                */
-
                 if (
                     session &&
                     session.user
@@ -5261,8 +5502,6 @@ if (supabaseClient) {
                 } else {
 
                     currentUser =
-
-                      currentUser =
                         null;
                 }
 
