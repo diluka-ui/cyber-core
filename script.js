@@ -56,6 +56,16 @@ var STORAGE_REFERENCE_GB =
 36;
 
 /* =====================================================
+CLOUDINARY CONFIG
+===================================================== */
+
+var CLOUDINARY_CLOUD_NAME =
+"am04nwhi";
+
+var CLOUDINARY_UPLOAD_PRESET =
+"cyber_core_upload";
+
+/* =====================================================
 OAUTH CONFIG
 ===================================================== */
 
@@ -3688,6 +3698,11 @@ async function viewSecurityItem(
             item.file_path
         );
 
+    var isCloudinaryFile =
+        item.file_path.indexOf(
+            "http"
+        ) === 0;
+
     var viewWindow =
         null;
 
@@ -3726,16 +3741,54 @@ async function viewSecurityItem(
             "OPENING...";
     }
 
-    var result =
-        await supabaseClient
-            .storage
-            .from(
-                STORAGE_BUCKET
-            )
-            .createSignedUrl(
-                item.file_path,
-                3600
+    var signedUrl =
+        "";
+
+    if (isCloudinaryFile) {
+
+        signedUrl =
+            item.file_path;
+
+    } else {
+
+        var result =
+            await supabaseClient
+                .storage
+                .from(
+                    STORAGE_BUCKET
+                )
+                .createSignedUrl(
+                    item.file_path,
+                    3600
+                );
+
+        if (result.error) {
+
+            if (button) {
+
+                button.disabled =
+                    false;
+
+                button.textContent =
+                    originalText;
+            }
+
+            if (viewWindow) {
+
+                viewWindow.close();
+            }
+
+            alert(
+                "❌ File could not be opened: " +
+                result.error.message
             );
+
+            return;
+        }
+
+        signedUrl =
+            result.data.signedUrl;
+    }
 
     if (button) {
 
@@ -3745,24 +3798,6 @@ async function viewSecurityItem(
         button.textContent =
             originalText;
     }
-
-    if (result.error) {
-
-        if (viewWindow) {
-
-            viewWindow.close();
-        }
-
-        alert(
-            "❌ File could not be opened: " +
-            result.error.message
-        );
-
-        return;
-    }
-
-    var signedUrl =
-        result.data.signedUrl;
 
     if (isImage) {
 
@@ -4097,63 +4132,65 @@ if (saveFileBtn) {
                 true;
 
             setAddFileMessage(
-                "Uploading file...",
+                "Uploading file to Cloudinary...",
                 true
             );
 
-            var safeOriginalName =
-                createSafeFileName(
-                    file.name
-                );
-
-            var uniqueName =
-                Date.now().toString() +
-                "_" +
-                Math.random()
-                    .toString(36)
-                    .slice(2) +
-                "_" +
-                safeOriginalName;
-
-            var filePath =
-                currentUser.id +
-                "/" +
-                uniqueName;
-
             try {
 
-                var uploadResult =
-                    await supabaseClient
-                        .storage
-                        .from(
-                            STORAGE_BUCKET
-                        )
-                        .upload(
-                            filePath,
-                            file,
-                            {
-                                upsert: false,
-                                contentType:
-                                    file.type ||
-                                    "application/octet-stream"
-                            }
-                        );
+                var cloudinaryFormData =
+                    new FormData();
+
+                cloudinaryFormData.append(
+                    "file",
+                    file
+                );
+
+                cloudinaryFormData.append(
+                    "upload_preset",
+                    CLOUDINARY_UPLOAD_PRESET
+                );
+
+                var cloudinaryResponse =
+                    await fetch(
+                        "https://api.cloudinary.com/v1_1/" +
+                        CLOUDINARY_CLOUD_NAME +
+                        "/auto/upload",
+                        {
+                            method:
+                                "POST",
+                            body:
+                                cloudinaryFormData
+                        }
+                    );
+
+                var cloudinaryData =
+                    await cloudinaryResponse.json();
 
                 if (
-                    uploadResult.error
+                    !cloudinaryResponse.ok ||
+                    !cloudinaryData.secure_url
                 ) {
 
                     saveFileBtn.disabled =
                         false;
 
                     setAddFileMessage(
-                        "❌ Upload failed: " +
-                        uploadResult.error.message,
+                        "❌ Cloudinary upload failed: " +
+                        (
+                            cloudinaryData.error &&
+                            cloudinaryData.error.message
+                                ? cloudinaryData.error.message
+                                : "Unknown error"
+                        ),
                         false
                     );
 
                     return;
                 }
+
+                var filePath =
+                    cloudinaryData.secure_url;
 
                 setAddFileMessage(
                     "Saving file information...",
@@ -4179,21 +4216,6 @@ if (saveFileBtn) {
                 if (
                     insertResult.error
                 ) {
-
-                    /*
-                    If database save fails,
-                    remove the uploaded file
-                    so there is no orphan file.
-                    */
-
-                    await supabaseClient
-                        .storage
-                        .from(
-                            STORAGE_BUCKET
-                        )
-                        .remove([
-                            filePath
-                        ]);
 
                     saveFileBtn.disabled =
                         false;
@@ -4430,7 +4452,49 @@ async function deleteSecurityItem(
     Storage file deletion.
     */
 
-    if (item.file_path) {
+    if (
+        item.file_path &&
+        item.file_path.indexOf(
+            "http"
+        ) === 0
+    ) {
+
+        var cloudinaryDeleteResult =
+            await supabaseClient
+                .functions
+                .invoke(
+                    "cloudinary-delete",
+                    {
+                        body: {
+                            fileUrl:
+                                item.file_path
+                        }
+                    }
+                );
+
+        if (
+            cloudinaryDeleteResult.error
+        ) {
+
+            console.log(
+                "Cloudinary delete error:",
+                cloudinaryDeleteResult.error.message
+            );
+
+            var continueDelete =
+                window.confirm(
+                    "The cloud file could not be removed.\n\n" +
+                    "Do you still want to remove its saved information?"
+                );
+
+            if (!continueDelete) {
+                return;
+            }
+        }
+
+    } else if (
+        item.file_path
+    ) {
 
         var storageResult =
             await supabaseClient
@@ -5200,7 +5264,7 @@ if (supabaseClient) {
 
 }
 
-/* =====================================================
+/* ====================================================
 START
 ===================================================== */
 
