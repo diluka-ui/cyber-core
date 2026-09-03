@@ -2,27 +2,26 @@
 "use strict";
 
 /* =====================================================
-   CYBER CORE - SUPABASE VERSION
-   GOOGLE + GITHUB OAUTH
-   ===================================================== */
-
+CYBER CORE - SUPABASE VERSION
+GOOGLE + GITHUB OAUTH
+===================================================== */
 
 /* =====================================================
-   SUPABASE CONFIG
-   ===================================================== */
+SUPABASE CONFIG
+===================================================== */
 
 var SUPABASE_URL =
-    "https://zlysjkpstaushfjgnvxi.supabase.co";
+"https://zlysjkpstaushfjgnvxi.supabase.co";
 
 var SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_45K-dyeWhUXpjOioTgPw_A_7R-t1gKu";
+"sb_publishable_45K-dyeWhUXpjOioTgPw_A_7R-t1gKu";
 
 var supabaseClient = null;
 
 if (
     window.supabase &&
     typeof window.supabase.createClient ===
-        "function"
+    "function"
 ) {
 
     supabaseClient =
@@ -37,37 +36,35 @@ if (
                 }
             }
         );
+
 }
 
-
 /* =====================================================
-   CONFIG
-   ===================================================== */
+CONFIG
+===================================================== */
 
 var HELP_WHATSAPP_NUMBER =
-    "94715874334";
+"94715874334";
 
 var STORAGE_BUCKET =
-    "cyber-files";
+"cyber-files";
 
 var MAX_ACCOUNTS =
-    5;
+5;
 
 var STORAGE_REFERENCE_GB =
-    36;
-
+36;
 
 /* =====================================================
-   OAUTH CONFIG
-   ===================================================== */
+OAUTH CONFIG
+===================================================== */
 
 var OAUTH_REDIRECT_URL =
-    "https://diluka-ui.github.io/cyber-core/";
-
+"https://diluka-ui.github.io/cyber-core/";
 
 /* =====================================================
-   VARIABLES
-   ===================================================== */
+VARIABLES
+===================================================== */
 
 var generatedOTP = "";
 
@@ -93,277 +90,311 @@ var googleOAuthLogin = false;
 
 var githubOAuthLogin = false;
 
-
 /*
-   Prevent duplicate OAuth handling.
+Prevent duplicate OAuth handling.
 */
 
 var oauthHandling =
-    false;
+false;
 
 var oauthCallbackHandled =
-    false;
-
+false;
 
 /* =====================================================
-   ELEMENTS
-   ===================================================== */
+ELEMENTS
+===================================================== */
 
 var container =
-    document.querySelector(".container");
+document.querySelector(".container");
 
 var registerBox =
-    document.getElementById("registerBox");
+document.getElementById("registerBox");
 
 var email =
-    document.getElementById("email");
+document.getElementById("email");
 
 var phone =
-    document.getElementById("phone");
+document.getElementById("phone");
 
 var sendBtn =
-    document.getElementById("sendBtn");
+document.getElementById("sendBtn");
 
 var otpBox =
-    document.getElementById("otpBox");
+document.getElementById("otpBox");
 
 var verifyBtn =
-    document.getElementById("verifyBtn");
+document.getElementById("verifyBtn");
 
 var timer =
-    document.getElementById("timer");
+document.getElementById("timer");
 
 var passwordBox =
-    document.getElementById("passwordBox");
+document.getElementById("passwordBox");
 
 var newPassword =
-    document.getElementById("newPassword");
+document.getElementById("newPassword");
 
 var confirmPassword =
-    document.getElementById("confirmPassword");
+document.getElementById("confirmPassword");
 
 var saveBtn =
-    document.getElementById("savePasswordBtn");
+document.getElementById("savePasswordBtn");
 
 var loginBox =
-    document.getElementById("loginBox");
+document.getElementById("loginBox");
 
 var loginEmail =
-    document.getElementById("loginEmail");
+document.getElementById("loginEmail");
 
 var loginPhone =
-    document.getElementById("loginPhone");
+document.getElementById("loginPhone");
 
 var loginPassword =
-    document.getElementById("loginPassword");
+document.getElementById("loginPassword");
 
 var loginBtn =
-    document.getElementById("loginBtn");
+document.getElementById("loginBtn");
 
 var googleLoginBtn =
-    document.getElementById("googleLoginBtn");
+document.getElementById("googleLoginBtn");
 
 var githubLoginBtn =
-    document.getElementById("githubLoginBtn");
+document.getElementById("githubLoginBtn");
 
 var createAccountBtn =
-    document.getElementById("createAccountBtn");
+document.getElementById("createAccountBtn");
 
 var message =
-    document.getElementById("message");
+document.getElementById("message");
 
 var dashboard =
-    document.getElementById("dashboard");
-
+document.getElementById("dashboard");
 
 /* =====================================================
-   HOME
-   ===================================================== */
+HOME
+===================================================== */
 
 var loginHistoryBtn =
-    document.getElementById(
-        "loginHistoryBtn"
-    );
+document.getElementById(
+    "loginHistoryBtn"
+);
 
 var loginHistoryBox =
-    document.getElementById(
-        "loginHistoryBox"
-    );
+document.getElementById(
+    "loginHistoryBox"
+);
 
 var loginHistoryContent =
-    document.getElementById(
-        "loginHistoryContent"
-    );
+document.getElementById(
+    "loginHistoryContent"
+);
 
 var clearHistoryBtn =
-    document.getElementById(
-        "clearHistoryBtn"
-    );
+document.getElementById(
+    "clearHistoryBtn"
+);
 
 var changePasswordBtn =
-    document.getElementById(
-        "changePasswordBtn"
-    );
+document.getElementById(
+    "changePasswordBtn"
+);
 
 var changePasswordBox =
-    document.getElementById(
-        "changePasswordBox"
-    );
+document.getElementById(
+    "changePasswordBox"
+);
 
 var oldPassword =
-    document.getElementById(
-        "oldPassword"
-    );
+document.getElementById(
+    "oldPassword"
+);
 
 var changeNewPassword =
-    document.getElementById(
-        "changeNewPassword"
-    );
+document.getElementById(
+    "changeNewPassword"
+);
 
 var changeConfirmPassword =
-    document.getElementById(
-        "changeConfirmPassword"
-    );
+document.getElementById(
+    "changeConfirmPassword"
+);
 
 var saveChangedPasswordBtn =
-    document.getElementById(
-        "saveChangedPasswordBtn"
-    );
+document.getElementById(
+    "saveChangedPasswordBtn"
+);
 
 var changePasswordMessage =
-    document.getElementById(
-        "changePasswordMessage"
-    );
+document.getElementById(
+    "changePasswordMessage"
+);
 
 var storageBtn =
-    document.getElementById(
-        "storageBtn"
-    );
+document.getElementById(
+    "storageBtn"
+);
 
 var storageBox =
-    document.getElementById(
-        "storageBox"
-    );
+document.getElementById(
+    "storageBox"
+);
 
 var storageUsed =
-    document.getElementById(
-        "storageUsed"
-    );
+document.getElementById(
+    "storageUsed"
+);
 
 var storageProgress =
-    document.getElementById(
-        "storageProgress"
-    );
+document.getElementById(
+    "storageProgress"
+);
 
 var storageDetails =
-    document.getElementById(
-        "storageDetails"
-    );
-
+document.getElementById(
+    "storageDetails"
+);
 
 /* =====================================================
-   PROFILE
-   ===================================================== */
+ADD PAGE
+FILE + TITLE + CATEGORY
+===================================================== */
+
+var addFileInput =
+document.getElementById(
+    "addFileInput"
+);
+
+var addFileName =
+document.getElementById(
+    "addFileName"
+);
+
+var addTitle =
+document.getElementById(
+    "addTitle"
+);
+
+var addCategory =
+document.getElementById(
+    "addCategory"
+);
+
+var saveFileBtn =
+document.getElementById(
+    "saveFileBtn"
+);
+
+var addFileMessage =
+document.getElementById(
+    "addFileMessage"
+);
+
+var securityItemsList =
+document.getElementById(
+    "securityItemsList"
+);
+
+/* =====================================================
+PROFILE
+===================================================== */
 
 var profilePicture =
-    document.getElementById(
-        "profilePicture"
-    );
+document.getElementById(
+    "profilePicture"
+);
 
 var profilePicturePlaceholder =
-    document.getElementById(
-        "profilePicturePlaceholder"
-    );
+document.getElementById(
+    "profilePicturePlaceholder"
+);
 
 var profilePictureInput =
-    document.getElementById(
-        "profilePictureInput"
-    );
+document.getElementById(
+    "profilePictureInput"
+);
 
 var profileUsername =
-    document.getElementById(
-        "profileUsername"
-    );
+document.getElementById(
+    "profileUsername"
+);
 
 var profileEmail =
-    document.getElementById(
-        "profileEmail"
-    );
+document.getElementById(
+    "profileEmail"
+);
 
 var profilePhone =
-    document.getElementById(
-        "profilePhone"
-    );
+document.getElementById(
+    "profilePhone"
+);
 
 var profileBirthday =
-    document.getElementById(
-        "profileBirthday"
-    );
+document.getElementById(
+    "profileBirthday"
+);
 
 var editUsername =
-    document.getElementById(
-        "editUsername"
-    );
+document.getElementById(
+    "editUsername"
+);
 
 var editBirthday =
-    document.getElementById(
-        "editBirthday"
-    );
+document.getElementById(
+    "editBirthday"
+);
 
 var saveProfileBtn =
-    document.getElementById(
-        "saveProfileBtn"
-    );
+document.getElementById(
+    "saveProfileBtn"
+);
 
 var profileMessage =
-    document.getElementById(
-        "profileMessage"
-    );
+document.getElementById(
+    "profileMessage"
+);
 
 var accountChangeBtn =
-    document.getElementById(
-        "accountChangeBtn"
-    );
+document.getElementById(
+    "accountChangeBtn"
+);
 
 var accountChangeBox =
-    document.getElementById(
-        "accountChangeBox"
-    );
+document.getElementById(
+    "accountChangeBox"
+);
 
 var accountList =
-    document.getElementById(
-        "accountList"
-    );
+document.getElementById(
+    "accountList"
+);
 
 var addAccountBtn =
-    document.getElementById(
-        "addAccountBtn"
-    );
+document.getElementById(
+    "addAccountBtn"
+);
 
 var helpCenterBtn =
-    document.getElementById(
-        "helpCenterBtn"
-    );
+document.getElementById(
+    "helpCenterBtn"
+);
 
 var removeAccountBtn =
-    document.getElementById(
-        "removeAccountBtn"
-    );
-
+document.getElementById(
+    "removeAccountBtn"
+);
 
 /* =====================================================
-   OTP INPUTS
-   ===================================================== */
+OTP INPUTS
+===================================================== */
 
 var otpInputs =
-    document.querySelectorAll(
-        ".otp-digit"
-    );
-
+document.querySelectorAll(
+    ".otp-digit"
+);
 
 /* =====================================================
-   REMEMBERED ACCOUNTS
-   ===================================================== */
+REMEMBERED ACCOUNTS
+===================================================== */
 
 function getRememberedAccounts() {
 
@@ -395,7 +426,6 @@ function getRememberedAccounts() {
     return [];
 }
 
-
 function saveRememberedAccounts(
     accounts
 ) {
@@ -404,8 +434,8 @@ function saveRememberedAccounts(
         "cyberCoreAccounts",
         JSON.stringify(accounts)
     );
-}
 
+}
 
 function rememberAccount(
     userEmail,
@@ -428,7 +458,7 @@ function rememberAccount(
         if (
             accounts[i].email &&
             accounts[i].email.toLowerCase() ===
-                userEmail.toLowerCase()
+            userEmail.toLowerCase()
         ) {
 
             accounts[i].phone =
@@ -458,15 +488,15 @@ function rememberAccount(
         accounts =
             accounts.slice(
                 accounts.length -
-                    MAX_ACCOUNTS
+                MAX_ACCOUNTS
             );
     }
 
     saveRememberedAccounts(
         accounts
     );
-}
 
+}
 
 function removeRememberedAccount(
     userEmail
@@ -488,7 +518,7 @@ function removeRememberedAccount(
         if (
             !accounts[i].email ||
             accounts[i].email.toLowerCase() !==
-                userEmail.toLowerCase()
+            userEmail.toLowerCase()
         ) {
 
             filtered.push(
@@ -502,12 +532,12 @@ function removeRememberedAccount(
     saveRememberedAccounts(
         filtered
     );
+
 }
 
-
 /* =====================================================
-   SAFE OLD LOCAL ACCOUNT CLEANUP
-   ===================================================== */
+SAFE OLD LOCAL ACCOUNT CLEANUP
+===================================================== */
 
 function removeOldLocalTestAccounts() {
 
@@ -570,14 +600,14 @@ function removeOldLocalTestAccounts() {
             error
         );
     }
+
 }
 
 removeOldLocalTestAccounts();
 
-
 /* =====================================================
-   LOGIN HISTORY
-   ===================================================== */
+LOGIN HISTORY
+===================================================== */
 
 function historyKey() {
 
@@ -589,8 +619,8 @@ function historyKey() {
         "cyberCoreLoginHistory_" +
         currentUser.id
     );
-}
 
+}
 
 function getLoginHistory() {
 
@@ -625,7 +655,6 @@ function getLoginHistory() {
     return [];
 }
 
-
 function saveLoginHistory(
     history
 ) {
@@ -641,8 +670,8 @@ function saveLoginHistory(
         key,
         JSON.stringify(history)
     );
-}
 
+}
 
 function addLoginHistory(
     accountEmail
@@ -671,12 +700,12 @@ function addLoginHistory(
     saveLoginHistory(
         history
     );
+
 }
 
-
 /* =====================================================
-   ESCAPE HTML
-   ===================================================== */
+ESCAPE HTML
+===================================================== */
 
 function escapeHTML(text) {
 
@@ -691,10 +720,9 @@ function escapeHTML(text) {
     return div.innerHTML;
 }
 
-
 /* =====================================================
-   DISPLAY LOGIN HISTORY
-   ===================================================== */
+DISPLAY LOGIN HISTORY
+===================================================== */
 
 function displayLoginHistory() {
 
@@ -756,12 +784,12 @@ function displayLoginHistory() {
 
         i++;
     }
+
 }
 
-
 /* =====================================================
-   UI
-   ===================================================== */
+UI
+===================================================== */
 
 function showRegister() {
 
@@ -799,8 +827,8 @@ function showRegister() {
         loginBox.style.display =
             "none";
     }
-}
 
+}
 
 function showOTP() {
 
@@ -833,8 +861,8 @@ function showOTP() {
         loginBox.style.display =
             "none";
     }
-}
 
+}
 
 function showPassword() {
 
@@ -867,8 +895,8 @@ function showPassword() {
         loginBox.style.display =
             "none";
     }
-}
 
+}
 
 function showLogin() {
 
@@ -904,12 +932,12 @@ function showLogin() {
         loginBox.style.display =
             "block";
     }
+
 }
 
-
 /* =====================================================
-   RESET REGISTRATION
-   ===================================================== */
+RESET REGISTRATION
+===================================================== */
 
 function resetRegistrationForm() {
 
@@ -946,12 +974,12 @@ function resetRegistrationForm() {
         timer.textContent =
             "OTP expires in: 60s";
     }
+
 }
 
-
 /* =====================================================
-   OTP
-   ===================================================== */
+OTP
+===================================================== */
 
 function clearOTP() {
 
@@ -963,8 +991,8 @@ function clearOTP() {
 
         i++;
     }
-}
 
+}
 
 function getEnteredOTP() {
 
@@ -982,7 +1010,6 @@ function getEnteredOTP() {
 
     return result;
 }
-
 
 var otpIndex = 0;
 
@@ -1006,15 +1033,16 @@ while (
 
                 if (
                     currentBox.value !==
-                        "" &&
+                    "" &&
                     currentIndex <
-                        otpInputs.length - 1
+                    otpInputs.length - 1
                 ) {
 
                     otpInputs[
                         currentIndex + 1
                     ].focus();
                 }
+
             };
 
         currentBox.onkeydown =
@@ -1022,9 +1050,9 @@ while (
 
                 if (
                     event.key ===
-                        "Backspace" &&
+                    "Backspace" &&
                     currentBox.value ===
-                        "" &&
+                    "" &&
                     currentIndex > 0
                 ) {
 
@@ -1032,17 +1060,18 @@ while (
                         currentIndex - 1
                     ].focus();
                 }
+
             };
 
     })(otpIndex);
 
     otpIndex++;
+
 }
 
-
 /* =====================================================
-   SEND OTP
-   ===================================================== */
+SEND OTP
+===================================================== */
 
 if (sendBtn) {
 
@@ -1109,7 +1138,7 @@ if (sendBtn) {
                 if (
                     accounts[i].email &&
                     accounts[i].email.toLowerCase() ===
-                        enteredEmail.toLowerCase()
+                    enteredEmail.toLowerCase()
                 ) {
 
                     message.textContent =
@@ -1125,7 +1154,7 @@ if (sendBtn) {
                 Math.floor(
                     100000 +
                     Math.random() *
-                        900000
+                    900000
                 ).toString();
 
             verifiedEmail =
@@ -1144,12 +1173,12 @@ if (sendBtn) {
 
             startTimer();
         };
+
 }
 
-
 /* =====================================================
-   OTP TIMER
-   ===================================================== */
+OTP TIMER
+===================================================== */
 
 function startTimer() {
 
@@ -1206,12 +1235,12 @@ function startTimer() {
             },
             1000
         );
+
 }
 
-
 /* =====================================================
-   VERIFY OTP
-   ===================================================== */
+VERIFY OTP
+===================================================== */
 
 if (verifyBtn) {
 
@@ -1263,13 +1292,14 @@ if (verifyBtn) {
                 message.textContent =
                     "❌ Incorrect OTP❗";
             }
+
         };
+
 }
 
-
 /* =====================================================
-   CREATE / UPDATE PROFILE
-   ===================================================== */
+CREATE / UPDATE PROFILE
+===================================================== */
 
 async function createOrUpdateProfile(
     user,
@@ -1330,7 +1360,7 @@ async function createOrUpdateProfile(
         if (
             userPhone &&
             result.data.phone !==
-                userPhone
+            userPhone
         ) {
 
             var updateResult =
@@ -1390,10 +1420,9 @@ async function createOrUpdateProfile(
     return insertResult.data;
 }
 
-
 /* =====================================================
-   LOAD PROFILE
-   ===================================================== */
+LOAD PROFILE
+===================================================== */
 
 async function loadProfile() {
 
@@ -1432,10 +1461,9 @@ async function loadProfile() {
     return currentProfile;
 }
 
-
 /* =====================================================
-   PROFILE PICTURE URL
-   ===================================================== */
+PROFILE PICTURE URL
+===================================================== */
 
 async function getProfilePictureURL(
     path
@@ -1475,10 +1503,9 @@ async function getProfilePictureURL(
     );
 }
 
-
 /* =====================================================
-   UPDATE PROFILE UI
-   ===================================================== */
+UPDATE PROFILE UI
+===================================================== */
 
 async function updateProfile() {
 
@@ -1605,10 +1632,9 @@ async function updateProfile() {
     }
 }
 
-
 /* =====================================================
-   SAVE PROFILE
-   ===================================================== */
+SAVE PROFILE
+===================================================== */
 
 if (saveProfileBtn) {
 
@@ -1694,12 +1720,12 @@ if (saveProfileBtn) {
             profileMessage.textContent =
                 "✔️ Profile updated successfully.";
         };
+
 }
 
-
 /* =====================================================
-   PROFILE PICTURE UPLOAD
-   ===================================================== */
+PROFILE PICTURE UPLOAD
+===================================================== */
 
 if (profilePictureInput) {
 
@@ -1846,12 +1872,12 @@ if (profilePictureInput) {
 
             updateStorage();
         };
+
 }
 
-
 /* =====================================================
-   NORMAL LOGIN
-   ===================================================== */
+NORMAL LOGIN
+===================================================== */
 
 if (loginBtn) {
 
@@ -1977,12 +2003,12 @@ if (loginBtn) {
 
             await showDashboard();
         };
+
 }
 
-
 /* =====================================================
-   OAUTH PROVIDER DETECTION
-   ===================================================== */
+OAUTH PROVIDER DETECTION
+===================================================== */
 
 function getOAuthProvider(
     user
@@ -2041,7 +2067,6 @@ function getOAuthProvider(
     return "";
 }
 
-
 function isGoogleUser(
     user
 ) {
@@ -2051,7 +2076,6 @@ function isGoogleUser(
         "google"
     );
 }
-
 
 function isGithubUser(
     user
@@ -2063,7 +2087,6 @@ function isGithubUser(
     );
 }
 
-
 function isOAuthUser(
     user
 ) {
@@ -2074,10 +2097,9 @@ function isOAuthUser(
     );
 }
 
-
 /* =====================================================
-   OAUTH CALLBACK DETECTION
-   ===================================================== */
+OAUTH CALLBACK DETECTION
+===================================================== */
 
 function isOAuthCallback() {
 
@@ -2100,10 +2122,9 @@ function isOAuthCallback() {
     );
 }
 
-
 /* =====================================================
-   OAUTH REDIRECT OPTIONS
-   ===================================================== */
+OAUTH REDIRECT OPTIONS
+===================================================== */
 
 function getOAuthOptions() {
 
@@ -2120,10 +2141,9 @@ function getOAuthOptions() {
     };
 }
 
-
 /* =====================================================
-   HANDLE OAUTH USER
-   ===================================================== */
+HANDLE OAUTH USER
+===================================================== */
 
 async function handleOAuthUser(
     user,
@@ -2161,7 +2181,6 @@ async function handleOAuthUser(
     githubOAuthLogin =
         provider === "github";
 
-
     if (
         currentAccountEmail
     ) {
@@ -2172,12 +2191,10 @@ async function handleOAuthUser(
         );
     }
 
-
     await createOrUpdateProfile(
         currentUser,
         ""
     );
-
 
     addLoginHistory(
         currentAccountEmail ||
@@ -2185,13 +2202,11 @@ async function handleOAuthUser(
         " ACCOUNT"
     );
 
-
     if (loginEmail) {
 
         loginEmail.value =
             currentAccountEmail;
     }
-
 
     if (loginPhone) {
 
@@ -2199,13 +2214,11 @@ async function handleOAuthUser(
             "";
     }
 
-
     if (loginPassword) {
 
         loginPassword.value =
             "";
     }
-
 
     if (provider === "google") {
 
@@ -2220,7 +2233,6 @@ async function handleOAuthUser(
             "✔️ GITHUB LOGIN SUCCESSFUL❗";
     }
 
-
     await showDashboard();
 
     oauthCallbackHandled =
@@ -2230,10 +2242,9 @@ async function handleOAuthUser(
         false;
 }
 
-
 /* =====================================================
-   HANDLE GOOGLE USER
-   ===================================================== */
+HANDLE GOOGLE USER
+===================================================== */
 
 async function handleGoogleUser(
     user
@@ -2245,10 +2256,9 @@ async function handleGoogleUser(
     );
 }
 
-
 /* =====================================================
-   HANDLE GITHUB USER
-   ===================================================== */
+HANDLE GITHUB USER
+===================================================== */
 
 async function handleGithubUser(
     user
@@ -2260,10 +2270,9 @@ async function handleGithubUser(
     );
 }
 
-
 /* =====================================================
-   GOOGLE LOGIN
-   ===================================================== */
+GOOGLE LOGIN
+===================================================== */
 
 if (googleLoginBtn) {
 
@@ -2341,12 +2350,12 @@ if (googleLoginBtn) {
                 );
             }
         };
+
 }
 
-
 /* =====================================================
-   GITHUB LOGIN
-   ===================================================== */
+GITHUB LOGIN
+===================================================== */
 
 if (githubLoginBtn) {
 
@@ -2424,12 +2433,12 @@ if (githubLoginBtn) {
                 );
             }
         };
+
 }
 
-
 /* =====================================================
-   CREATE ACCOUNT
-   ===================================================== */
+CREATE ACCOUNT
+===================================================== */
 
 if (saveBtn) {
 
@@ -2619,12 +2628,12 @@ if (saveBtn) {
                 );
             }
         };
+
 }
 
-
 /* =====================================================
-   CREATE NEW ACCOUNT
-   ===================================================== */
+CREATE NEW ACCOUNT
+===================================================== */
 
 if (createAccountBtn) {
 
@@ -2661,12 +2670,12 @@ if (createAccountBtn) {
 
             showRegister();
         };
+
 }
 
-
 /* =====================================================
-   ADD ACCOUNT
-   ===================================================== */
+ADD ACCOUNT
+===================================================== */
 
 if (addAccountBtn) {
 
@@ -2704,12 +2713,12 @@ if (addAccountBtn) {
             message.textContent =
                 "➕ Add a new account.";
         };
+
 }
 
-
 /* =====================================================
-   DASHBOARD
-   ===================================================== */
+DASHBOARD
+===================================================== */
 
 async function showDashboard() {
 
@@ -2749,10 +2758,9 @@ async function showDashboard() {
     activateHome();
 }
 
-
 /* =====================================================
-   NAVIGATION
-   ===================================================== */
+NAVIGATION
+===================================================== */
 
 function activateHome() {
 
@@ -2816,7 +2824,6 @@ function activateHome() {
         );
     }
 }
-
 
 function setupNavigation() {
 
@@ -2908,6 +2915,16 @@ function setupNavigation() {
 
                     if (
                         pageId ===
+                        "addPage"
+                    ) {
+
+                        await loadSecurityItems();
+
+                        updateStorage();
+                    }
+
+                    if (
+                        pageId ===
                         "profilePage"
                     ) {
 
@@ -2922,12 +2939,12 @@ function setupNavigation() {
 
         i++;
     }
+
 }
 
-
 /* =====================================================
-   CLOSE BOXES
-   ===================================================== */
+CLOSE BOXES
+===================================================== */
 
 function closeAllProfileBoxes() {
 
@@ -2958,12 +2975,12 @@ function closeAllProfileBoxes() {
             "show-box"
         );
     }
+
 }
 
-
 /* =====================================================
-   LOGIN HISTORY BUTTON
-   ===================================================== */
+LOGIN HISTORY BUTTON
+===================================================== */
 
 if (loginHistoryBtn) {
 
@@ -2976,8 +2993,8 @@ if (loginHistoryBtn) {
 
             displayLoginHistory();
         };
-}
 
+}
 
 if (clearHistoryBtn) {
 
@@ -3005,12 +3022,12 @@ if (clearHistoryBtn) {
 
             displayLoginHistory();
         };
+
 }
 
-
 /* =====================================================
-   CHANGE PASSWORD BOX
-   ===================================================== */
+CHANGE PASSWORD BOX
+===================================================== */
 
 if (changePasswordBtn) {
 
@@ -3040,12 +3057,12 @@ if (changePasswordBtn) {
                     "";
             }
         };
+
 }
 
-
 /* =====================================================
-   CHANGE PASSWORD
-   ===================================================== */
+CHANGE PASSWORD
+===================================================== */
 
 if (saveChangedPasswordBtn) {
 
@@ -3059,7 +3076,6 @@ if (saveChangedPasswordBtn) {
                 return;
             }
 
-
             if (
                 isGoogleUser(
                     currentUser
@@ -3072,7 +3088,6 @@ if (saveChangedPasswordBtn) {
                 return;
             }
 
-
             if (
                 isGithubUser(
                     currentUser
@@ -3084,7 +3099,6 @@ if (saveChangedPasswordBtn) {
 
                 return;
             }
-
 
             var currentPass =
                 oldPassword.value;
@@ -3208,12 +3222,12 @@ if (saveChangedPasswordBtn) {
             changePasswordMessage.textContent =
                 "✔️ Password changed successfully.";
         };
+
 }
 
-
 /* =====================================================
-   STORAGE
-   ===================================================== */
+STORAGE
+===================================================== */
 
 async function updateStorage() {
 
@@ -3297,7 +3311,7 @@ async function updateStorage() {
             files[i] &&
             files[i].metadata &&
             typeof files[i].metadata.size ===
-                "number"
+            "number"
         ) {
 
             totalBytes +=
@@ -3366,12 +3380,12 @@ async function updateStorage() {
         " • Reference: " +
         STORAGE_REFERENCE_GB +
         " GB";
+
 }
 
-
 /* =====================================================
-   STORAGE BUTTON
-   ===================================================== */
+STORAGE BUTTON
+===================================================== */
 
 if (storageBtn) {
 
@@ -3395,12 +3409,1108 @@ if (storageBtn) {
                 updateStorage();
             }
         };
+
 }
 
+/* =====================================================
+ADD PAGE - FILE NAME DISPLAY
+===================================================== */
+
+if (addFileInput) {
+
+    addFileInput.onchange =
+        function () {
+
+            if (!addFileName) {
+                return;
+            }
+
+            var file =
+                addFileInput.files[0];
+
+            if (!file) {
+
+                addFileName.textContent =
+                    "No file selected";
+
+                return;
+            }
+
+            addFileName.textContent =
+                file.name;
+        };
+
+}
 
 /* =====================================================
-   ACCOUNT CHANGE
-   ===================================================== */
+ADD PAGE - MESSAGE
+===================================================== */
+
+function setAddFileMessage(
+    text,
+    success
+) {
+
+    if (!addFileMessage) {
+        return;
+    }
+
+    addFileMessage.textContent =
+        text;
+
+    if (success) {
+
+        addFileMessage.classList.add(
+            "success-message"
+        );
+
+        addFileMessage.classList.remove(
+            "error-message"
+        );
+
+    } else {
+
+        addFileMessage.classList.add(
+            "error-message"
+        );
+
+        addFileMessage.classList.remove(
+            "success-message"
+        );
+    }
+
+}
+
+/* =====================================================
+ADD PAGE - SAFE FILE NAME
+===================================================== */
+
+function createSafeFileName(
+    fileName
+) {
+
+    var safeName =
+        String(fileName || "")
+            .replace(
+                /[^\w.\-]/g,
+                "_"
+            );
+
+    if (safeName === "") {
+        safeName = "file";
+    }
+
+    return safeName;
+}
+
+/* =====================================================
+ADD PAGE - FORMAT FILE SIZE
+===================================================== */
+
+function formatFileSize(
+    bytes
+) {
+
+    var size =
+        Number(bytes) || 0;
+
+    if (size < 1024) {
+
+        return (
+            size.toFixed(0) +
+            " B"
+        );
+    }
+
+    if (size < 1024 * 1024) {
+
+        return (
+            (size / 1024).toFixed(2) +
+            " KB"
+        );
+    }
+
+    if (size < 1024 * 1024 * 1024) {
+
+        return (
+            (size / (1024 * 1024)).toFixed(2) +
+            " MB"
+        );
+    }
+
+    return (
+        (size / (1024 * 1024 * 1024)).toFixed(2) +
+        " GB"
+    );
+}
+
+/* =====================================================
+ADD PAGE - LOAD SAVED SECURITY ITEMS
+===================================================== */
+
+async function loadSecurityItems() {
+
+    if (!securityItemsList) {
+        return;
+    }
+
+    if (
+        !supabaseClient ||
+        !currentUser
+    ) {
+
+        securityItemsList.textContent =
+            "Please login to view saved files.";
+
+        return;
+    }
+
+    securityItemsList.textContent =
+        "Loading saved files...";
+
+    var result =
+        await supabaseClient
+            .from("security_items")
+            .select("*")
+            .eq(
+                "user_id",
+                currentUser.id
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+    if (result.error) {
+
+        securityItemsList.textContent =
+            "❌ Could not load saved files.";
+
+        console.log(
+            "Security items load error:",
+            result.error.message
+        );
+
+        return;
+    }
+
+    var items =
+        result.data || [];
+
+    securityItemsList.innerHTML =
+        "";
+
+    if (items.length === 0) {
+
+        securityItemsList.textContent =
+            "No files saved yet.";
+
+        return;
+    }
+
+    var i = 0;
+
+    while (i < items.length) {
+
+        createSecurityItemElement(
+            items[i]
+        );
+
+        i++;
+    }
+
+}
+
+/* =====================================================
+ADD PAGE - VIEW FILE
+===================================================== */
+
+/* =====================================================
+ADD PAGE - IMAGE FILE CHECK
+===================================================== */
+
+function isImageFilePath(
+    filePath
+) {
+
+    var pathValue =
+        String(filePath || "");
+
+    var parts =
+        pathValue.split(".");
+
+    var extension =
+        parts.length > 1
+            ? parts[
+                parts.length - 1
+            ].toLowerCase()
+            : "";
+
+    var imageExtensions = [
+        "jpg",
+        "jpeg",
+        "png",
+        "gif",
+        "webp",
+        "bmp",
+        "svg"
+    ];
+
+    return (
+        imageExtensions.indexOf(
+            extension
+        ) !== -1
+    );
+}
+
+/* =====================================================
+ADD PAGE - VIEW FILE
+===================================================== */
+
+async function viewSecurityItem(
+    item,
+    button
+) {
+
+    if (
+        !supabaseClient ||
+        !currentUser ||
+        !item ||
+        !item.file_path
+    ) {
+        return;
+    }
+
+    var isImage =
+        isImageFilePath(
+            item.file_path
+        );
+
+    var viewWindow =
+        null;
+
+    if (isImage) {
+
+        viewWindow =
+            window.open(
+                "",
+                "_blank"
+            );
+
+        if (viewWindow) {
+
+            viewWindow.document.write(
+                "<!DOCTYPE html><html><head><title>Loading...</title>" +
+                "<style>body{margin:0;background:#000;" +
+                "display:flex;align-items:center;justify-content:center;" +
+                "min-height:100vh;color:#00ff00;" +
+                "font-family:sans-serif;}</style></head>" +
+                "<body>Loading...</body></html>"
+            );
+        }
+    }
+
+    var originalText =
+        button
+            ? button.textContent
+            : "VIEW";
+
+    if (button) {
+
+        button.disabled =
+            true;
+
+        button.textContent =
+            "OPENING...";
+    }
+
+    var result =
+        await supabaseClient
+            .storage
+            .from(
+                STORAGE_BUCKET
+            )
+            .createSignedUrl(
+                item.file_path,
+                3600
+            );
+
+    if (button) {
+
+        button.disabled =
+            false;
+
+        button.textContent =
+            originalText;
+    }
+
+    if (result.error) {
+
+        if (viewWindow) {
+
+            viewWindow.close();
+        }
+
+        alert(
+            "❌ File could not be opened: " +
+            result.error.message
+        );
+
+        return;
+    }
+
+    var signedUrl =
+        result.data.signedUrl;
+
+    if (isImage) {
+
+        if (viewWindow) {
+
+            var safeTitle =
+                escapeHTML(
+                    item.title ||
+                    "File"
+                );
+
+            viewWindow.document.open();
+
+            viewWindow.document.write(
+                "<!DOCTYPE html><html><head><title>" +
+                safeTitle +
+                "</title><style>" +
+                "body{margin:0;background:#000;" +
+                "display:flex;align-items:center;" +
+                "justify-content:center;min-height:100vh;}" +
+                "img{max-width:100%;max-height:100vh;" +
+                "object-fit:contain;}" +
+                "</style></head><body>" +
+                "<img src=\"" +
+                signedUrl +
+                "\" alt=\"" +
+                safeTitle +
+                "\"></body></html>"
+            );
+
+            viewWindow.document.close();
+
+            return;
+        }
+
+        window.open(
+            signedUrl,
+            "_blank"
+        );
+
+        return;
+    }
+
+    window.open(
+        signedUrl,
+        "_blank"
+    );
+
+}
+
+/* =====================================================
+ADD PAGE - CREATE SAVED ITEM UI
+===================================================== */
+
+function createSecurityItemElement(
+    item
+) {
+
+    if (!securityItemsList) {
+        return;
+    }
+
+    var itemBox =
+        document.createElement(
+            "div"
+        );
+
+    itemBox.className =
+        "security-item";
+
+    var titleElement =
+        document.createElement(
+            "div"
+        );
+
+    titleElement.className =
+        "security-item-title";
+
+    titleElement.textContent =
+        item.title ||
+        "Untitled File";
+
+    var categoryElement =
+        document.createElement(
+            "div"
+        );
+
+    categoryElement.className =
+        "security-item-category";
+
+    categoryElement.textContent =
+        "CATEGORY: " +
+        (
+            item.category ||
+            "Other"
+        );
+
+    var fileName =
+        "";
+
+    if (item.file_path) {
+
+        var pathParts =
+            item.file_path.split("/");
+
+        fileName =
+            pathParts[
+                pathParts.length - 1
+            ];
+    }
+
+    if (fileName) {
+
+        var fileElement =
+            document.createElement(
+                "div"
+            );
+
+        fileElement.className =
+            "security-item-file";
+
+        fileElement.textContent =
+            "FILE: " +
+            fileName;
+
+        itemBox.appendChild(
+            fileElement
+        );
+    }
+
+    var infoBox =
+        document.createElement(
+            "div"
+        );
+
+    infoBox.className =
+        "security-item-info";
+
+    infoBox.appendChild(
+        titleElement
+    );
+
+    infoBox.appendChild(
+        categoryElement
+    );
+
+    var buttonBox =
+        document.createElement(
+            "div"
+        );
+
+    buttonBox.className =
+        "security-item-actions";
+
+    var viewButton =
+        document.createElement(
+            "button"
+        );
+
+    viewButton.type =
+        "button";
+
+    viewButton.className =
+        "security-view-button";
+
+    viewButton.textContent =
+        "VIEW";
+
+    viewButton.onclick =
+        function () {
+
+            viewSecurityItem(
+                item,
+                viewButton
+            );
+        };
+
+    buttonBox.appendChild(
+        viewButton
+    );
+
+    var editButton =
+        document.createElement(
+            "button"
+        );
+
+    editButton.type =
+        "button";
+
+    editButton.className =
+        "security-edit-button";
+
+    editButton.textContent =
+        "EDIT";
+
+    editButton.onclick =
+        function () {
+
+            editSecurityItem(
+                item
+            );
+        };
+
+    var deleteButton =
+        document.createElement(
+            "button"
+        );
+
+    deleteButton.type =
+        "button";
+
+    deleteButton.className =
+        "security-delete-button";
+
+    deleteButton.textContent =
+        "DELETE";
+
+    deleteButton.onclick =
+        function () {
+
+            deleteSecurityItem(
+                item
+            );
+        };
+
+    buttonBox.appendChild(
+        editButton
+    );
+
+    buttonBox.appendChild(
+        deleteButton
+    );
+
+    itemBox.appendChild(
+        infoBox
+    );
+
+    itemBox.appendChild(
+        buttonBox
+    );
+
+    securityItemsList.appendChild(
+        itemBox
+    );
+
+}
+
+/* =====================================================
+ADD PAGE - SAVE FILE
+===================================================== */
+
+if (saveFileBtn) {
+
+    saveFileBtn.onclick =
+        async function () {
+
+            if (
+                !supabaseClient ||
+                !currentUser
+            ) {
+
+                setAddFileMessage(
+                    "❌ Please login first.",
+                    false
+                );
+
+                return;
+            }
+
+            if (!addFileInput) {
+
+                setAddFileMessage(
+                    "❌ File input is unavailable.",
+                    false
+                );
+
+                return;
+            }
+
+            var file =
+                addFileInput.files[0];
+
+            var title =
+                addTitle
+                    ? addTitle.value.trim()
+                    : "";
+
+            var category =
+                addCategory
+                    ? addCategory.value
+                    : "";
+
+            if (!file) {
+
+                setAddFileMessage(
+                    "❌ Please select a file.",
+                    false
+                );
+
+                return;
+            }
+
+            if (title === "") {
+
+                setAddFileMessage(
+                    "❌ Please enter a file title.",
+                    false
+                );
+
+                if (addTitle) {
+                    addTitle.focus();
+                }
+
+                return;
+            }
+
+            if (category === "") {
+
+                setAddFileMessage(
+                    "❌ Please select a category.",
+                    false
+                );
+
+                if (addCategory) {
+                    addCategory.focus();
+                }
+
+                return;
+            }
+
+            saveFileBtn.disabled =
+                true;
+
+            setAddFileMessage(
+                "Uploading file...",
+                true
+            );
+
+            var safeOriginalName =
+                createSafeFileName(
+                    file.name
+                );
+
+            var uniqueName =
+                Date.now().toString() +
+                "_" +
+                Math.random()
+                    .toString(36)
+                    .slice(2) +
+                "_" +
+                safeOriginalName;
+
+            var filePath =
+                currentUser.id +
+                "/" +
+                uniqueName;
+
+            try {
+
+                var uploadResult =
+                    await supabaseClient
+                        .storage
+                        .from(
+                            STORAGE_BUCKET
+                        )
+                        .upload(
+                            filePath,
+                            file,
+                            {
+                                upsert: false,
+                                contentType:
+                                    file.type ||
+                                    "application/octet-stream"
+                            }
+                        );
+
+                if (
+                    uploadResult.error
+                ) {
+
+                    saveFileBtn.disabled =
+                        false;
+
+                    setAddFileMessage(
+                        "❌ Upload failed: " +
+                        uploadResult.error.message,
+                        false
+                    );
+
+                    return;
+                }
+
+                setAddFileMessage(
+                    "Saving file information...",
+                    true
+                );
+
+                var insertResult =
+                    await supabaseClient
+                        .from(
+                            "security_items"
+                        )
+                        .insert({
+                            user_id:
+                                currentUser.id,
+                            title:
+                                title,
+                            category:
+                                category,
+                            file_path:
+                                filePath
+                        });
+
+                if (
+                    insertResult.error
+                ) {
+
+                    /*
+                    If database save fails,
+                    remove the uploaded file
+                    so there is no orphan file.
+                    */
+
+                    await supabaseClient
+                        .storage
+                        .from(
+                            STORAGE_BUCKET
+                        )
+                        .remove([
+                            filePath
+                        ]);
+
+                    saveFileBtn.disabled =
+                        false;
+
+                    setAddFileMessage(
+                        "❌ File information could not be saved: " +
+                        insertResult.error.message,
+                        false
+                    );
+
+                    return;
+                }
+
+                if (addFileInput) {
+                    addFileInput.value =
+                        "";
+                }
+
+                if (addFileName) {
+
+                    addFileName.textContent =
+                        "No file selected";
+                }
+
+                if (addTitle) {
+                    addTitle.value =
+                        "";
+                }
+
+                if (addCategory) {
+                    addCategory.value =
+                        "";
+                }
+
+                saveFileBtn.disabled =
+                    false;
+
+                setAddFileMessage(
+                    "✔️ File saved successfully.",
+                    true
+                );
+
+                await loadSecurityItems();
+
+                updateStorage();
+
+            } catch (error) {
+
+                saveFileBtn.disabled =
+                    false;
+
+                console.log(
+                    "Save security item error:",
+                    error
+                );
+
+                setAddFileMessage(
+                    "❌ File save failed.",
+                    false
+                );
+            }
+
+        };
+
+}
+
+/* =====================================================
+ADD PAGE - EDIT FILE
+===================================================== */
+
+async function editSecurityItem(
+    item
+) {
+
+    if (
+        !supabaseClient ||
+        !currentUser ||
+        !item
+    ) {
+        return;
+    }
+
+    var currentTitle =
+        item.title ||
+        "";
+
+    var currentCategory =
+        item.category ||
+        "";
+
+    var newTitle =
+        window.prompt(
+            "Enter new file title:",
+            currentTitle
+        );
+
+    if (newTitle === null) {
+        return;
+    }
+
+    newTitle =
+        newTitle.trim();
+
+    if (newTitle === "") {
+
+        alert(
+            "File title cannot be empty."
+        );
+
+        return;
+    }
+
+    var categoryText =
+        "Documents, Photos, Videos, Accounts, Security, Personal, Other";
+
+    var newCategory =
+        window.prompt(
+            "Enter category:\n\n" +
+            categoryText,
+            currentCategory
+        );
+
+    if (newCategory === null) {
+        return;
+    }
+
+    newCategory =
+        newCategory.trim();
+
+    var allowedCategories = [
+        "Documents",
+        "Photos",
+        "Videos",
+        "Accounts",
+        "Security",
+        "Personal",
+        "Other"
+    ];
+
+    if (
+        allowedCategories.indexOf(
+            newCategory
+        ) === -1
+    ) {
+
+        alert(
+            "Please use one of the available categories."
+        );
+
+        return;
+    }
+
+    var confirmed =
+        window.confirm(
+            "Update this file information?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    var result =
+        await supabaseClient
+            .from(
+                "security_items"
+            )
+            .update({
+                title:
+                    newTitle,
+                category:
+                    newCategory
+            })
+            .eq(
+                "id",
+                item.id
+            )
+            .eq(
+                "user_id",
+                currentUser.id
+            );
+
+    if (result.error) {
+
+        alert(
+            "❌ Update failed: " +
+            result.error.message
+        );
+
+        return;
+    }
+
+    if (addFileMessage) {
+
+        setAddFileMessage(
+            "✔️ File information updated.",
+            true
+        );
+    }
+
+    await loadSecurityItems();
+
+}
+
+/* =====================================================
+ADD PAGE - DELETE FILE
+===================================================== */
+
+async function deleteSecurityItem(
+    item
+) {
+
+    if (
+        !supabaseClient ||
+        !currentUser ||
+        !item
+    ) {
+        return;
+    }
+
+    var confirmed =
+        window.confirm(
+            "Delete this saved file?\n\n" +
+            "The file and its saved information will be removed."
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    var deleteButton =
+        null;
+
+    /*
+    Storage file deletion.
+    */
+
+    if (item.file_path) {
+
+        var storageResult =
+            await supabaseClient
+                .storage
+                .from(
+                    STORAGE_BUCKET
+                )
+                .remove([
+                    item.file_path
+                ]);
+
+        if (
+            storageResult.error
+        ) {
+
+            console.log(
+                "Storage file delete error:",
+                storageResult.error.message
+            );
+
+            var continueDelete =
+                window.confirm(
+                    "The cloud file could not be removed.\n\n" +
+                    "Do you still want to remove its saved information?"
+                );
+
+            if (!continueDelete) {
+                return;
+            }
+        }
+    }
+
+    /*
+    Database metadata deletion.
+    */
+
+    var databaseResult =
+        await supabaseClient
+            .from(
+                "security_items"
+            )
+            .delete()
+            .eq(
+                "id",
+                item.id
+            )
+            .eq(
+                "user_id",
+                currentUser.id
+            );
+
+    if (
+        databaseResult.error
+    ) {
+
+        alert(
+            "❌ Saved file information could not be deleted: " +
+            databaseResult.error.message
+        );
+
+        return;
+    }
+
+    if (addFileMessage) {
+
+        setAddFileMessage(
+            "✔️ File deleted successfully.",
+            true
+        );
+    }
+
+    await loadSecurityItems();
+
+    updateStorage();
+
+}
+
+/* =====================================================
+ACCOUNT CHANGE
+===================================================== */
 
 if (accountChangeBtn) {
 
@@ -3419,12 +4529,12 @@ if (accountChangeBtn) {
                 updateProfile();
             }
         };
+
 }
 
-
 /* =====================================================
-   DISPLAY ACCOUNTS
-   ===================================================== */
+DISPLAY ACCOUNTS
+===================================================== */
 
 async function displayAccounts() {
 
@@ -3514,7 +4624,7 @@ async function displayAccounts() {
             account.email &&
             currentUser.email &&
             account.email.toLowerCase() ===
-                currentUser.email.toLowerCase()
+            currentUser.email.toLowerCase()
         ) {
 
             var current =
@@ -3564,12 +4674,12 @@ async function displayAccounts() {
 
         i++;
     }
+
 }
 
-
 /* =====================================================
-   SWITCH ACCOUNT
-   ===================================================== */
+SWITCH ACCOUNT
+===================================================== */
 
 function createSwitchHandler(
     account
@@ -3599,10 +4709,9 @@ function createSwitchHandler(
     };
 }
 
-
 /* =====================================================
-   HELP CENTER
-   ===================================================== */
+HELP CENTER
+===================================================== */
 
 if (helpCenterBtn) {
 
@@ -3659,12 +4768,12 @@ if (helpCenterBtn) {
                 "_blank"
             );
         };
+
 }
 
-
 /* =====================================================
-   REMOVE ACCOUNT
-   ===================================================== */
+REMOVE ACCOUNT
+===================================================== */
 
 if (removeAccountBtn) {
 
@@ -3728,12 +4837,12 @@ if (removeAccountBtn) {
             message.textContent =
                 "✔️ Account removed from this device.";
         };
+
 }
 
-
 /* =====================================================
-   OAUTH CALLBACK SESSION HANDLER
-   ===================================================== */
+OAUTH CALLBACK SESSION HANDLER
+===================================================== */
 
 async function handleOAuthCallbackSession() {
 
@@ -3789,7 +4898,6 @@ async function handleOAuthCallbackSession() {
         waitCount++;
     }
 
-
     if (
         !session ||
         !session.user
@@ -3798,12 +4906,10 @@ async function handleOAuthCallbackSession() {
         return false;
     }
 
-
     var provider =
         getOAuthProvider(
             session.user
         );
-
 
     if (
         provider !== "google" &&
@@ -3812,7 +4918,6 @@ async function handleOAuthCallbackSession() {
 
         return false;
     }
-
 
     /*
        This is the OAuth session created by
@@ -3846,7 +4951,6 @@ async function handleOAuthCallbackSession() {
         );
     }
 
-
     /*
        Remove OAuth parameters from the
        browser address bar after processing.
@@ -3868,14 +4972,12 @@ async function handleOAuthCallbackSession() {
         );
     }
 
-
     return true;
 }
 
-
 /* =====================================================
-   SUPABASE SESSION
-   ===================================================== */
+SUPABASE SESSION
+===================================================== */
 
 async function checkExistingSession() {
 
@@ -3888,7 +4990,6 @@ async function checkExistingSession() {
 
         return;
     }
-
 
     /*
        IMPORTANT:
@@ -3911,7 +5012,6 @@ async function checkExistingSession() {
         }
     }
 
-
     /*
        No OAuth callback:
        check the existing Supabase session.
@@ -3920,7 +5020,6 @@ async function checkExistingSession() {
     var sessionResult =
         await supabaseClient.auth
             .getSession();
-
 
     if (
         sessionResult.error
@@ -3939,13 +5038,11 @@ async function checkExistingSession() {
         return;
     }
 
-
     var session =
         sessionResult.data &&
         sessionResult.data.session
             ? sessionResult.data.session
             : null;
-
 
     /* =================================================
        OAUTH EXISTING SESSION
@@ -3982,7 +5079,6 @@ async function checkExistingSession() {
             return;
         }
 
-
         if (
             provider ===
             "github"
@@ -4002,7 +5098,6 @@ async function checkExistingSession() {
         }
     }
 
-
     /* =================================================
        NORMAL SESSION
        ================================================= */
@@ -4012,7 +5107,6 @@ async function checkExistingSession() {
         await supabaseClient.auth
             .signOut();
     }
-
 
     currentUser =
         null;
@@ -4032,10 +5126,8 @@ async function checkExistingSession() {
     githubOAuthLogin =
         false;
 
-
     var accounts =
         getRememberedAccounts();
-
 
     if (
         accounts.length > 0
@@ -4066,12 +5158,12 @@ async function checkExistingSession() {
         message.textContent =
             "Please login to continue❗";
     }
+
 }
 
-
 /* =====================================================
-   AUTH STATE
-   ===================================================== */
+AUTH STATE
+===================================================== */
 
 if (supabaseClient) {
 
@@ -4105,12 +5197,12 @@ if (supabaseClient) {
 
             }
         );
+
 }
 
-
 /* =====================================================
-   START
-   ===================================================== */
+START
+===================================================== */
 
 document.addEventListener(
     "DOMContentLoaded",
