@@ -4151,6 +4151,11 @@ if (saveFileBtn) {
                     CLOUDINARY_UPLOAD_PRESET
                 );
 
+                cloudinaryFormData.append(
+                    "folder",
+                    "cyber-core"
+                );
+
                 var cloudinaryResponse =
                     await fetch(
                         "https://api.cloudinary.com/v1_1/" +
@@ -5256,6 +5261,8 @@ if (supabaseClient) {
                 } else {
 
                     currentUser =
+
+                      currentUser =
                         null;
                 }
 
@@ -5264,7 +5271,7 @@ if (supabaseClient) {
 
 }
 
-/* ====================================================
+/* =====================================================
 START
 ===================================================== */
 
