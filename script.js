@@ -6,6 +6,7 @@ CYBER CORE - SUPABASE VERSION
 GOOGLE + GITHUB OAUTH
 BACKBLAZE B2 VIDEO STORAGE
 CLOUDINARY OTHER FILE STORAGE
+SECURITY CENTER
 ===================================================== */
 
 /* =====================================================
@@ -135,6 +136,22 @@ var githubOAuthLogin = false;
 var oauthHandling = false;
 
 var oauthCallbackHandled = false;
+
+/* =====================================================
+SECURITY CENTER VARIABLES
+===================================================== */
+
+var securityCenterInitialized =
+    false;
+
+var securityMenuButton =
+    null;
+
+var securityCenterPanel =
+    null;
+
+var securityCenterOverlay =
+    null;
 
 /* =====================================================
 ELEMENTS
@@ -1197,11 +1214,6 @@ async function reconcileStorageUsage() {
                     ledger[filePath]
                 ) || 0;
 
-            /*
-             * Keep only files that still exist
-             * in security_items.
-             */
-
             if (
                 existingPaths[filePath] &&
                 isFinite(fileSize) &&
@@ -1471,6 +1483,8 @@ function showLogin() {
         loginBox.style.display =
             "block";
     }
+
+    closeSecurityCenter();
 }
 
 /* =====================================================
@@ -3414,6 +3428,8 @@ async function showDashboard() {
 
     closeAllProfileBoxes();
 
+    setupSecurityCenter();
+
     setupNavigation();
 
     activateHome();
@@ -3609,6 +3625,913 @@ function setupNavigation() {
 }
 
 /* =====================================================
+SECURITY CENTER
+===================================================== */
+
+function setupSecurityCenter() {
+
+    if (
+        securityCenterInitialized ||
+        !dashboard
+    ) {
+        return;
+    }
+
+    securityCenterInitialized =
+        true;
+
+    securityMenuButton =
+        document.createElement(
+            "button"
+        );
+
+    securityMenuButton.id =
+        "securityMenuButton";
+
+    securityMenuButton.type =
+        "button";
+
+    securityMenuButton.setAttribute(
+        "aria-label",
+        "Open Security Center"
+    );
+
+    securityMenuButton.setAttribute(
+        "aria-expanded",
+        "false"
+    );
+
+    securityMenuButton.innerHTML =
+        "☰";
+
+    securityCenterOverlay =
+        document.createElement(
+            "div"
+        );
+
+    securityCenterOverlay.id =
+        "securityCenterOverlay";
+
+    securityCenterPanel =
+        document.createElement(
+            "aside"
+        );
+
+    securityCenterPanel.id =
+        "securityCenterPanel";
+
+    securityCenterPanel.setAttribute(
+        "aria-label",
+        "Security Center"
+    );
+
+    securityCenterPanel.innerHTML =
+
+        '<div id="securityCenterHeader">' +
+
+        '<div>' +
+        '<div id="securityCenterTitle">' +
+        'SECURITY CENTER' +
+        '</div>' +
+        '<div id="securityCenterSubtitle">' +
+        'CYBER CORE PROTECTION' +
+        '</div>' +
+        '</div>' +
+
+        '<button id="securityCenterClose" type="button">' +
+        '×' +
+        '</button>' +
+
+        '</div>' +
+
+        '<div id="securityCenterContent">' +
+
+        '<div class="security-center-card">' +
+        '<div class="security-center-card-title">' +
+        '🛡 SECURITY STATUS' +
+        '</div>' +
+        '<div id="securityStatusContent">' +
+        'Checking security status...' +
+        '</div>' +
+        '</div>' +
+
+        '<div class="security-center-card">' +
+        '<div class="security-center-card-title">' +
+        '📱 CURRENT SESSION' +
+        '</div>' +
+        '<div id="securitySessionContent">' +
+        'Checking current session...' +
+        '</div>' +
+        '</div>' +
+
+        '<div class="security-center-card">' +
+        '<div class="security-center-card-title">' +
+        '📋 SECURITY ACTIVITY' +
+        '</div>' +
+        '<div id="securityActivityContent">' +
+        'Loading security activity...' +
+        '</div>' +
+        '</div>' +
+
+        '<div class="security-center-card">' +
+        '<div class="security-center-card-title">' +
+        '⚠ SECURITY ALERTS' +
+        '</div>' +
+        '<div id="securityAlertsContent">' +
+        'Checking alerts...' +
+        '</div>' +
+        '</div>' +
+
+        '<div class="security-center-card">' +
+        '<div class="security-center-card-title">' +
+        '🔐 ACCOUNT SECURITY' +
+        '</div>' +
+
+        '<button id="securityChangePasswordBtn" type="button" class="security-center-action">' +
+        'CHANGE PASSWORD' +
+        '</button>' +
+
+        '<button id="securitySignOutOthersBtn" type="button" class="security-center-action">' +
+        'SIGN OUT OTHER SESSIONS' +
+        '</button>' +
+
+        '<div id="securityActionMessage"></div>' +
+
+        '</div>' +
+
+        '</div>';
+
+    dashboard.appendChild(
+        securityMenuButton
+    );
+
+    dashboard.appendChild(
+        securityCenterOverlay
+    );
+
+    dashboard.appendChild(
+        securityCenterPanel
+    );
+
+    injectSecurityCenterStyles();
+
+    var closeButton =
+        document.getElementById(
+            "securityCenterClose"
+        );
+
+    var changeButton =
+        document.getElementById(
+            "securityChangePasswordBtn"
+        );
+
+    var signOutButton =
+        document.getElementById(
+            "securitySignOutOthersBtn"
+        );
+
+    securityMenuButton.onclick =
+        function () {
+
+            if (
+                securityCenterPanel.classList.contains(
+                    "show-security-panel"
+                )
+            ) {
+
+                closeSecurityCenter();
+
+            } else {
+
+                openSecurityCenter();
+            }
+        };
+
+    securityCenterOverlay.onclick =
+        function () {
+
+            closeSecurityCenter();
+        };
+
+    if (closeButton) {
+
+        closeButton.onclick =
+            function () {
+
+                closeSecurityCenter();
+            };
+    }
+
+    if (changeButton) {
+
+        changeButton.onclick =
+            function () {
+
+                closeSecurityCenter();
+
+                if (changePasswordBtn) {
+
+                    changePasswordBtn.click();
+                }
+            };
+    }
+
+    if (signOutButton) {
+
+        signOutButton.onclick =
+            async function () {
+
+                await signOutOtherSessions();
+            };
+    }
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key ===
+                "Escape" &&
+                securityCenterPanel &&
+                securityCenterPanel.classList.contains(
+                    "show-security-panel"
+                )
+            ) {
+
+                closeSecurityCenter();
+            }
+        }
+    );
+}
+
+function injectSecurityCenterStyles() {
+
+    if (
+        document.getElementById(
+            "securityCenterDynamicStyles"
+        )
+    ) {
+        return;
+    }
+
+    var style =
+        document.createElement(
+            "style"
+        );
+
+    style.id =
+        "securityCenterDynamicStyles";
+
+    style.textContent =
+
+        "#securityMenuButton{" +
+        "position:fixed;" +
+        "top:18px;" +
+        "right:18px;" +
+        "width:48px;" +
+        "height:48px;" +
+        "border:1px solid rgba(0,255,100,.75);" +
+        "border-radius:16px;" +
+        "background:rgba(0,25,15,.55);" +
+        "backdrop-filter:blur(18px);" +
+        "-webkit-backdrop-filter:blur(18px);" +
+        "color:#00ff66;" +
+        "font-size:25px;" +
+        "line-height:1;" +
+        "cursor:pointer;" +
+        "z-index:1000015;" +
+        "display:flex;" +
+        "align-items:center;" +
+        "justify-content:center;" +
+        "box-shadow:none;" +
+        "text-shadow:none;" +
+        "}" +
+
+        "#securityCenterOverlay{" +
+        "position:fixed;" +
+        "inset:0;" +
+        "background:rgba(0,0,0,.48);" +
+        "backdrop-filter:blur(3px);" +
+        "-webkit-backdrop-filter:blur(3px);" +
+        "opacity:0;" +
+        "visibility:hidden;" +
+        "transition:opacity .25s ease,visibility .25s ease;" +
+        "z-index:1000010;" +
+        "}" +
+
+        "#securityCenterOverlay.show-security-overlay{" +
+        "opacity:1;" +
+        "visibility:visible;" +
+        "}" +
+
+        "#securityCenterPanel{" +
+        "position:fixed;" +
+        "top:0;" +
+        "right:0;" +
+        "width:min(390px,92vw);" +
+        "height:100vh;" +
+        "height:100dvh;" +
+        "background:rgba(0,20,12,.78);" +
+        "backdrop-filter:blur(25px);" +
+        "-webkit-backdrop-filter:blur(25px);" +
+        "border-left:1px solid rgba(0,255,100,.55);" +
+        "transform:translateX(105%);" +
+        "transition:transform .3s ease;" +
+        "z-index:1000012;" +
+        "overflow-y:auto;" +
+        "overflow-x:hidden;" +
+        "box-shadow:none;" +
+        "}" +
+
+        "#securityCenterPanel.show-security-panel{" +
+        "transform:translateX(0);" +
+        "}" +
+
+        "#securityCenterHeader{" +
+        "display:flex;" +
+        "align-items:center;" +
+        "justify-content:space-between;" +
+        "gap:12px;" +
+        "padding:22px 18px 16px;" +
+        "border-bottom:1px solid rgba(0,255,100,.25);" +
+        "position:sticky;" +
+        "top:0;" +
+        "background:rgba(0,20,12,.78);" +
+        "backdrop-filter:blur(20px);" +
+        "-webkit-backdrop-filter:blur(20px);" +
+        "z-index:2;" +
+        "}" +
+
+        "#securityCenterTitle{" +
+        "font-size:18px;" +
+        "font-weight:800;" +
+        "letter-spacing:1.4px;" +
+        "color:#fff;" +
+        "}" +
+
+        "#securityCenterSubtitle{" +
+        "font-size:10px;" +
+        "letter-spacing:2px;" +
+        "color:#00ff66;" +
+        "margin-top:5px;" +
+        "}" +
+
+        "#securityCenterClose{" +
+        "width:40px;" +
+        "height:40px;" +
+        "border:1px solid rgba(0,255,100,.55);" +
+        "border-radius:13px;" +
+        "background:rgba(0,255,100,.06);" +
+        "color:#00ff66;" +
+        "font-size:28px;" +
+        "cursor:pointer;" +
+        "box-shadow:none;" +
+        "text-shadow:none;" +
+        "}" +
+
+        "#securityCenterContent{" +
+        "padding:16px;" +
+        "padding-bottom:35px;" +
+        "}" +
+
+        ".security-center-card{" +
+        "border:1px solid rgba(0,255,100,.27);" +
+        "border-radius:18px;" +
+        "background:rgba(0,0,0,.25);" +
+        "padding:15px;" +
+        "margin-bottom:13px;" +
+        "box-shadow:none;" +
+        "}" +
+
+        ".security-center-card-title{" +
+        "font-size:12px;" +
+        "font-weight:800;" +
+        "letter-spacing:1px;" +
+        "color:#00ff66;" +
+        "margin-bottom:11px;" +
+        "}" +
+
+        ".security-center-line{" +
+        "font-size:12px;" +
+        "line-height:1.7;" +
+        "color:#eee;" +
+        "padding:3px 0;" +
+        "word-break:break-word;" +
+        "}" +
+
+        ".security-center-success{" +
+        "color:#00ff66;" +
+        "font-weight:700;" +
+        "}" +
+
+        ".security-center-warning{" +
+        "color:#ffd24a;" +
+        "font-weight:700;" +
+        "}" +
+
+        ".security-center-muted{" +
+        "color:#aaa;" +
+        "}" +
+
+        ".security-center-activity{" +
+        "border-bottom:1px solid rgba(255,255,255,.08);" +
+        "padding:8px 0;" +
+        "font-size:11px;" +
+        "line-height:1.55;" +
+        "color:#eee;" +
+        "}" +
+
+        ".security-center-activity:last-child{" +
+        "border-bottom:none;" +
+        "}" +
+
+        ".security-center-action{" +
+        "width:100%;" +
+        "min-height:44px;" +
+        "margin-top:9px;" +
+        "padding:10px 13px;" +
+        "border:1px solid rgba(0,255,100,.5);" +
+        "border-radius:13px;" +
+        "background:rgba(0,255,100,.07);" +
+        "color:#fff;" +
+        "font-size:11px;" +
+        "font-weight:800;" +
+        "letter-spacing:.7px;" +
+        "cursor:pointer;" +
+        "box-shadow:none;" +
+        "text-shadow:none;" +
+        "}" +
+
+        "#securityActionMessage{" +
+        "font-size:11px;" +
+        "line-height:1.5;" +
+        "margin-top:10px;" +
+        "color:#00ff66;" +
+        "}" +
+
+        "@media(max-width:600px){" +
+
+        "#securityMenuButton{" +
+        "top:12px;" +
+        "right:12px;" +
+        "width:44px;" +
+        "height:44px;" +
+        "border-radius:14px;" +
+        "font-size:23px;" +
+        "}" +
+
+        "#securityCenterPanel{" +
+        "width:92vw;" +
+        "}" +
+
+        "#securityCenterHeader{" +
+        "padding:18px 14px 14px;" +
+        "}" +
+
+        "#securityCenterContent{" +
+        "padding:13px;" +
+        "}" +
+
+        "}";
+
+    document.head.appendChild(
+        style
+    );
+}
+
+function openSecurityCenter() {
+
+    if (
+        !securityCenterPanel ||
+        !securityCenterOverlay
+    ) {
+        return;
+    }
+
+    securityCenterPanel.classList.add(
+        "show-security-panel"
+    );
+
+    securityCenterOverlay.classList.add(
+        "show-security-overlay"
+    );
+
+    if (securityMenuButton) {
+
+        securityMenuButton.innerHTML =
+            "×";
+
+        securityMenuButton.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+        securityMenuButton.setAttribute(
+            "aria-label",
+            "Close Security Center"
+        );
+    }
+
+    updateSecurityCenter();
+}
+
+function closeSecurityCenter() {
+
+    if (
+        securityCenterPanel
+    ) {
+
+        securityCenterPanel.classList.remove(
+            "show-security-panel"
+        );
+    }
+
+    if (
+        securityCenterOverlay
+    ) {
+
+        securityCenterOverlay.classList.remove(
+            "show-security-overlay"
+        );
+    }
+
+    if (securityMenuButton) {
+
+        securityMenuButton.innerHTML =
+            "☰";
+
+        securityMenuButton.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+        securityMenuButton.setAttribute(
+            "aria-label",
+            "Open Security Center"
+        );
+    }
+}
+
+function updateSecurityCenter() {
+
+    if (!securityCenterInitialized) {
+        return;
+    }
+
+    var statusContent =
+        document.getElementById(
+            "securityStatusContent"
+        );
+
+    var sessionContent =
+        document.getElementById(
+            "securitySessionContent"
+        );
+
+    var activityContent =
+        document.getElementById(
+            "securityActivityContent"
+        );
+
+    var alertsContent =
+        document.getElementById(
+            "securityAlertsContent"
+        );
+
+    if (
+        !currentUser
+    ) {
+
+        if (statusContent) {
+            statusContent.innerHTML =
+                '<div class="security-center-warning">NOT LOGGED IN</div>';
+        }
+
+        if (sessionContent) {
+            sessionContent.innerHTML =
+                '<div class="security-center-muted">No active session.</div>';
+        }
+
+        return;
+    }
+
+    var provider =
+        getOAuthProvider(
+            currentUser
+        );
+
+    var loginMethod =
+        "PASSWORD";
+
+    if (
+        provider ===
+        "google"
+    ) {
+
+        loginMethod =
+            "GOOGLE";
+
+    } else if (
+        provider ===
+        "github"
+    ) {
+
+        loginMethod =
+            "GITHUB";
+    }
+
+    if (statusContent) {
+
+        statusContent.innerHTML =
+            '<div class="security-center-line">' +
+            '<span class="security-center-success">● SECURE</span>' +
+            '</div>' +
+
+            '<div class="security-center-line">' +
+            'Account: ACTIVE' +
+            '</div>' +
+
+            '<div class="security-center-line">' +
+            'Login method: ' +
+            escapeHTML(
+                loginMethod
+            ) +
+            '</div>';
+    }
+
+    if (sessionContent) {
+
+        var sessionEmail =
+            currentUser.email ||
+            currentAccountEmail ||
+            "-";
+
+        sessionContent.innerHTML =
+            '<div class="security-center-line">' +
+            'Device: CURRENT DEVICE' +
+            '</div>' +
+
+            '<div class="security-center-line">' +
+            'Account: ' +
+            escapeHTML(
+                sessionEmail
+            ) +
+            '</div>' +
+
+            '<div class="security-center-line">' +
+            'Session: ' +
+            '<span class="security-center-success">ACTIVE</span>' +
+            '</div>';
+    }
+
+    if (activityContent) {
+
+        var history =
+            getLoginHistory();
+
+        if (
+            history.length ===
+            0
+        ) {
+
+            activityContent.innerHTML =
+                '<div class="security-center-muted">' +
+                'No security activity yet.' +
+                '</div>';
+
+        } else {
+
+            activityContent.innerHTML =
+                "";
+
+            var max =
+                Math.min(
+                    history.length,
+                    5
+                );
+
+            var i =
+                0;
+
+            while (
+                i < max
+            ) {
+
+                var item =
+                    history[i] ||
+                    {};
+
+                var activity =
+                    document.createElement(
+                        "div"
+                    );
+
+                activity.className =
+                    "security-center-activity";
+
+                activity.innerHTML =
+                    '<span class="security-center-success">LOGIN SUCCESSFUL</span><br>' +
+                    escapeHTML(
+                        item.date ||
+                        ""
+                    ) +
+                    " • " +
+                    escapeHTML(
+                        item.time ||
+                        ""
+                    ) +
+                    "<br>" +
+                    escapeHTML(
+                        item.email ||
+                        ""
+                    );
+
+                activityContent.appendChild(
+                    activity
+                );
+
+                i++;
+            }
+        }
+    }
+
+    if (alertsContent) {
+
+        var alerts = [];
+
+        if (
+            loginMethod ===
+            "PASSWORD"
+        ) {
+
+            alerts.push(
+                "Password authentication is active."
+            );
+
+        } else {
+
+            alerts.push(
+                loginMethod +
+                " authentication is active."
+            );
+        }
+
+        alerts.push(
+            "Keep your account credentials private."
+        );
+
+        if (
+            historyKey() !==
+            ""
+        ) {
+
+            alerts.push(
+                "Login history tracking is active."
+            );
+        }
+
+        alertsContent.innerHTML =
+            "";
+
+        var a =
+            0;
+
+        while (
+            a < alerts.length
+        ) {
+
+            var alertLine =
+                document.createElement(
+                    "div"
+                );
+
+            alertLine.className =
+                "security-center-line";
+
+            alertLine.innerHTML =
+                "• " +
+                escapeHTML(
+                    alerts[a]
+                );
+
+            alertsContent.appendChild(
+                alertLine
+            );
+
+            a++;
+        }
+    }
+}
+
+/* =====================================================
+SIGN OUT OTHER SESSIONS
+===================================================== */
+
+async function signOutOtherSessions() {
+
+    var actionMessage =
+        document.getElementById(
+            "securityActionMessage"
+        );
+
+    if (
+        !supabaseClient ||
+        !currentUser
+    ) {
+
+        if (actionMessage) {
+
+            actionMessage.textContent =
+                "❌ No active account.";
+        }
+
+        return;
+    }
+
+    var confirmed =
+        window.confirm(
+            "Sign out other active sessions?\n\n" +
+            "Your current device will remain signed in."
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    var button =
+        document.getElementById(
+            "securitySignOutOthersBtn"
+        );
+
+    if (button) {
+
+        button.disabled =
+            true;
+
+        button.textContent =
+            "SIGNING OUT...";
+    }
+
+    if (actionMessage) {
+
+        actionMessage.textContent =
+            "Updating sessions...";
+    }
+
+    try {
+
+        var result =
+            await supabaseClient.auth
+                .signOut({
+                    scope:
+                        "others"
+                });
+
+        if (result.error) {
+
+            if (actionMessage) {
+
+                actionMessage.textContent =
+                    "❌ " +
+                    result.error.message;
+            }
+
+            return;
+        }
+
+        if (actionMessage) {
+
+            actionMessage.textContent =
+                "✔️ Other sessions signed out.";
+        }
+
+    } catch (error) {
+
+        console.log(
+            "Other session sign-out error:",
+            error
+        );
+
+        if (actionMessage) {
+
+            actionMessage.textContent =
+                "❌ Could not sign out other sessions.";
+        }
+
+    } finally {
+
+        if (button) {
+
+            button.disabled =
+                false;
+
+            button.textContent =
+                "SIGN OUT OTHER SESSIONS";
+        }
+    }
+}
+
+/* =====================================================
 CLOSE BOXES
 ===================================================== */
 
@@ -3641,6 +4564,8 @@ function closeAllProfileBoxes() {
             "show-box"
         );
     }
+
+    closeSecurityCenter();
 }
 
 /* =====================================================
@@ -3689,6 +4614,8 @@ if (clearHistoryBtn) {
             }
 
             displayLoginHistory();
+
+            updateSecurityCenter();
         };
 }
 
@@ -3914,6 +4841,8 @@ if (saveChangedPasswordBtn) {
 
             changePasswordMessage.textContent =
                 "✔️ Password changed successfully.";
+
+            updateSecurityCenter();
         };
 }
 
@@ -3953,15 +4882,6 @@ async function updateStorage() {
 
     storageDetails.textContent =
         "Checking cloud storage...";
-
-    /*
-     * Rebuild the local storage usage from the
-     * current security_items database records.
-     *
-     * This removes stale ledger entries for files
-     * that were already deleted from Cloudinary/B2
-     * and whose database record was also removed.
-     */
 
     await reconcileStorageUsage();
 
@@ -6067,12 +6987,6 @@ async function deleteSecurityItem(
         );
     }
 
-    /*
-     * Reconcile once more after deletion.
-     * This removes any stale ledger entries and
-     * guarantees the displayed usage is rebuilt.
-     */
-
     await reconcileStorageUsage();
 
     if (addFileMessage) {
@@ -6406,6 +7320,8 @@ if (removeAccountBtn) {
             removeRememberedAccount(
                 userEmail
             );
+
+            closeSecurityCenter();
 
             await supabaseClient.auth
                 .signOut();
@@ -6779,10 +7695,19 @@ if (supabaseClient) {
                     currentUser =
                         session.user;
 
+                    if (
+                        securityCenterInitialized
+                    ) {
+
+                        updateSecurityCenter();
+                    }
+
                 } else {
 
                     currentUser =
                         null;
+
+                    closeSecurityCenter();
                 }
             }
         );
