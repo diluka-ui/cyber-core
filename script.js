@@ -56,6 +56,19 @@ var STORAGE_REFERENCE_GB =
     36;
 
 /* =====================================================
+1.4 GB PER USER STORAGE QUOTA
+===================================================== */
+
+var USER_STORAGE_LIMIT_GB =
+    1.4;
+
+var USER_STORAGE_LIMIT_BYTES =
+    USER_STORAGE_LIMIT_GB *
+    1024 *
+    1024 *
+    1024;
+
+/* =====================================================
 CLOUDINARY CONFIG
 ===================================================== */
 
@@ -722,6 +735,149 @@ function addLoginHistory(
     saveLoginHistory(
         history
     );
+}
+
+/* =====================================================
+1.4 GB STORAGE TRACKING
+===================================================== */
+
+function storageUsageKey() {
+
+    if (!currentUser) {
+        return "";
+    }
+
+    return (
+        "cyberCoreStorageUsage_" +
+        currentUser.id
+    );
+}
+
+function getTrackedStorageUsage() {
+
+    var key =
+        storageUsageKey();
+
+    if (key === "") {
+        return 0;
+    }
+
+    var saved =
+        localStorage.getItem(key);
+
+    if (!saved) {
+        return 0;
+    }
+
+    var value =
+        Number(saved);
+
+    if (
+        !isFinite(value) ||
+        value < 0
+    ) {
+        return 0;
+    }
+
+    return value;
+}
+
+function saveTrackedStorageUsage(
+    bytes
+) {
+
+    var key =
+        storageUsageKey();
+
+    if (key === "") {
+        return;
+    }
+
+    var value =
+        Number(bytes) || 0;
+
+    if (value < 0) {
+        value = 0;
+    }
+
+    localStorage.setItem(
+        key,
+        String(value)
+    );
+}
+
+function increaseTrackedStorageUsage(
+    bytes
+) {
+
+    var amount =
+        Number(bytes) || 0;
+
+    if (amount <= 0) {
+        return;
+    }
+
+    var current =
+        getTrackedStorageUsage();
+
+    saveTrackedStorageUsage(
+        current + amount
+    );
+}
+
+function decreaseTrackedStorageUsage(
+    bytes
+) {
+
+    var amount =
+        Number(bytes) || 0;
+
+    if (amount <= 0) {
+        return;
+    }
+
+    var current =
+        getTrackedStorageUsage();
+
+    var updated =
+        current - amount;
+
+    if (updated < 0) {
+        updated = 0;
+    }
+
+    saveTrackedStorageUsage(
+        updated
+    );
+}
+
+function getRemainingStorageBytes() {
+
+    var used =
+        getTrackedStorageUsage();
+
+    var remaining =
+        USER_STORAGE_LIMIT_BYTES -
+        used;
+
+    if (remaining < 0) {
+        remaining = 0;
+    }
+
+    return remaining;
+}
+
+function canUploadFileSize(
+    fileSize
+) {
+
+    var size =
+        Number(fileSize) || 0;
+
+    var remaining =
+        getRemainingStorageBytes();
+
+    return size <= remaining;
 }
 
 /* =====================================================
@@ -3330,105 +3486,27 @@ async function updateStorage() {
     storageDetails.textContent =
         "Checking cloud storage...";
 
-    var result =
-        await supabaseClient
-            .storage
-            .from(
-                STORAGE_BUCKET
-            )
-            .list(
-                currentUser.id,
-                {
-                    limit: 1000,
-                    offset: 0
-                }
-            );
+    /*
+     * Main Cyber Core quota is 1.4 GB per user.
+     * Usage is tracked for B2 + Cloudinary security items
+     * using the localStorage usage ledger.
+     */
 
-    if (result.error) {
+    var trackedBytes =
+        getTrackedStorageUsage();
 
-        storageUsed.textContent =
-            "Unavailable";
+    var remainingBytes =
+        USER_STORAGE_LIMIT_BYTES -
+        trackedBytes;
 
-        storageDetails.textContent =
-            "Storage check failed.";
-
-        storageProgress.style.width =
-            "0%";
-
-        console.log(
-            "Storage list error:",
-            result.error.message
-        );
-
-        return;
+    if (remainingBytes < 0) {
+        remainingBytes = 0;
     }
-
-    var files =
-        result.data || [];
-
-    var totalBytes =
-        0;
-
-    var i = 0;
-
-    while (
-        i < files.length
-    ) {
-
-        if (
-            files[i] &&
-            files[i].metadata &&
-            typeof files[i].metadata.size ===
-            "number"
-        ) {
-
-            totalBytes +=
-                files[i].metadata.size;
-        }
-
-        i++;
-    }
-
-    var kb =
-        totalBytes / 1024;
-
-    var mb =
-        kb / 1024;
-
-    var display;
-
-    if (mb >= 1) {
-
-        display =
-            mb.toFixed(2) +
-            " MB";
-
-    } else if (kb >= 1) {
-
-        display =
-            kb.toFixed(2) +
-            " KB";
-
-    } else {
-
-        display =
-            totalBytes.toFixed(0) +
-            " B";
-    }
-
-    storageUsed.textContent =
-        display;
-
-    var referenceBytes =
-        STORAGE_REFERENCE_GB *
-        1024 *
-        1024 *
-        1024;
 
     var percent =
         (
-            totalBytes /
-            referenceBytes
+            trackedBytes /
+            USER_STORAGE_LIMIT_BYTES
         ) * 100;
 
     if (percent > 100) {
@@ -3439,14 +3517,25 @@ async function updateStorage() {
         percent = 0;
     }
 
+    storageUsed.textContent =
+        formatFileSize(
+            trackedBytes
+        );
+
     storageProgress.style.width =
         percent + "%";
 
     storageDetails.textContent =
-        "Cloud storage used: " +
-        display +
-        " • Reference: " +
-        STORAGE_REFERENCE_GB +
+        "Used: " +
+        formatFileSize(
+            trackedBytes
+        ) +
+        " • Free: " +
+        formatFileSize(
+            remainingBytes
+        ) +
+        " • Limit: " +
+        USER_STORAGE_LIMIT_GB +
         " GB";
 }
 
@@ -4440,6 +4529,42 @@ if (saveFileBtn) {
                 return;
             }
 
+            /* =====================================
+               1.4 GB QUOTA CHECK
+               ===================================== */
+
+            var fileSize =
+                Number(file.size) || 0;
+
+            var remainingBytes =
+                getRemainingStorageBytes();
+
+            if (
+                fileSize >
+                remainingBytes
+            ) {
+
+                setAddFileMessage(
+                    "❌ Storage quota exceeded. " +
+                    "Free space: " +
+                    formatFileSize(
+                        remainingBytes
+                    ) +
+                    " • File size: " +
+                    formatFileSize(
+                        fileSize
+                    ) +
+                    " • Limit: " +
+                    USER_STORAGE_LIMIT_GB +
+                    " GB",
+                    false
+                );
+
+                updateStorage();
+
+                return;
+            }
+
             saveFileBtn.disabled =
                 true;
 
@@ -4667,6 +4792,16 @@ if (saveFileBtn) {
 
                     return;
                 }
+
+                /*
+                 * Database save succeeded.
+                 * Now add the exact uploaded file size
+                 * to this user's local quota ledger.
+                 */
+
+                increaseTrackedStorageUsage(
+                    fileSize
+                );
 
                 if (addFileInput) {
 
@@ -4925,6 +5060,34 @@ async function deleteSecurityItem(
         false;
 
     /* ================================================
+       GET TRACKED FILE SIZE BEFORE DELETE
+       ================================================ */
+
+    var trackedFileSize =
+        0;
+
+    /*
+     * The security_items table currently does not
+     * require a file_size column, so the quota ledger
+     * keeps the total usage. For the exact deleted
+     * item's size, the browser can only know it if the
+     * current item has a stored size property.
+     *
+     * If an older/current item does not contain size,
+     * we keep the ledger unchanged rather than
+     * incorrectly subtracting an unknown amount.
+     */
+
+    if (
+        item.file_size &&
+        Number(item.file_size) > 0
+    ) {
+
+        trackedFileSize =
+            Number(item.file_size);
+    }
+
+    /* ================================================
        BACKBLAZE B2 VIDEO
        ================================================ */
 
@@ -5129,6 +5292,26 @@ async function deleteSecurityItem(
         );
 
         return;
+    }
+
+    /*
+     * Only reduce tracked quota when we know the
+     * deleted item's size.
+     *
+     * New uploads from this updated script can store
+     * their size in the local quota ledger, but the
+     * current security_items schema has no file_size
+     * field. Therefore unknown old items are not
+     * guessed.
+     */
+
+    if (
+        trackedFileSize > 0
+    ) {
+
+        decreaseTrackedStorageUsage(
+            trackedFileSize
+        );
     }
 
     if (addFileMessage) {
