@@ -776,6 +776,7 @@ function getTrackedStorageUsage() {
         !isFinite(value) ||
         value < 0
     ) {
+
         return 0;
     }
 
@@ -1104,10 +1105,143 @@ function removeStorageFileSize(
 }
 
 /* =====================================================
+STORAGE RECONCILIATION FIX
+===================================================== */
+
+async function reconcileStorageUsage() {
+
+    if (
+        !supabaseClient ||
+        !currentUser
+    ) {
+        return;
+    }
+
+    try {
+
+        var result =
+            await supabaseClient
+                .from("security_items")
+                .select(
+                    "file_path"
+                )
+                .eq(
+                    "user_id",
+                    currentUser.id
+                );
+
+        if (result.error) {
+
+            console.log(
+                "Storage reconciliation error:",
+                result.error.message
+            );
+
+            return;
+        }
+
+        var items =
+            result.data || [];
+
+        var existingPaths = {};
+
+        var i = 0;
+
+        while (
+            i < items.length
+        ) {
+
+            var path =
+                items[i] &&
+                items[i].file_path
+                    ? String(
+                        items[i].file_path
+                    )
+                    : "";
+
+            if (
+                path !== ""
+            ) {
+
+                existingPaths[path] =
+                    true;
+            }
+
+            i++;
+        }
+
+        var ledger =
+            getStorageFileLedger();
+
+        var cleanLedger = {};
+
+        var totalBytes =
+            0;
+
+        var keys =
+            Object.keys(
+                ledger
+            );
+
+        i = 0;
+
+        while (
+            i < keys.length
+        ) {
+
+            var filePath =
+                keys[i];
+
+            var fileSize =
+                Number(
+                    ledger[filePath]
+                ) || 0;
+
+            /*
+             * Keep only files that still exist
+             * in security_items.
+             */
+
+            if (
+                existingPaths[filePath] &&
+                isFinite(fileSize) &&
+                fileSize > 0
+            ) {
+
+                cleanLedger[filePath] =
+                    fileSize;
+
+                totalBytes +=
+                    fileSize;
+            }
+
+            i++;
+        }
+
+        saveStorageFileLedger(
+            cleanLedger
+        );
+
+        saveTrackedStorageUsage(
+            totalBytes
+        );
+
+    } catch (error) {
+
+        console.log(
+            "Storage reconciliation failed:",
+            error
+        );
+    }
+}
+
+/* =====================================================
 ESCAPE HTML
 ===================================================== */
 
-function escapeHTML(text) {
+function escapeHTML(
+    text
+) {
 
     var div =
         document.createElement(
@@ -1135,7 +1269,10 @@ function displayLoginHistory() {
     var history =
         getLoginHistory();
 
-    if (history.length === 0) {
+    if (
+        history.length ===
+        0
+    ) {
 
         loginHistoryContent.textContent =
             "No login history yet.";
@@ -1148,7 +1285,9 @@ function displayLoginHistory() {
 
     var i = 0;
 
-    while (i < history.length) {
+    while (
+        i < history.length
+    ) {
 
         var item =
             history[i];
@@ -1344,31 +1483,39 @@ function resetRegistrationForm() {
         countdown
     );
 
-    generatedOTP = "";
+    generatedOTP =
+        "";
 
-    verifiedEmail = "";
+    verifiedEmail =
+        "";
 
-    verifiedPhone = "";
+    verifiedPhone =
+        "";
 
     if (email) {
-        email.value = "";
+        email.value =
+            "";
     }
 
     if (phone) {
-        phone.value = "";
+        phone.value =
+            "";
     }
 
     if (newPassword) {
-        newPassword.value = "";
+        newPassword.value =
+            "";
     }
 
     if (confirmPassword) {
-        confirmPassword.value = "";
+        confirmPassword.value =
+            "";
     }
 
     clearOTP();
 
-    timeLeft = 60;
+    timeLeft =
+        60;
 
     if (timer) {
 
@@ -1385,7 +1532,9 @@ function clearOTP() {
 
     var i = 0;
 
-    while (i < otpInputs.length) {
+    while (
+        i < otpInputs.length
+    ) {
 
         otpInputs[i].value =
             "";
@@ -1401,7 +1550,9 @@ function getEnteredOTP() {
 
     var i = 0;
 
-    while (i < otpInputs.length) {
+    while (
+        i < otpInputs.length
+    ) {
 
         result +=
             otpInputs[i].value;
@@ -1412,7 +1563,8 @@ function getEnteredOTP() {
     return result;
 }
 
-var otpIndex = 0;
+var otpIndex =
+    0;
 
 while (
     otpIndex <
@@ -1456,7 +1608,9 @@ while (
             };
 
         currentBox.onkeydown =
-            function (event) {
+            function (
+                event
+            ) {
 
                 if (
                     event.key ===
@@ -1543,7 +1697,8 @@ if (sendBtn) {
                 return;
             }
 
-            var i = 0;
+            var i =
+                0;
 
             while (
                 i < accounts.length
@@ -1627,7 +1782,8 @@ function startTimer() {
                 }
 
                 if (
-                    timeLeft <= 0
+                    timeLeft <=
+                    0
                 ) {
 
                     clearInterval(
@@ -1792,7 +1948,9 @@ async function createOrUpdateProfile(
                         user.id
                     );
 
-            if (updateResult.error) {
+            if (
+                updateResult.error
+            ) {
 
                 console.log(
                     "Phone update error:",
@@ -1827,7 +1985,9 @@ async function createOrUpdateProfile(
             )
             .single();
 
-    if (insertResult.error) {
+    if (
+        insertResult.error
+    ) {
 
         console.log(
             "Profile insert error:",
@@ -2018,7 +2178,8 @@ async function updateProfile() {
             );
 
         if (
-            pictureURL !== ""
+            pictureURL !==
+            ""
         ) {
 
             profilePicture.src =
@@ -2209,7 +2370,9 @@ if (profilePictureInput) {
 
             if (
                 file.size >
-                5 * 1024 * 1024
+                5 *
+                1024 *
+                1024
             ) {
 
                 alert(
@@ -2476,7 +2639,8 @@ function getOAuthProvider(
     }
 
     var metadata =
-        user.app_metadata || {};
+        user.app_metadata ||
+        {};
 
     var provider =
         metadata.provider ||
@@ -2503,13 +2667,16 @@ function getOAuthProvider(
     }
 
     if (
-        Array.isArray(providers)
+        Array.isArray(
+            providers
+        )
     ) {
 
         if (
             providers.indexOf(
                 "google"
-            ) !== -1
+            ) !==
+            -1
         ) {
 
             return "google";
@@ -2518,7 +2685,8 @@ function getOAuthProvider(
         if (
             providers.indexOf(
                 "github"
-            ) !== -1
+            ) !==
+            -1
         ) {
 
             return "github";
@@ -2533,7 +2701,9 @@ function isGoogleUser(
 ) {
 
     return (
-        getOAuthProvider(user) ===
+        getOAuthProvider(
+            user
+        ) ===
         "google"
     );
 }
@@ -2543,7 +2713,9 @@ function isGithubUser(
 ) {
 
     return (
-        getOAuthProvider(user) ===
+        getOAuthProvider(
+            user
+        ) ===
         "github"
     );
 }
@@ -2553,7 +2725,9 @@ function isOAuthUser(
 ) {
 
     return (
-        getOAuthProvider(user) !==
+        getOAuthProvider(
+            user
+        ) !==
         ""
     );
 }
@@ -2575,13 +2749,16 @@ function isOAuthCallback() {
     return (
         hash.indexOf(
             "access_token="
-        ) !== -1 ||
+        ) !==
+        -1 ||
         hash.indexOf(
             "refresh_token="
-        ) !== -1 ||
+        ) !==
+        -1 ||
         search.indexOf(
             "code="
-        ) !== -1
+        ) !==
+        -1
     );
 }
 
@@ -3233,7 +3410,7 @@ async function showDashboard() {
 
     displayLoginHistory();
 
-    updateStorage();
+    await updateStorage();
 
     closeAllProfileBoxes();
 
@@ -3258,7 +3435,8 @@ function activateHome() {
             ".dashboard-page"
         );
 
-    var i = 0;
+    var i =
+        0;
 
     while (
         i < navItems.length
@@ -3271,7 +3449,8 @@ function activateHome() {
         i++;
     }
 
-    i = 0;
+    i =
+        0;
 
     while (
         i < pages.length
@@ -3321,7 +3500,8 @@ function setupNavigation() {
             ".dashboard-page"
         );
 
-    var i = 0;
+    var i =
+        0;
 
     while (
         i < navItems.length
@@ -3339,7 +3519,8 @@ function setupNavigation() {
                             "data-page"
                         );
 
-                    var j = 0;
+                    var j =
+                        0;
 
                     while (
                         j <
@@ -3355,7 +3536,8 @@ function setupNavigation() {
                         j++;
                     }
 
-                    j = 0;
+                    j =
+                        0;
 
                     while (
                         j <
@@ -3396,7 +3578,7 @@ function setupNavigation() {
 
                         displayLoginHistory();
 
-                        updateStorage();
+                        await updateStorage();
                     }
 
                     if (
@@ -3406,7 +3588,7 @@ function setupNavigation() {
 
                         await loadSecurityItems();
 
-                        updateStorage();
+                        await updateStorage();
                     }
 
                     if (
@@ -3766,6 +3948,23 @@ async function updateStorage() {
         return;
     }
 
+    storageUsed.textContent =
+        "Checking...";
+
+    storageDetails.textContent =
+        "Checking cloud storage...";
+
+    /*
+     * Rebuild the local storage usage from the
+     * current security_items database records.
+     *
+     * This removes stale ledger entries for files
+     * that were already deleted from Cloudinary/B2
+     * and whose database record was also removed.
+     */
+
+    await reconcileStorageUsage();
+
     var trackedBytes =
         getTrackedStorageUsage();
 
@@ -3777,6 +3976,7 @@ async function updateStorage() {
         remainingBytes <
         0
     ) {
+
         remainingBytes =
             0;
     }
@@ -3788,12 +3988,22 @@ async function updateStorage() {
         ) *
         100;
 
-    if (percent > 100) {
-        percent = 100;
+    if (
+        percent >
+        100
+    ) {
+
+        percent =
+            100;
     }
 
-    if (percent < 0) {
-        percent = 0;
+    if (
+        percent <
+        0
+    ) {
+
+        percent =
+            0;
     }
 
     storageUsed.textContent =
@@ -3826,7 +4036,7 @@ STORAGE BUTTON
 if (storageBtn) {
 
     storageBtn.onclick =
-        function () {
+        async function () {
 
             if (!storageBox) {
                 return;
@@ -3842,7 +4052,7 @@ if (storageBtn) {
                 )
             ) {
 
-                updateStorage();
+                await updateStorage();
             }
         };
 }
@@ -4370,7 +4580,8 @@ async function loadSecurityItems() {
         return;
     }
 
-    var i = 0;
+    var i =
+        0;
 
     while (
         i < items.length
@@ -5060,10 +5271,6 @@ if (saveFileBtn) {
                 return;
             }
 
-            /* =====================================
-               FINAL 1.4 GB QUOTA CHECK
-               ===================================== */
-
             var remainingBytes =
                 getRemainingStorageBytes();
 
@@ -5088,14 +5295,10 @@ if (saveFileBtn) {
                     false
                 );
 
-                updateStorage();
+                await updateStorage();
 
                 return;
             }
-
-            /* =====================================
-               SANITIZED REMOTE FILE
-               ===================================== */
 
             var safeFile =
                 createSafeUploadFile(
@@ -5128,10 +5331,6 @@ if (saveFileBtn) {
                     isVideoFile(
                         file
                     );
-
-                /* =================================
-                   VIDEO → B2
-                   ================================= */
 
                 if (videoFile) {
 
@@ -5213,10 +5412,6 @@ if (saveFileBtn) {
 
                 } else {
 
-                    /* =================================
-                       OTHER FILES → CLOUDINARY
-                       ================================= */
-
                     setAddFileMessage(
                         "Uploading file to Cloudinary...",
                         true
@@ -5286,10 +5481,6 @@ if (saveFileBtn) {
                         true;
                 }
 
-                /* =====================================
-                   SAVE DATABASE INFORMATION
-                   ===================================== */
-
                 setAddFileMessage(
                     "Saving file information...",
                     true
@@ -5331,23 +5522,10 @@ if (saveFileBtn) {
                     return;
                 }
 
-                /* =====================================
-                   IMPORTANT QUOTA FIX
-                   ===================================== */
-
-                /*
-                 * Save exact file size against the
-                 * exact remote file path.
-                 */
-
                 saveStorageFileSize(
                     filePath,
                     fileSize
                 );
-
-                /*
-                 * Increase total storage only once.
-                 */
 
                 increaseTrackedStorageUsage(
                     fileSize
@@ -5409,7 +5587,7 @@ if (saveFileBtn) {
 
                 await loadSecurityItems();
 
-                updateStorage();
+                await updateStorage();
 
             } catch (error) {
 
@@ -5620,10 +5798,6 @@ async function deleteSecurityItem(
     var remoteDeleteFailed =
         false;
 
-    /* ================================================
-       GET EXACT FILE SIZE BEFORE ANYTHING IS REMOVED
-       ================================================ */
-
     var ledgerSize =
         getStorageFileSize(
             item.file_path
@@ -5635,13 +5809,10 @@ async function deleteSecurityItem(
         ) || 0;
 
     var trackedFileSize =
-        ledgerSize > 0
+        ledgerSize >
+        0
             ? ledgerSize
             : databaseFileSize;
-
-    /* ================================================
-       BACKBLAZE B2 VIDEO
-       ================================================ */
 
     if (
         item.file_path &&
@@ -5738,10 +5909,6 @@ async function deleteSecurityItem(
         )
     ) {
 
-        /* ============================================
-           CLOUDINARY FILE
-           ============================================ */
-
         var cloudinaryDeleteResult =
             await supabaseClient
                 .functions
@@ -5811,10 +5978,6 @@ async function deleteSecurityItem(
         item.file_path
     ) {
 
-        /* ============================================
-           SUPABASE STORAGE FILE
-           ============================================ */
-
         var storageResult =
             await supabaseClient
                 .storage
@@ -5851,10 +6014,6 @@ async function deleteSecurityItem(
         }
     }
 
-    /* ================================================
-       DATABASE METADATA DELETE
-       ================================================ */
-
     var databaseResult =
         await supabaseClient
             .from(
@@ -5882,15 +6041,6 @@ async function deleteSecurityItem(
         return;
     }
 
-    /* ================================================
-       IMPORTANT STORAGE DELETE FIX
-       ================================================ */
-
-    /*
-     * Remove the per-file ledger entry and use the
-     * exact size that was stored for that file.
-     */
-
     var removedLedgerSize =
         removeStorageFileSize(
             item.file_path
@@ -5907,10 +6057,6 @@ async function deleteSecurityItem(
             removedLedgerSize;
     }
 
-    /*
-     * Decrease total storage exactly once.
-     */
-
     if (
         trackedFileSize >
         0
@@ -5920,6 +6066,14 @@ async function deleteSecurityItem(
             trackedFileSize
         );
     }
+
+    /*
+     * Reconcile once more after deletion.
+     * This removes any stale ledger entries and
+     * guarantees the displayed usage is rebuilt.
+     */
+
+    await reconcileStorageUsage();
 
     if (addFileMessage) {
 
@@ -5943,7 +6097,7 @@ async function deleteSecurityItem(
 
     await loadSecurityItems();
 
-    updateStorage();
+    await updateStorage();
 }
 
 /* =====================================================
@@ -6000,7 +6154,8 @@ async function displayAccounts() {
         return;
     }
 
-    var i = 0;
+    var i =
+        0;
 
     while (
         i < accounts.length
@@ -6483,10 +6638,6 @@ async function checkExistingSession() {
             ? sessionResult.data.session
             : null;
 
-    /* =================================================
-       OAUTH EXISTING SESSION
-       ================================================= */
-
     if (
         session &&
         session.user &&
@@ -6536,10 +6687,6 @@ async function checkExistingSession() {
             return;
         }
     }
-
-    /* =================================================
-       NORMAL SESSION
-       ================================================= */
 
     if (session) {
 
