@@ -891,10 +891,10 @@ function canUploadFileSize(
     var size =
         Number(fileSize) || 0;
 
-    var remaining =
-        getRemainingStorageBytes();
-
-    return size <= remaining;
+    return (
+        size <=
+        getRemainingStorageBytes()
+    );
 }
 
 /* =====================================================
@@ -946,7 +946,7 @@ function getStorageFileLedger() {
     } catch (error) {
 
         console.log(
-            "Storage file ledger read error:",
+            "Storage ledger read error:",
             error
         );
     }
@@ -977,7 +977,7 @@ function saveStorageFileLedger(
     } catch (error) {
 
         console.log(
-            "Storage file ledger save error:",
+            "Storage ledger save error:",
             error
         );
     }
@@ -1009,7 +1009,10 @@ function saveStorageFileSize(
     var size =
         Number(fileSize) || 0;
 
-    if (size <= 0) {
+    if (
+        !isFinite(size) ||
+        size <= 0
+    ) {
         return;
     }
 
@@ -1047,9 +1050,8 @@ function getStorageFileSize(
 
     if (
         !isFinite(size) ||
-        size < 0
+        size <= 0
     ) {
-
         return 0;
     }
 
@@ -1066,11 +1068,16 @@ function removeStorageFileSize(
         );
 
     if (key === "") {
-        return;
+        return 0;
     }
 
     var ledger =
         getStorageFileLedger();
+
+    var size =
+        Number(
+            ledger[key]
+        ) || 0;
 
     if (
         Object.prototype.hasOwnProperty.call(
@@ -1085,6 +1092,15 @@ function removeStorageFileSize(
             ledger
         );
     }
+
+    if (
+        !isFinite(size) ||
+        size <= 0
+    ) {
+        return 0;
+    }
+
+    return size;
 }
 
 /* =====================================================
@@ -1099,7 +1115,9 @@ function escapeHTML(text) {
         );
 
     div.textContent =
-        String(text);
+        text == null
+            ? ""
+            : String(text);
 
     return div.innerHTML;
 }
@@ -1176,7 +1194,9 @@ UI
 
 function showRegister() {
 
-    clearInterval(countdown);
+    clearInterval(
+        countdown
+    );
 
     if (container) {
         container.style.display =
@@ -1320,7 +1340,9 @@ RESET REGISTRATION
 
 function resetRegistrationForm() {
 
-    clearInterval(countdown);
+    clearInterval(
+        countdown
+    );
 
     generatedOTP = "";
 
@@ -1365,7 +1387,8 @@ function clearOTP() {
 
     while (i < otpInputs.length) {
 
-        otpInputs[i].value = "";
+        otpInputs[i].value =
+            "";
 
         i++;
     }
@@ -1373,7 +1396,8 @@ function clearOTP() {
 
 function getEnteredOTP() {
 
-    var result = "";
+    var result =
+        "";
 
     var i = 0;
 
@@ -1395,18 +1419,28 @@ while (
     otpInputs.length
 ) {
 
-    (function (currentIndex) {
+    (function (
+        currentIndex
+    ) {
 
         var currentBox =
-            otpInputs[currentIndex];
+            otpInputs[
+                currentIndex
+            ];
 
         currentBox.oninput =
             function () {
 
                 currentBox.value =
                     currentBox.value
-                        .replace(/\D/g, "")
-                        .slice(0, 1);
+                        .replace(
+                            /\D/g,
+                            ""
+                        )
+                        .slice(
+                            0,
+                            1
+                        );
 
                 if (
                     currentBox.value !==
@@ -1477,7 +1511,8 @@ if (sendBtn) {
             }
 
             if (
-                enteredEmail === ""
+                enteredEmail ===
+                ""
             ) {
 
                 message.textContent =
@@ -1498,7 +1533,8 @@ if (sendBtn) {
             }
 
             if (
-                enteredPhone === ""
+                enteredPhone ===
+                ""
             ) {
 
                 message.textContent =
@@ -1560,9 +1596,12 @@ OTP TIMER
 
 function startTimer() {
 
-    clearInterval(countdown);
+    clearInterval(
+        countdown
+    );
 
-    timeLeft = 60;
+    timeLeft =
+        60;
 
     if (timer) {
 
@@ -1595,7 +1634,8 @@ function startTimer() {
                         countdown
                     );
 
-                    generatedOTP = "";
+                    generatedOTP =
+                        "";
 
                     if (timer) {
 
@@ -1639,7 +1679,8 @@ if (verifyBtn) {
             }
 
             if (
-                generatedOTP === ""
+                generatedOTP ===
+                ""
             ) {
 
                 message.textContent =
@@ -1657,7 +1698,8 @@ if (verifyBtn) {
                     countdown
                 );
 
-                generatedOTP = "";
+                generatedOTP =
+                    "";
 
                 showPassword();
 
@@ -1759,6 +1801,9 @@ async function createOrUpdateProfile(
             }
         }
 
+        currentProfile =
+            result.data;
+
         return result.data;
     }
 
@@ -1791,6 +1836,9 @@ async function createOrUpdateProfile(
 
         return null;
     }
+
+    currentProfile =
+        insertResult.data;
 
     return insertResult.data;
 }
@@ -1873,8 +1921,10 @@ async function getProfilePictureURL(
     }
 
     return (
-        result.data.signedUrl ||
-        ""
+        result.data &&
+        result.data.signedUrl
+            ? result.data.signedUrl
+            : ""
     );
 }
 
@@ -2050,7 +2100,8 @@ if (saveProfileBtn) {
                     : "";
 
             if (
-                username === ""
+                username ===
+                ""
             ) {
 
                 profileMessage.textContent =
@@ -2060,7 +2111,8 @@ if (saveProfileBtn) {
             }
 
             if (
-                username.length > 30
+                username.length >
+                30
             ) {
 
                 profileMessage.textContent =
@@ -2213,7 +2265,8 @@ if (profilePictureInput) {
                         path,
                         file,
                         {
-                            upsert: true,
+                            upsert:
+                                true,
                             contentType:
                                 file.type
                         }
@@ -2301,7 +2354,8 @@ if (loginBtn) {
                     : "";
 
             if (
-                enteredEmail === ""
+                enteredEmail ===
+                ""
             ) {
 
                 message.textContent =
@@ -2311,7 +2365,8 @@ if (loginBtn) {
             }
 
             if (
-                enteredPhone === ""
+                enteredPhone ===
+                ""
             ) {
 
                 message.textContent =
@@ -2321,7 +2376,8 @@ if (loginBtn) {
             }
 
             if (
-                enteredPassword === ""
+                enteredPassword ===
+                ""
             ) {
 
                 message.textContent =
@@ -2395,6 +2451,7 @@ if (loginBtn) {
             );
 
             if (loginPassword) {
+
                 loginPassword.value =
                     "";
             }
@@ -2422,20 +2479,24 @@ function getOAuthProvider(
         user.app_metadata || {};
 
     var provider =
-        metadata.provider || "";
+        metadata.provider ||
+        "";
 
     var providers =
-        metadata.providers || [];
+        metadata.providers ||
+        [];
 
     if (
-        provider === "google"
+        provider ===
+        "google"
     ) {
 
         return "google";
     }
 
     if (
-        provider === "github"
+        provider ===
+        "github"
     ) {
 
         return "github";
@@ -2504,10 +2565,12 @@ OAUTH CALLBACK DETECTION
 function isOAuthCallback() {
 
     var hash =
-        window.location.hash || "";
+        window.location.hash ||
+        "";
 
     var search =
-        window.location.search || "";
+        window.location.search ||
+        "";
 
     return (
         hash.indexOf(
@@ -2563,7 +2626,8 @@ async function handleOAuthUser(
         user;
 
     currentAccountEmail =
-        user.email || "";
+        user.email ||
+        "";
 
     currentAccountPhone =
         "";
@@ -2575,10 +2639,12 @@ async function handleOAuthUser(
         "";
 
     googleOAuthLogin =
-        provider === "google";
+        provider ===
+        "google";
 
     githubOAuthLogin =
-        provider === "github";
+        provider ===
+        "github";
 
     if (
         currentAccountEmail
@@ -2619,13 +2685,17 @@ async function handleOAuthUser(
             "";
     }
 
-    if (provider === "google") {
+    if (
+        provider ===
+        "google"
+    ) {
 
         message.textContent =
             "✔️ GOOGLE LOGIN SUCCESSFUL❗";
 
     } else if (
-        provider === "github"
+        provider ===
+        "github"
     ) {
 
         message.textContent =
@@ -2861,7 +2931,8 @@ if (saveBtn) {
                     : "";
 
             if (
-                pass === ""
+                pass ===
+                ""
             ) {
 
                 message.textContent =
@@ -2871,7 +2942,8 @@ if (saveBtn) {
             }
 
             if (
-                pass.length < 6
+                pass.length <
+                6
             ) {
 
                 message.textContent =
@@ -2881,7 +2953,8 @@ if (saveBtn) {
             }
 
             if (
-                pass !== confirm
+                pass !==
+                confirm
             ) {
 
                 message.textContent =
@@ -2891,7 +2964,8 @@ if (saveBtn) {
             }
 
             if (
-                verifiedEmail === ""
+                verifiedEmail ===
+                ""
             ) {
 
                 message.textContent =
@@ -3253,7 +3327,9 @@ function setupNavigation() {
         i < navItems.length
     ) {
 
-        (function (currentNav) {
+        (function (
+            currentNav
+        ) {
 
             currentNav.onclick =
                 async function () {
@@ -3536,7 +3612,8 @@ if (saveChangedPasswordBtn) {
                     : "";
 
             if (
-                currentPass === ""
+                currentPass ===
+                ""
             ) {
 
                 changePasswordMessage.textContent =
@@ -3546,7 +3623,8 @@ if (saveChangedPasswordBtn) {
             }
 
             if (
-                newPass === ""
+                newPass ===
+                ""
             ) {
 
                 changePasswordMessage.textContent =
@@ -3556,7 +3634,8 @@ if (saveChangedPasswordBtn) {
             }
 
             if (
-                newPass.length < 6
+                newPass.length <
+                6
             ) {
 
                 changePasswordMessage.textContent =
@@ -3687,18 +3766,6 @@ async function updateStorage() {
         return;
     }
 
-    storageUsed.textContent =
-        "Checking...";
-
-    storageDetails.textContent =
-        "Checking cloud storage...";
-
-    /*
-     * Main Cyber Core quota is 1.4 GB per user.
-     * Usage is tracked for B2 + Cloudinary security items
-     * using the localStorage usage ledger.
-     */
-
     var trackedBytes =
         getTrackedStorageUsage();
 
@@ -3706,15 +3773,20 @@ async function updateStorage() {
         USER_STORAGE_LIMIT_BYTES -
         trackedBytes;
 
-    if (remainingBytes < 0) {
-        remainingBytes = 0;
+    if (
+        remainingBytes <
+        0
+    ) {
+        remainingBytes =
+            0;
     }
 
     var percent =
         (
             trackedBytes /
             USER_STORAGE_LIMIT_BYTES
-        ) * 100;
+        ) *
+        100;
 
     if (percent > 100) {
         percent = 100;
@@ -3730,7 +3802,8 @@ async function updateStorage() {
         );
 
     storageProgress.style.width =
-        percent + "%";
+        percent +
+        "%";
 
     storageDetails.textContent =
         "Used: " +
@@ -3850,7 +3923,10 @@ function createSafeFileName(
 ) {
 
     var original =
-        String(fileName || "");
+        String(
+            fileName ||
+            ""
+        );
 
     var safeName =
         original
@@ -3858,10 +3934,6 @@ function createSafeFileName(
                 /[^\w.\-]/g,
                 "_"
             );
-
-    /*
-     * Prevent path-like or hidden-name problems.
-     */
 
     safeName =
         safeName.replace(
@@ -3894,17 +3966,15 @@ function createSafeFileName(
             "file";
     }
 
-    /*
-     * Keep filenames reasonably small.
-     */
-
     if (
         safeName.length >
         180
     ) {
 
         var lastDot =
-            safeName.lastIndexOf(".");
+            safeName.lastIndexOf(
+                "."
+            );
 
         if (
             lastDot > 0 &&
@@ -3961,14 +4031,6 @@ function createSafeUploadFile(
             file.name
         );
 
-    /*
-     * If browser supports File(), create a new File
-     * with the sanitized filename.
-     *
-     * If not supported, FormData can still receive
-     * the original file with the safe name separately.
-     */
-
     try {
 
         if (
@@ -3981,9 +4043,11 @@ function createSafeUploadFile(
                 safeName,
                 {
                     type:
-                        file.type || "",
+                        file.type ||
+                        "",
                     lastModified:
-                        file.lastModified || Date.now()
+                        file.lastModified ||
+                        Date.now()
                 }
             );
         }
@@ -4010,7 +4074,10 @@ function formatFileSize(
     var size =
         Number(bytes) || 0;
 
-    if (size < 1024) {
+    if (
+        size <
+        1024
+    ) {
 
         return (
             size.toFixed(0) +
@@ -4018,24 +4085,49 @@ function formatFileSize(
         );
     }
 
-    if (size < 1024 * 1024) {
+    if (
+        size <
+        1024 *
+        1024
+    ) {
 
         return (
-            (size / 1024).toFixed(2) +
+            (
+                size /
+                1024
+            ).toFixed(2) +
             " KB"
         );
     }
 
-    if (size < 1024 * 1024 * 1024) {
+    if (
+        size <
+        1024 *
+        1024 *
+        1024
+    ) {
 
         return (
-            (size / (1024 * 1024)).toFixed(2) +
+            (
+                size /
+                (
+                    1024 *
+                    1024
+                )
+            ).toFixed(2) +
             " MB"
         );
     }
 
     return (
-        (size / (1024 * 1024 * 1024)).toFixed(2) +
+        (
+            size /
+            (
+                1024 *
+                1024 *
+                1024
+            )
+        ).toFixed(2) +
         " GB"
     );
 }
@@ -4049,7 +4141,10 @@ function isBackblazeB2FilePath(
 ) {
 
     var value =
-        String(filePath || "");
+        String(
+            filePath ||
+            ""
+        );
 
     var prefix =
         "https://" +
@@ -4059,7 +4154,9 @@ function isBackblazeB2FilePath(
         "/";
 
     return (
-        value.indexOf(prefix) ===
+        value.indexOf(
+            prefix
+        ) ===
         0
     );
 }
@@ -4069,14 +4166,18 @@ function isCloudinaryFilePath(
 ) {
 
     var value =
-        String(filePath || "");
+        String(
+            filePath ||
+            ""
+        );
 
     return (
         value.indexOf(
             "https://res.cloudinary.com/" +
             CLOUDINARY_CLOUD_NAME +
             "/"
-        ) === 0
+        ) ===
+        0
     );
 }
 
@@ -4101,7 +4202,9 @@ function getB2ObjectKeyFromUrl(
         "/";
 
     var objectKey =
-        String(fileUrl).slice(
+        String(
+            fileUrl
+        ).slice(
             prefix.length
         );
 
@@ -4118,7 +4221,7 @@ function getB2ObjectKeyFromUrl(
 }
 
 /* =====================================================
-VIDEO DETECTION - IMPORTANT
+VIDEO DETECTION
 ===================================================== */
 
 function isVideoFile(
@@ -4131,13 +4234,15 @@ function isVideoFile(
 
     var mimeType =
         String(
-            file.type || ""
+            file.type ||
+            ""
         ).toLowerCase();
 
     if (
         mimeType.indexOf(
             "video/"
-        ) === 0
+        ) ===
+        0
     ) {
 
         return true;
@@ -4145,14 +4250,18 @@ function isVideoFile(
 
     var fileName =
         String(
-            file.name || ""
+            file.name ||
+            ""
         ).toLowerCase();
 
     var lastDot =
-        fileName.lastIndexOf(".");
+        fileName.lastIndexOf(
+            "."
+        );
 
     if (
-        lastDot === -1
+        lastDot ===
+        -1
     ) {
 
         return false;
@@ -4185,12 +4294,13 @@ function isVideoFile(
     return (
         videoExtensions.indexOf(
             extension
-        ) !== -1
+        ) !==
+        -1
     );
 }
 
 /* =====================================================
-ADD PAGE - LOAD SAVED SECURITY ITEMS
+LOAD SAVED SECURITY ITEMS
 ===================================================== */
 
 async function loadSecurityItems() {
@@ -4224,7 +4334,8 @@ async function loadSecurityItems() {
             .order(
                 "created_at",
                 {
-                    ascending: false
+                    ascending:
+                        false
                 }
             );
 
@@ -4242,12 +4353,16 @@ async function loadSecurityItems() {
     }
 
     var items =
-        result.data || [];
+        result.data ||
+        [];
 
     securityItemsList.innerHTML =
         "";
 
-    if (items.length === 0) {
+    if (
+        items.length ===
+        0
+    ) {
 
         securityItemsList.textContent =
             "No files saved yet.";
@@ -4257,7 +4372,9 @@ async function loadSecurityItems() {
 
     var i = 0;
 
-    while (i < items.length) {
+    while (
+        i < items.length
+    ) {
 
         createSecurityItemElement(
             items[i]
@@ -4268,7 +4385,7 @@ async function loadSecurityItems() {
 }
 
 /* =====================================================
-ADD PAGE - IMAGE FILE CHECK
+IMAGE FILE CHECK
 ===================================================== */
 
 function isImageFilePath(
@@ -4276,16 +4393,25 @@ function isImageFilePath(
 ) {
 
     var pathValue =
-        String(filePath || "");
+        String(
+            filePath ||
+            ""
+        );
+
+    var cleanPath =
+        pathValue
+            .split("?")[0]
+            .split("#")[0]
+            .toLowerCase();
 
     var parts =
-        pathValue.split(".");
+        cleanPath.split(".");
 
     var extension =
         parts.length > 1
             ? parts[
                 parts.length - 1
-            ].toLowerCase()
+            ]
             : "";
 
     var imageExtensions = [
@@ -4301,12 +4427,13 @@ function isImageFilePath(
     return (
         imageExtensions.indexOf(
             extension
-        ) !== -1
+        ) !==
+        -1
     );
 }
 
 /* =====================================================
-ADD PAGE - VIEW FILE
+VIEW FILE
 ===================================================== */
 
 async function viewSecurityItem(
@@ -4352,11 +4479,15 @@ async function viewSecurityItem(
         if (viewWindow) {
 
             viewWindow.document.write(
-                "<!DOCTYPE html><html><head><title>Loading...</title>" +
-                "<style>body{margin:0;background:#000;" +
-                "display:flex;align-items:center;justify-content:center;" +
+                "<!DOCTYPE html><html><head>" +
+                "<title>Loading...</title>" +
+                "<style>" +
+                "body{margin:0;background:#000;" +
+                "display:flex;align-items:center;" +
+                "justify-content:center;" +
                 "min-height:100vh;color:#00ff00;" +
-                "font-family:sans-serif;}</style></head>" +
+                "font-family:sans-serif;}" +
+                "</style></head>" +
                 "<body>Loading...</body></html>"
             );
         }
@@ -4425,7 +4556,10 @@ async function viewSecurityItem(
         }
 
         signedUrl =
-            result.data.signedUrl;
+            result.data &&
+            result.data.signedUrl
+                ? result.data.signedUrl
+                : "";
     }
 
     if (button) {
@@ -4435,6 +4569,19 @@ async function viewSecurityItem(
 
         button.textContent =
             originalText;
+    }
+
+    if (!signedUrl) {
+
+        if (viewWindow) {
+            viewWindow.close();
+        }
+
+        alert(
+            "❌ File URL could not be created."
+        );
+
+        return;
     }
 
     if (isImage) {
@@ -4450,17 +4597,23 @@ async function viewSecurityItem(
             viewWindow.document.open();
 
             viewWindow.document.write(
-                "<!DOCTYPE html><html><head><title>" +
+                "<!DOCTYPE html><html><head>" +
+                "<title>" +
                 safeTitle +
-                "</title><style>" +
+                "</title>" +
+                "<style>" +
                 "body{margin:0;background:#000;" +
                 "display:flex;align-items:center;" +
-                "justify-content:center;min-height:100vh;}" +
-                "img{max-width:100%;max-height:100vh;" +
+                "justify-content:center;" +
+                "min-height:100vh;}" +
+                "img{max-width:100%;" +
+                "max-height:100vh;" +
                 "object-fit:contain;}" +
                 "</style></head><body>" +
                 "<img src=\"" +
-                signedUrl +
+                escapeHTML(
+                    signedUrl
+                ) +
                 "\" alt=\"" +
                 safeTitle +
                 "\"></body></html>"
@@ -4486,7 +4639,7 @@ async function viewSecurityItem(
 }
 
 /* =====================================================
-ADD PAGE - CREATE SAVED ITEM UI
+CREATE SAVED ITEM UI
 ===================================================== */
 
 function createSecurityItemElement(
@@ -4571,7 +4724,8 @@ function createSecurityItemElement(
         );
 
     if (
-        knownFileSize > 0
+        knownFileSize >
+        0
     ) {
 
         var sizeElement =
@@ -4854,7 +5008,10 @@ if (saveFileBtn) {
                 return;
             }
 
-            if (title === "") {
+            if (
+                title ===
+                ""
+            ) {
 
                 setAddFileMessage(
                     "❌ Please enter a file title.",
@@ -4868,7 +5025,10 @@ if (saveFileBtn) {
                 return;
             }
 
-            if (category === "") {
+            if (
+                category ===
+                ""
+            ) {
 
                 setAddFileMessage(
                     "❌ Please select a category.",
@@ -4882,15 +5042,14 @@ if (saveFileBtn) {
                 return;
             }
 
-            /* =====================================
-               FILE SIZE
-               ===================================== */
-
             var fileSize =
-                Number(file.size) || 0;
+                Number(
+                    file.size
+                ) || 0;
 
             if (
-                fileSize <= 0
+                fileSize <=
+                0
             ) {
 
                 setAddFileMessage(
@@ -4902,7 +5061,7 @@ if (saveFileBtn) {
             }
 
             /* =====================================
-               1.4 GB QUOTA CHECK
+               FINAL 1.4 GB QUOTA CHECK
                ===================================== */
 
             var remainingBytes =
@@ -4934,11 +5093,9 @@ if (saveFileBtn) {
                 return;
             }
 
-            /*
-             * Create a sanitized filename for remote
-             * upload while keeping the original local
-             * File input untouched.
-             */
+            /* =====================================
+               SANITIZED REMOTE FILE
+               ===================================== */
 
             var safeFile =
                 createSafeUploadFile(
@@ -4967,18 +5124,14 @@ if (saveFileBtn) {
 
             try {
 
-                /* =====================================
-                   STRONG VIDEO DETECTION
-                   ===================================== */
-
                 var videoFile =
                     isVideoFile(
                         file
                     );
 
-                /* =====================================
-                   VIDEO → BACKBLAZE B2 ONLY
-                   ===================================== */
+                /* =================================
+                   VIDEO → B2
+                   ================================= */
 
                 if (videoFile) {
 
@@ -5029,7 +5182,8 @@ if (saveFileBtn) {
                     }
 
                     var b2Data =
-                        b2Result.data || {};
+                        b2Result.data ||
+                        {};
 
                     if (
                         !b2Data.success ||
@@ -5060,7 +5214,7 @@ if (saveFileBtn) {
                 } else {
 
                     /* =================================
-                       OTHER FILES → CLOUDINARY ONLY
+                       OTHER FILES → CLOUDINARY
                        ================================= */
 
                     setAddFileMessage(
@@ -5161,12 +5315,6 @@ if (saveFileBtn) {
                     insertResult.error
                 ) {
 
-                    /*
-                     * Database save failed.
-                     * Remove remote file so we do not
-                     * leave an orphaned upload.
-                     */
-
                     await cleanupRemoteFile(
                         filePath
                     );
@@ -5183,11 +5331,13 @@ if (saveFileBtn) {
                     return;
                 }
 
+                /* =====================================
+                   IMPORTANT QUOTA FIX
+                   ===================================== */
+
                 /*
-                 * Database save succeeded.
-                 *
-                 * Store exact file size in the local
-                 * per-file ledger FIRST.
+                 * Save exact file size against the
+                 * exact remote file path.
                  */
 
                 saveStorageFileSize(
@@ -5196,9 +5346,7 @@ if (saveFileBtn) {
                 );
 
                 /*
-                 * Increase total usage only after the
-                 * remote upload and database save both
-                 * succeeded.
+                 * Increase total storage only once.
                  */
 
                 increaseTrackedStorageUsage(
@@ -5270,12 +5418,6 @@ if (saveFileBtn) {
                     error
                 );
 
-                /*
-                 * If database save succeeded and usage
-                 * was already added, do not clean the
-                 * remote file here.
-                 */
-
                 if (
                     filePath &&
                     !usageWasAdded
@@ -5333,14 +5475,20 @@ async function editSecurityItem(
             currentTitle
         );
 
-    if (newTitle === null) {
+    if (
+        newTitle ===
+        null
+    ) {
         return;
     }
 
     newTitle =
         newTitle.trim();
 
-    if (newTitle === "") {
+    if (
+        newTitle ===
+        ""
+    ) {
 
         alert(
             "File title cannot be empty."
@@ -5359,7 +5507,10 @@ async function editSecurityItem(
             currentCategory
         );
 
-    if (newCategory === null) {
+    if (
+        newCategory ===
+        null
+    ) {
         return;
     }
 
@@ -5379,7 +5530,8 @@ async function editSecurityItem(
     if (
         allowedCategories.indexOf(
             newCategory
-        ) === -1
+        ) ===
+        -1
     ) {
 
         alert(
@@ -5469,28 +5621,23 @@ async function deleteSecurityItem(
         false;
 
     /* ================================================
-       GET EXACT FILE SIZE
+       GET EXACT FILE SIZE BEFORE ANYTHING IS REMOVED
        ================================================ */
 
-    var trackedFileSize =
+    var ledgerSize =
         getStorageFileSize(
             item.file_path
         );
 
-    /*
-     * Compatibility with any future/current item
-     * that may already contain file_size.
-     */
+    var databaseFileSize =
+        Number(
+            item.file_size
+        ) || 0;
 
-    if (
-        trackedFileSize <= 0 &&
-        item.file_size &&
-        Number(item.file_size) > 0
-    ) {
-
-        trackedFileSize =
-            Number(item.file_size);
-    }
+    var trackedFileSize =
+        ledgerSize > 0
+            ? ledgerSize
+            : databaseFileSize;
 
     /* ================================================
        BACKBLAZE B2 VIDEO
@@ -5550,14 +5697,17 @@ async function deleteSecurityItem(
                     "Do you still want to remove its saved information?"
                 );
 
-            if (!continueB2Delete) {
+            if (
+                !continueB2Delete
+            ) {
                 return;
             }
 
         } else {
 
             var b2DeleteData =
-                b2DeleteResult.data || {};
+                b2DeleteResult.data ||
+                {};
 
             if (
                 b2DeleteData.success ===
@@ -5573,7 +5723,9 @@ async function deleteSecurityItem(
                         "Do you still want to remove its saved information?"
                     );
 
-                if (!continueB2Delete2) {
+                if (
+                    !continueB2Delete2
+                ) {
                     return;
                 }
             }
@@ -5621,14 +5773,17 @@ async function deleteSecurityItem(
                     "Do you still want to remove its saved information?"
                 );
 
-            if (!continueCloudinaryDelete) {
+            if (
+                !continueCloudinaryDelete
+            ) {
                 return;
             }
 
         } else {
 
             var cloudinaryDeleteData =
-                cloudinaryDeleteResult.data || {};
+                cloudinaryDeleteResult.data ||
+                {};
 
             if (
                 cloudinaryDeleteData.success ===
@@ -5644,7 +5799,9 @@ async function deleteSecurityItem(
                         "Do you still want to remove its saved information?"
                     );
 
-                if (!continueCloudinaryDelete2) {
+                if (
+                    !continueCloudinaryDelete2
+                ) {
                     return;
                 }
             }
@@ -5686,7 +5843,9 @@ async function deleteSecurityItem(
                     "Do you still want to remove its saved information?"
                 );
 
-            if (!continueStorageDelete) {
+            if (
+                !continueStorageDelete
+            ) {
                 return;
             }
         }
@@ -5723,20 +5882,38 @@ async function deleteSecurityItem(
         return;
     }
 
+    /* ================================================
+       IMPORTANT STORAGE DELETE FIX
+       ================================================ */
+
     /*
-     * Remove exact per-file ledger entry.
+     * Remove the per-file ledger entry and use the
+     * exact size that was stored for that file.
      */
 
-    removeStorageFileSize(
-        item.file_path
-    );
+    var removedLedgerSize =
+        removeStorageFileSize(
+            item.file_path
+        );
+
+    if (
+        trackedFileSize <=
+        0 &&
+        removedLedgerSize >
+        0
+    ) {
+
+        trackedFileSize =
+            removedLedgerSize;
+    }
 
     /*
-     * Reduce total quota only when exact size is known.
+     * Decrease total storage exactly once.
      */
 
     if (
-        trackedFileSize > 0
+        trackedFileSize >
+        0
     ) {
 
         decreaseTrackedStorageUsage(
@@ -5746,7 +5923,9 @@ async function deleteSecurityItem(
 
     if (addFileMessage) {
 
-        if (remoteDeleteFailed) {
+        if (
+            remoteDeleteFailed
+        ) {
 
             setAddFileMessage(
                 "⚠️ Saved information deleted, but the cloud file may still exist.",
@@ -5811,7 +5990,8 @@ async function displayAccounts() {
         "";
 
     if (
-        accounts.length === 0
+        accounts.length ===
+        0
     ) {
 
         accountList.textContent =
@@ -5953,16 +6133,20 @@ function createSwitchHandler(
         }
 
         if (loginEmail) {
+
             loginEmail.value =
                 account.email;
         }
 
         if (loginPhone) {
+
             loginPhone.value =
-                account.phone || "";
+                account.phone ||
+                "";
         }
 
         if (loginPassword) {
+
             loginPassword.value =
                 "";
         }
@@ -6090,16 +6274,19 @@ if (removeAccountBtn) {
                 false;
 
             if (loginEmail) {
+
                 loginEmail.value =
                     "";
             }
 
             if (loginPhone) {
+
                 loginPhone.value =
                     "";
             }
 
             if (loginPassword) {
+
                 loginPassword.value =
                     "";
             }
@@ -6127,12 +6314,15 @@ async function handleOAuthCallbackSession() {
         return false;
     }
 
-    var waitCount = 0;
+    var waitCount =
+        0;
 
-    var session = null;
+    var session =
+        null;
 
     while (
-        waitCount < 20
+        waitCount <
+        20
     ) {
 
         var result =
@@ -6151,7 +6341,9 @@ async function handleOAuthCallbackSession() {
         }
 
         await new Promise(
-            function (resolve) {
+            function (
+                resolve
+            ) {
 
                 setTimeout(
                     resolve,
@@ -6177,15 +6369,18 @@ async function handleOAuthCallbackSession() {
         );
 
     if (
-        provider !== "google" &&
-        provider !== "github"
+        provider !==
+        "google" &&
+        provider !==
+        "github"
     ) {
 
         return false;
     }
 
     if (
-        provider === "google"
+        provider ===
+        "google"
     ) {
 
         googleOAuthLogin =
@@ -6374,7 +6569,8 @@ async function checkExistingSession() {
         getRememberedAccounts();
 
     if (
-        accounts.length > 0
+        accounts.length >
+        0
     ) {
 
         showLogin();
@@ -6384,7 +6580,8 @@ async function checkExistingSession() {
             loginEmail.value =
                 accounts[
                     accounts.length - 1
-                ].email || "";
+                ].email ||
+                "";
         }
 
         if (loginPhone) {
@@ -6392,7 +6589,8 @@ async function checkExistingSession() {
             loginPhone.value =
                 accounts[
                     accounts.length - 1
-                ].phone || "";
+                ].phone ||
+                "";
         }
 
         if (loginPassword) {
