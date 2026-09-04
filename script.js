@@ -1652,7 +1652,7 @@ SEND OTP
 if (sendBtn) {
 
     sendBtn.onclick =
-        function () {
+        async function () {
 
             var enteredEmail =
                 email
@@ -1734,28 +1734,113 @@ if (sendBtn) {
                 i++;
             }
 
-            generatedOTP =
+            if (!supabaseClient) {
+
+                message.textContent =
+                    "❌ Supabase could not be loaded.";
+
+                return;
+            }
+
+            var otpToSend =
                 Math.floor(
                     100000 +
                     Math.random() *
                     900000
                 ).toString();
 
-            verifiedEmail =
-                enteredEmail;
-
-            verifiedPhone =
-                enteredPhone;
-
-            clearOTP();
-
-            showOTP();
+            sendBtn.disabled =
+                true;
 
             message.textContent =
-                "🔐 DEMO OTP: " +
-                generatedOTP;
+                "Sending OTP to your email...";
 
-            startTimer();
+            try {
+
+                var sendResult =
+                    await supabaseClient
+                        .functions
+                        .invoke(
+                            "send-otp-email",
+                            {
+                                body: {
+                                    email:
+                                        enteredEmail,
+                                    otp:
+                                        otpToSend
+                                }
+                            }
+                        );
+
+                sendBtn.disabled =
+                    false;
+
+                if (
+                    sendResult.error
+                ) {
+
+                    message.textContent =
+                        "❌ Failed to send OTP email. Please try again.";
+
+                    console.log(
+                        "send-otp-email invoke error:",
+                        sendResult.error
+                    );
+
+                    return;
+                }
+
+                var sendData =
+                    sendResult.data ||
+                    {};
+
+                if (
+                    !sendData.success
+                ) {
+
+                    message.textContent =
+                        "❌ " +
+                        (
+                            sendData.error ||
+                            "Failed to send OTP email."
+                        );
+
+                    return;
+                }
+
+                generatedOTP =
+                    otpToSend;
+
+                verifiedEmail =
+                    enteredEmail;
+
+                verifiedPhone =
+                    enteredPhone;
+
+                clearOTP();
+
+                showOTP();
+
+                message.textContent =
+                    "📧 OTP sent to " +
+                    enteredEmail +
+                    ". Please check your inbox.";
+
+                startTimer();
+
+            } catch (error) {
+
+                sendBtn.disabled =
+                    false;
+
+                message.textContent =
+                    "❌ Failed to send OTP email. Please try again.";
+
+                console.log(
+                    "Send OTP error:",
+                    error
+                );
+            }
         };
 }
 
