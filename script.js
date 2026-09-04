@@ -5,6 +5,7 @@
 CYBER CORE - SUPABASE VERSION
 GOOGLE + GITHUB OAUTH
 BACKBLAZE B2 VIDEO STORAGE
+CLOUDINARY OTHER FILE STORAGE
 ===================================================== */
 
 /* =====================================================
@@ -12,10 +13,10 @@ SUPABASE CONFIG
 ===================================================== */
 
 var SUPABASE_URL =
-"https://zlysjkpstaushfjgnvxi.supabase.co";
+    "https://zlysjkpstaushfjgnvxi.supabase.co";
 
 var SUPABASE_PUBLISHABLE_KEY =
-"sb_publishable_45K-dyeWhUXpjOioTgPw_A_7R-t1gKu";
+    "sb_publishable_45K-dyeWhUXpjOioTgPw_A_7R-t1gKu";
 
 var supabaseClient = null;
 
@@ -24,7 +25,6 @@ if (
     typeof window.supabase.createClient ===
     "function"
 ) {
-
     supabaseClient =
         window.supabase.createClient(
             SUPABASE_URL,
@@ -37,7 +37,6 @@ if (
                 }
             }
         );
-
 }
 
 /* =====================================================
@@ -45,49 +44,52 @@ CONFIG
 ===================================================== */
 
 var HELP_WHATSAPP_NUMBER =
-"94715874334";
+    "94715874334";
 
 var STORAGE_BUCKET =
-"cyber-files";
+    "cyber-files";
 
 var MAX_ACCOUNTS =
-5;
+    5;
 
 var STORAGE_REFERENCE_GB =
-36;
+    36;
 
 /* =====================================================
 CLOUDINARY CONFIG
 ===================================================== */
 
 var CLOUDINARY_CLOUD_NAME =
-"am04nwhi";
+    "am04nwhi";
 
 var CLOUDINARY_UPLOAD_PRESET =
-"cyber_core_upload";
+    "cyber_core_upload";
+
+var CLOUDINARY_FOLDER =
+    "cyber-core";
 
 /* =====================================================
 BACKBLAZE B2 CONFIG
 ===================================================== */
 
 var B2_FUNCTION_UPLOAD =
-"b2-video-upload";
+    "b2-video-upload";
 
 var B2_FUNCTION_DELETE =
-"b2-video-delete";
+    "b2-video-delete";
 
 var B2_ENDPOINT =
-"s3.us-east-005.backblazeb2.com";
+    "s3.us-east-005.backblazeb2.com";
 
 var B2_BUCKET_NAME =
-"cyber-core-videos";
+    "cyber-core-videos";
 
 /* =====================================================
 OAUTH CONFIG
 ===================================================== */
 
 var OAUTH_REDIRECT_URL =
-"https://diluka-ui.github.io/cyber-core/";
+    "https://diluka-ui.github.io/cyber-core/";
 
 /* =====================================================
 VARIABLES
@@ -117,303 +119,300 @@ var googleOAuthLogin = false;
 
 var githubOAuthLogin = false;
 
-var oauthHandling =
-false;
+var oauthHandling = false;
 
-var oauthCallbackHandled =
-false;
+var oauthCallbackHandled = false;
 
 /* =====================================================
 ELEMENTS
 ===================================================== */
 
 var container =
-document.querySelector(".container");
+    document.querySelector(".container");
 
 var registerBox =
-document.getElementById("registerBox");
+    document.getElementById("registerBox");
 
 var email =
-document.getElementById("email");
+    document.getElementById("email");
 
 var phone =
-document.getElementById("phone");
+    document.getElementById("phone");
 
 var sendBtn =
-document.getElementById("sendBtn");
+    document.getElementById("sendBtn");
 
 var otpBox =
-document.getElementById("otpBox");
+    document.getElementById("otpBox");
 
 var verifyBtn =
-document.getElementById("verifyBtn");
+    document.getElementById("verifyBtn");
 
 var timer =
-document.getElementById("timer");
+    document.getElementById("timer");
 
 var passwordBox =
-document.getElementById("passwordBox");
+    document.getElementById("passwordBox");
 
 var newPassword =
-document.getElementById("newPassword");
+    document.getElementById("newPassword");
 
 var confirmPassword =
-document.getElementById("confirmPassword");
+    document.getElementById("confirmPassword");
 
 var saveBtn =
-document.getElementById("savePasswordBtn");
+    document.getElementById("savePasswordBtn");
 
 var loginBox =
-document.getElementById("loginBox");
+    document.getElementById("loginBox");
 
 var loginEmail =
-document.getElementById("loginEmail");
+    document.getElementById("loginEmail");
 
 var loginPhone =
-document.getElementById("loginPhone");
+    document.getElementById("loginPhone");
 
 var loginPassword =
-document.getElementById("loginPassword");
+    document.getElementById("loginPassword");
 
 var loginBtn =
-document.getElementById("loginBtn");
+    document.getElementById("loginBtn");
 
 var googleLoginBtn =
-document.getElementById("googleLoginBtn");
+    document.getElementById("googleLoginBtn");
 
 var githubLoginBtn =
-document.getElementById("githubLoginBtn");
+    document.getElementById("githubLoginBtn");
 
 var createAccountBtn =
-document.getElementById("createAccountBtn");
+    document.getElementById("createAccountBtn");
 
 var message =
-document.getElementById("message");
+    document.getElementById("message");
 
 var dashboard =
-document.getElementById("dashboard");
+    document.getElementById("dashboard");
 
 /* =====================================================
 HOME
 ===================================================== */
 
 var loginHistoryBtn =
-document.getElementById(
-    "loginHistoryBtn"
-);
+    document.getElementById(
+        "loginHistoryBtn"
+    );
 
 var loginHistoryBox =
-document.getElementById(
-    "loginHistoryBox"
-);
+    document.getElementById(
+        "loginHistoryBox"
+    );
 
 var loginHistoryContent =
-document.getElementById(
-    "loginHistoryContent"
-);
+    document.getElementById(
+        "loginHistoryContent"
+    );
 
 var clearHistoryBtn =
-document.getElementById(
-    "clearHistoryBtn"
-);
+    document.getElementById(
+        "clearHistoryBtn"
+    );
 
 var changePasswordBtn =
-document.getElementById(
-    "changePasswordBtn"
-);
+    document.getElementById(
+        "changePasswordBtn"
+    );
 
 var changePasswordBox =
-document.getElementById(
-    "changePasswordBox"
-);
+    document.getElementById(
+        "changePasswordBox"
+    );
 
 var oldPassword =
-document.getElementById(
-    "oldPassword"
-);
+    document.getElementById(
+        "oldPassword"
+    );
 
 var changeNewPassword =
-document.getElementById(
-    "changeNewPassword"
-);
+    document.getElementById(
+        "changeNewPassword"
+    );
 
 var changeConfirmPassword =
-document.getElementById(
-    "changeConfirmPassword"
-);
+    document.getElementById(
+        "changeConfirmPassword"
+    );
 
 var saveChangedPasswordBtn =
-document.getElementById(
-    "saveChangedPasswordBtn"
-);
+    document.getElementById(
+        "saveChangedPasswordBtn"
+    );
 
 var changePasswordMessage =
-document.getElementById(
-    "changePasswordMessage"
-);
+    document.getElementById(
+        "changePasswordMessage"
+    );
 
 var storageBtn =
-document.getElementById(
-    "storageBtn"
-);
+    document.getElementById(
+        "storageBtn"
+    );
 
 var storageBox =
-document.getElementById(
-    "storageBox"
-);
+    document.getElementById(
+        "storageBox"
+    );
 
 var storageUsed =
-document.getElementById(
-    "storageUsed"
-);
+    document.getElementById(
+        "storageUsed"
+    );
 
 var storageProgress =
-document.getElementById(
-    "storageProgress"
-);
+    document.getElementById(
+        "storageProgress"
+    );
 
 var storageDetails =
-document.getElementById(
-    "storageDetails"
-);
+    document.getElementById(
+        "storageDetails"
+    );
 
 /* =====================================================
 ADD PAGE
-FILE + TITLE + CATEGORY
 ===================================================== */
 
 var addFileInput =
-document.getElementById(
-    "addFileInput"
-);
+    document.getElementById(
+        "addFileInput"
+    );
 
 var addFileName =
-document.getElementById(
-    "addFileName"
-);
+    document.getElementById(
+        "addFileName"
+    );
 
 var addTitle =
-document.getElementById(
-    "addTitle"
-);
+    document.getElementById(
+        "addTitle"
+    );
 
 var addCategory =
-document.getElementById(
-    "addCategory"
-);
+    document.getElementById(
+        "addCategory"
+    );
 
 var saveFileBtn =
-document.getElementById(
-    "saveFileBtn"
-);
+    document.getElementById(
+        "saveFileBtn"
+    );
 
 var addFileMessage =
-document.getElementById(
-    "addFileMessage"
-);
+    document.getElementById(
+        "addFileMessage"
+    );
 
 var securityItemsList =
-document.getElementById(
-    "securityItemsList"
-);
+    document.getElementById(
+        "securityItemsList"
+    );
 
 /* =====================================================
 PROFILE
 ===================================================== */
 
 var profilePicture =
-document.getElementById(
-    "profilePicture"
-);
+    document.getElementById(
+        "profilePicture"
+    );
 
 var profilePicturePlaceholder =
-document.getElementById(
-    "profilePicturePlaceholder"
-);
+    document.getElementById(
+        "profilePicturePlaceholder"
+    );
 
 var profilePictureInput =
-document.getElementById(
-    "profilePictureInput"
-);
+    document.getElementById(
+        "profilePictureInput"
+    );
 
 var profileUsername =
-document.getElementById(
-    "profileUsername"
-);
+    document.getElementById(
+        "profileUsername"
+    );
 
 var profileEmail =
-document.getElementById(
-    "profileEmail"
-);
+    document.getElementById(
+        "profileEmail"
+    );
 
 var profilePhone =
-document.getElementById(
-    "profilePhone"
-);
+    document.getElementById(
+        "profilePhone"
+    );
 
 var profileBirthday =
-document.getElementById(
-    "profileBirthday"
-);
+    document.getElementById(
+        "profileBirthday"
+    );
 
 var editUsername =
-document.getElementById(
-    "editUsername"
-);
+    document.getElementById(
+        "editUsername"
+    );
 
 var editBirthday =
-document.getElementById(
-    "editBirthday"
-);
+    document.getElementById(
+        "editBirthday"
+    );
 
 var saveProfileBtn =
-document.getElementById(
-    "saveProfileBtn"
-);
+    document.getElementById(
+        "saveProfileBtn"
+    );
 
 var profileMessage =
-document.getElementById(
-    "profileMessage"
-);
+    document.getElementById(
+        "profileMessage"
+    );
 
 var accountChangeBtn =
-document.getElementById(
-    "accountChangeBtn"
-);
+    document.getElementById(
+        "accountChangeBtn"
+    );
 
 var accountChangeBox =
-document.getElementById(
-    "accountChangeBox"
-);
+    document.getElementById(
+        "accountChangeBox"
+    );
 
 var accountList =
-document.getElementById(
-    "accountList"
-);
+    document.getElementById(
+        "accountList"
+    );
 
 var addAccountBtn =
-document.getElementById(
-    "addAccountBtn"
-);
+    document.getElementById(
+        "addAccountBtn"
+    );
 
 var helpCenterBtn =
-document.getElementById(
-    "helpCenterBtn"
-);
+    document.getElementById(
+        "helpCenterBtn"
+    );
 
 var removeAccountBtn =
-document.getElementById(
-    "removeAccountBtn"
-);
+    document.getElementById(
+        "removeAccountBtn"
+    );
 
 /* =====================================================
 OTP INPUTS
 ===================================================== */
 
 var otpInputs =
-document.querySelectorAll(
-    ".otp-digit"
-);
+    document.querySelectorAll(
+        ".otp-digit"
+    );
 
 /* =====================================================
 REMEMBERED ACCOUNTS
@@ -457,7 +456,6 @@ function saveRememberedAccounts(
         "cyberCoreAccounts",
         JSON.stringify(accounts)
     );
-
 }
 
 function rememberAccount(
@@ -479,13 +477,16 @@ function rememberAccount(
     while (i < accounts.length) {
 
         if (
+            accounts[i] &&
             accounts[i].email &&
             accounts[i].email.toLowerCase() ===
             userEmail.toLowerCase()
         ) {
 
             accounts[i].phone =
-                userPhone || "";
+                userPhone ||
+                accounts[i].phone ||
+                "";
 
             found = true;
 
@@ -498,8 +499,10 @@ function rememberAccount(
     if (!found) {
 
         accounts.push({
-            email: userEmail,
-            phone: userPhone || ""
+            email:
+                userEmail,
+            phone:
+                userPhone || ""
         });
     }
 
@@ -518,7 +521,6 @@ function rememberAccount(
     saveRememberedAccounts(
         accounts
     );
-
 }
 
 function removeRememberedAccount(
@@ -539,6 +541,7 @@ function removeRememberedAccount(
     while (i < accounts.length) {
 
         if (
+            !accounts[i] ||
             !accounts[i].email ||
             accounts[i].email.toLowerCase() !==
             userEmail.toLowerCase()
@@ -555,7 +558,6 @@ function removeRememberedAccount(
     saveRememberedAccounts(
         filtered
     );
-
 }
 
 /* =====================================================
@@ -623,7 +625,6 @@ function removeOldLocalTestAccounts() {
             error
         );
     }
-
 }
 
 removeOldLocalTestAccounts();
@@ -642,7 +643,6 @@ function historyKey() {
         "cyberCoreLoginHistory_" +
         currentUser.id
     );
-
 }
 
 function getLoginHistory() {
@@ -693,7 +693,6 @@ function saveLoginHistory(
         key,
         JSON.stringify(history)
     );
-
 }
 
 function addLoginHistory(
@@ -723,7 +722,6 @@ function addLoginHistory(
     saveLoginHistory(
         history
     );
-
 }
 
 /* =====================================================
@@ -807,7 +805,6 @@ function displayLoginHistory() {
 
         i++;
     }
-
 }
 
 /* =====================================================
@@ -850,7 +847,6 @@ function showRegister() {
         loginBox.style.display =
             "none";
     }
-
 }
 
 function showOTP() {
@@ -884,7 +880,6 @@ function showOTP() {
         loginBox.style.display =
             "none";
     }
-
 }
 
 function showPassword() {
@@ -918,7 +913,6 @@ function showPassword() {
         loginBox.style.display =
             "none";
     }
-
 }
 
 function showLogin() {
@@ -955,7 +949,6 @@ function showLogin() {
         loginBox.style.display =
             "block";
     }
-
 }
 
 /* =====================================================
@@ -997,7 +990,6 @@ function resetRegistrationForm() {
         timer.textContent =
             "OTP expires in: 60s";
     }
-
 }
 
 /* =====================================================
@@ -1014,7 +1006,6 @@ function clearOTP() {
 
         i++;
     }
-
 }
 
 function getEnteredOTP() {
@@ -1065,7 +1056,6 @@ while (
                         currentIndex + 1
                     ].focus();
                 }
-
             };
 
         currentBox.onkeydown =
@@ -1083,13 +1073,11 @@ while (
                         currentIndex - 1
                     ].focus();
                 }
-
             };
 
     })(otpIndex);
 
     otpIndex++;
-
 }
 
 /* =====================================================
@@ -1102,10 +1090,14 @@ if (sendBtn) {
         function () {
 
             var enteredEmail =
-                email.value.trim();
+                email
+                    ? email.value.trim()
+                    : "";
 
             var enteredPhone =
-                phone.value.trim();
+                phone
+                    ? phone.value.trim()
+                    : "";
 
             var accounts =
                 getRememberedAccounts();
@@ -1159,6 +1151,7 @@ if (sendBtn) {
             ) {
 
                 if (
+                    accounts[i] &&
                     accounts[i].email &&
                     accounts[i].email.toLowerCase() ===
                     enteredEmail.toLowerCase()
@@ -1196,7 +1189,6 @@ if (sendBtn) {
 
             startTimer();
         };
-
 }
 
 /* =====================================================
@@ -1258,7 +1250,6 @@ function startTimer() {
             },
             1000
         );
-
 }
 
 /* =====================================================
@@ -1315,9 +1306,7 @@ if (verifyBtn) {
                 message.textContent =
                     "❌ Incorrect OTP❗";
             }
-
         };
-
 }
 
 /* =====================================================
@@ -1632,6 +1621,22 @@ async function updateProfile() {
                 profilePicturePlaceholder.style.display =
                     "none";
             }
+
+        } else {
+
+            profilePicture.src =
+                "";
+
+            profilePicture.style.display =
+                "none";
+
+            if (
+                profilePicturePlaceholder
+            ) {
+
+                profilePicturePlaceholder.style.display =
+                    "block";
+            }
         }
 
     } else {
@@ -1672,10 +1677,14 @@ if (saveProfileBtn) {
             }
 
             var username =
-                editUsername.value.trim();
+                editUsername
+                    ? editUsername.value.trim()
+                    : "";
 
             var birthday =
-                editBirthday.value;
+                editBirthday
+                    ? editBirthday.value
+                    : "";
 
             if (
                 username === ""
@@ -1743,7 +1752,6 @@ if (saveProfileBtn) {
             profileMessage.textContent =
                 "✔️ Profile updated successfully.";
         };
-
 }
 
 /* =====================================================
@@ -1895,7 +1903,6 @@ if (profilePictureInput) {
 
             updateStorage();
         };
-
 }
 
 /* =====================================================
@@ -1916,13 +1923,19 @@ if (loginBtn) {
             }
 
             var enteredEmail =
-                loginEmail.value.trim();
+                loginEmail
+                    ? loginEmail.value.trim()
+                    : "";
 
             var enteredPhone =
-                loginPhone.value.trim();
+                loginPhone
+                    ? loginPhone.value.trim()
+                    : "";
 
             var enteredPassword =
-                loginPassword.value;
+                loginPassword
+                    ? loginPassword.value
+                    : "";
 
             if (
                 enteredEmail === ""
@@ -2018,15 +2031,16 @@ if (loginBtn) {
                 enteredEmail
             );
 
-            loginPassword.value =
-                "";
+            if (loginPassword) {
+                loginPassword.value =
+                    "";
+            }
 
             message.textContent =
                 "✔️ LOGIN SUCCESSFUL❗";
 
             await showDashboard();
         };
-
 }
 
 /* =====================================================
@@ -2160,7 +2174,6 @@ function getOAuthOptions() {
 
         redirectTo:
             OAUTH_REDIRECT_URL
-
     };
 }
 
@@ -2373,7 +2386,6 @@ if (googleLoginBtn) {
                 );
             }
         };
-
 }
 
 /* =====================================================
@@ -2456,7 +2468,6 @@ if (githubLoginBtn) {
                 );
             }
         };
-
 }
 
 /* =====================================================
@@ -2477,10 +2488,14 @@ if (saveBtn) {
             }
 
             var pass =
-                newPassword.value;
+                newPassword
+                    ? newPassword.value
+                    : "";
 
             var confirm =
-                confirmPassword.value;
+                confirmPassword
+                    ? confirmPassword.value
+                    : "";
 
             if (
                 pass === ""
@@ -2651,7 +2666,6 @@ if (saveBtn) {
                 );
             }
         };
-
 }
 
 /* =====================================================
@@ -2679,21 +2693,26 @@ if (createAccountBtn) {
 
             resetRegistrationForm();
 
-            loginEmail.value =
-                "";
+            if (loginEmail) {
+                loginEmail.value =
+                    "";
+            }
 
-            loginPhone.value =
-                "";
+            if (loginPhone) {
+                loginPhone.value =
+                    "";
+            }
 
-            loginPassword.value =
-                "";
+            if (loginPassword) {
+                loginPassword.value =
+                    "";
+            }
 
             message.textContent =
                 "Create your new account❗";
 
             showRegister();
         };
-
 }
 
 /* =====================================================
@@ -2722,21 +2741,26 @@ if (addAccountBtn) {
 
             resetRegistrationForm();
 
-            loginEmail.value =
-                "";
+            if (loginEmail) {
+                loginEmail.value =
+                    "";
+            }
 
-            loginPhone.value =
-                "";
+            if (loginPhone) {
+                loginPhone.value =
+                    "";
+            }
 
-            loginPassword.value =
-                "";
+            if (loginPassword) {
+                loginPassword.value =
+                    "";
+            }
 
             showRegister();
 
             message.textContent =
                 "➕ Add a new account.";
         };
-
 }
 
 /* =====================================================
@@ -2955,14 +2979,12 @@ function setupNavigation() {
 
                         displayAccounts();
                     }
-
                 };
 
         })(navItems[i]);
 
         i++;
     }
-
 }
 
 /* =====================================================
@@ -2998,7 +3020,6 @@ function closeAllProfileBoxes() {
             "show-box"
         );
     }
-
 }
 
 /* =====================================================
@@ -3010,13 +3031,16 @@ if (loginHistoryBtn) {
     loginHistoryBtn.onclick =
         function () {
 
+            if (!loginHistoryBox) {
+                return;
+            }
+
             loginHistoryBox.classList.toggle(
                 "show-box"
             );
 
             displayLoginHistory();
         };
-
 }
 
 if (clearHistoryBtn) {
@@ -3045,7 +3069,6 @@ if (clearHistoryBtn) {
 
             displayLoginHistory();
         };
-
 }
 
 /* =====================================================
@@ -3057,6 +3080,10 @@ if (changePasswordBtn) {
     changePasswordBtn.onclick =
         function () {
 
+            if (!changePasswordBox) {
+                return;
+            }
+
             changePasswordBox.classList.toggle(
                 "show-box"
             );
@@ -3067,20 +3094,27 @@ if (changePasswordBtn) {
                 )
             ) {
 
-                oldPassword.value =
-                    "";
+                if (oldPassword) {
+                    oldPassword.value =
+                        "";
+                }
 
-                changeNewPassword.value =
-                    "";
+                if (changeNewPassword) {
+                    changeNewPassword.value =
+                        "";
+                }
 
-                changeConfirmPassword.value =
-                    "";
+                if (changeConfirmPassword) {
+                    changeConfirmPassword.value =
+                        "";
+                }
 
-                changePasswordMessage.textContent =
-                    "";
+                if (changePasswordMessage) {
+                    changePasswordMessage.textContent =
+                        "";
+                }
             }
         };
-
 }
 
 /* =====================================================
@@ -3124,13 +3158,19 @@ if (saveChangedPasswordBtn) {
             }
 
             var currentPass =
-                oldPassword.value;
+                oldPassword
+                    ? oldPassword.value
+                    : "";
 
             var newPass =
-                changeNewPassword.value;
+                changeNewPassword
+                    ? changeNewPassword.value
+                    : "";
 
             var confirmPass =
-                changeConfirmPassword.value;
+                changeConfirmPassword
+                    ? changeConfirmPassword.value
+                    : "";
 
             if (
                 currentPass === ""
@@ -3233,19 +3273,24 @@ if (saveChangedPasswordBtn) {
                 return;
             }
 
-            oldPassword.value =
-                "";
+            if (oldPassword) {
+                oldPassword.value =
+                    "";
+            }
 
-            changeNewPassword.value =
-                "";
+            if (changeNewPassword) {
+                changeNewPassword.value =
+                    "";
+            }
 
-            changeConfirmPassword.value =
-                "";
+            if (changeConfirmPassword) {
+                changeConfirmPassword.value =
+                    "";
+            }
 
             changePasswordMessage.textContent =
                 "✔️ Password changed successfully.";
         };
-
 }
 
 /* =====================================================
@@ -3403,7 +3448,6 @@ async function updateStorage() {
         " • Reference: " +
         STORAGE_REFERENCE_GB +
         " GB";
-
 }
 
 /* =====================================================
@@ -3432,7 +3476,6 @@ if (storageBtn) {
                 updateStorage();
             }
         };
-
 }
 
 /* =====================================================
@@ -3462,7 +3505,6 @@ if (addFileInput) {
             addFileName.textContent =
                 file.name;
         };
-
 }
 
 /* =====================================================
@@ -3501,7 +3543,6 @@ function setAddFileMessage(
             "success-message"
         );
     }
-
 }
 
 /* =====================================================
@@ -3645,6 +3686,88 @@ function getB2ObjectKeyFromUrl(
 }
 
 /* =====================================================
+VIDEO DETECTION - IMPORTANT
+===================================================== */
+
+function isVideoFile(
+    file
+) {
+
+    if (!file) {
+        return false;
+    }
+
+    /* ---------------------------------------------
+       FIRST CHECK MIME TYPE
+       --------------------------------------------- */
+
+    var mimeType =
+        String(
+            file.type || ""
+        ).toLowerCase();
+
+    if (
+        mimeType.indexOf(
+            "video/"
+        ) === 0
+    ) {
+
+        return true;
+    }
+
+    /* ---------------------------------------------
+       SECOND CHECK FILE EXTENSION
+       This protects against Android/browser MIME
+       type problems.
+       --------------------------------------------- */
+
+    var fileName =
+        String(
+            file.name || ""
+        ).toLowerCase();
+
+    var lastDot =
+        fileName.lastIndexOf(".");
+
+    if (
+        lastDot === -1
+    ) {
+
+        return false;
+    }
+
+    var extension =
+        fileName.slice(
+            lastDot + 1
+        );
+
+    var videoExtensions = [
+        "mp4",
+        "m4v",
+        "mov",
+        "avi",
+        "mkv",
+        "webm",
+        "wmv",
+        "flv",
+        "mpeg",
+        "mpg",
+        "3gp",
+        "3g2",
+        "ts",
+        "mts",
+        "m2ts",
+        "ogv"
+    ];
+
+    return (
+        videoExtensions.indexOf(
+            extension
+        ) !== -1
+    );
+}
+
+/* =====================================================
 ADD PAGE - LOAD SAVED SECURITY ITEMS
 ===================================================== */
 
@@ -3720,7 +3843,6 @@ async function loadSecurityItems() {
 
         i++;
     }
-
 }
 
 /* =====================================================
@@ -3939,7 +4061,6 @@ async function viewSecurityItem(
         signedUrl,
         "_blank"
     );
-
 }
 
 /* =====================================================
@@ -4136,7 +4257,104 @@ function createSecurityItemElement(
     securityItemsList.appendChild(
         itemBox
     );
+}
 
+/* =====================================================
+REMOTE FILE CLEANUP
+===================================================== */
+
+async function cleanupRemoteFile(
+    filePath
+) {
+
+    if (
+        !supabaseClient ||
+        !currentUser ||
+        !filePath
+    ) {
+        return;
+    }
+
+    /* ---------------------------------------------
+       B2 FILE
+       --------------------------------------------- */
+
+    if (
+        isBackblazeB2FilePath(
+            filePath
+        )
+    ) {
+
+        var objectKey =
+            getB2ObjectKeyFromUrl(
+                filePath
+            );
+
+        if (!objectKey) {
+            return;
+        }
+
+        try {
+
+            await supabaseClient
+                .functions
+                .invoke(
+                    B2_FUNCTION_DELETE,
+                    {
+                        body: {
+                            objectKey:
+                                objectKey,
+                            userId:
+                                currentUser.id
+                        }
+                    }
+                );
+
+        } catch (error) {
+
+            console.log(
+                "B2 cleanup error:",
+                error
+            );
+        }
+
+        return;
+    }
+
+    /* ---------------------------------------------
+       CLOUDINARY FILE
+       --------------------------------------------- */
+
+    if (
+        isCloudinaryFilePath(
+            filePath
+        )
+    ) {
+
+        try {
+
+            await supabaseClient
+                .functions
+                .invoke(
+                    "cloudinary-delete",
+                    {
+                        body: {
+                            fileUrl:
+                                filePath
+                        }
+                    }
+                );
+
+        } catch (error) {
+
+            console.log(
+                "Cloudinary cleanup error:",
+                error
+            );
+        }
+
+        return;
+    }
 }
 
 /* =====================================================
@@ -4225,21 +4443,31 @@ if (saveFileBtn) {
             saveFileBtn.disabled =
                 true;
 
+            var filePath =
+                "";
+
+            var uploadedToB2 =
+                false;
+
+            var uploadedToCloudinary =
+                false;
+
             try {
 
-                var filePath =
-                    "";
-
                 /* =====================================
-                   VIDEO → BACKBLAZE B2
+                   STRONG VIDEO DETECTION
                    ===================================== */
 
-                if (
-                    file.type &&
-                    file.type.startsWith(
-                        "video/"
-                    )
-                ) {
+                var videoFile =
+                    isVideoFile(
+                        file
+                    );
+
+                /* =====================================
+                   VIDEO → BACKBLAZE B2 ONLY
+                   ===================================== */
+
+                if (videoFile) {
 
                     setAddFileMessage(
                         "Uploading video to Backblaze B2...",
@@ -4312,10 +4540,13 @@ if (saveFileBtn) {
                     filePath =
                         b2Data.url;
 
+                    uploadedToB2 =
+                        true;
+
                 } else {
 
                     /* =================================
-                       OTHER FILES → CLOUDINARY
+                       OTHER FILES → CLOUDINARY ONLY
                        ================================= */
 
                     setAddFileMessage(
@@ -4338,7 +4569,7 @@ if (saveFileBtn) {
 
                     cloudinaryFormData.append(
                         "folder",
-                        "cyber-core"
+                        CLOUDINARY_FOLDER
                     );
 
                     var cloudinaryResponse =
@@ -4381,6 +4612,9 @@ if (saveFileBtn) {
 
                     filePath =
                         cloudinaryData.secure_url;
+
+                    uploadedToCloudinary =
+                        true;
                 }
 
                 /* =====================================
@@ -4411,6 +4645,16 @@ if (saveFileBtn) {
                 if (
                     insertResult.error
                 ) {
+
+                    /* ---------------------------------
+                       IMPORTANT:
+                       Remove uploaded remote file if
+                       database save fails.
+                       --------------------------------- */
+
+                    await cleanupRemoteFile(
+                        filePath
+                    );
 
                     saveFileBtn.disabled =
                         false;
@@ -4451,10 +4695,29 @@ if (saveFileBtn) {
                 saveFileBtn.disabled =
                     false;
 
-                setAddFileMessage(
-                    "✔️ File saved successfully.",
-                    true
-                );
+                if (uploadedToB2) {
+
+                    setAddFileMessage(
+                        "✔️ Video saved successfully to Backblaze B2.",
+                        true
+                    );
+
+                } else if (
+                    uploadedToCloudinary
+                ) {
+
+                    setAddFileMessage(
+                        "✔️ File saved successfully to Cloudinary.",
+                        true
+                    );
+
+                } else {
+
+                    setAddFileMessage(
+                        "✔️ File saved successfully.",
+                        true
+                    );
+                }
 
                 await loadSecurityItems();
 
@@ -4462,22 +4725,38 @@ if (saveFileBtn) {
 
             } catch (error) {
 
-                saveFileBtn.disabled =
-                    false;
-
                 console.log(
                     "Save security item error:",
                     error
                 );
 
+                /* ---------------------------------
+                   If upload succeeded but another
+                   operation failed, clean it up.
+                   --------------------------------- */
+
+                if (filePath) {
+
+                    await cleanupRemoteFile(
+                        filePath
+                    );
+                }
+
+                saveFileBtn.disabled =
+                    false;
+
                 setAddFileMessage(
-                    "❌ File save failed.",
+                    "❌ File save failed: " +
+                    (
+                        error &&
+                        error.message
+                            ? error.message
+                            : "Unknown error"
+                    ),
                     false
                 );
             }
-
         };
-
 }
 
 /* =====================================================
@@ -4614,7 +4893,6 @@ async function editSecurityItem(
     }
 
     await loadSecurityItems();
-
 }
 
 /* =====================================================
@@ -4642,6 +4920,9 @@ async function deleteSecurityItem(
     if (!confirmed) {
         return;
     }
+
+    var remoteDeleteFailed =
+        false;
 
     /* ================================================
        BACKBLAZE B2 VIDEO
@@ -4687,6 +4968,9 @@ async function deleteSecurityItem(
             b2DeleteResult.error
         ) {
 
+            remoteDeleteFailed =
+                true;
+
             console.log(
                 "B2 delete error:",
                 b2DeleteResult.error.message
@@ -4701,6 +4985,7 @@ async function deleteSecurityItem(
             if (!continueB2Delete) {
                 return;
             }
+
         } else {
 
             var b2DeleteData =
@@ -4710,6 +4995,9 @@ async function deleteSecurityItem(
                 b2DeleteData.success ===
                 false
             ) {
+
+                remoteDeleteFailed =
+                    true;
 
                 var continueB2Delete2 =
                     window.confirm(
@@ -4751,6 +5039,9 @@ async function deleteSecurityItem(
             cloudinaryDeleteResult.error
         ) {
 
+            remoteDeleteFailed =
+                true;
+
             console.log(
                 "Cloudinary delete error:",
                 cloudinaryDeleteResult.error.message
@@ -4788,6 +5079,9 @@ async function deleteSecurityItem(
         if (
             storageResult.error
         ) {
+
+            remoteDeleteFailed =
+                true;
 
             console.log(
                 "Storage file delete error:",
@@ -4839,16 +5133,25 @@ async function deleteSecurityItem(
 
     if (addFileMessage) {
 
-        setAddFileMessage(
-            "✔️ File deleted successfully.",
-            true
-        );
+        if (remoteDeleteFailed) {
+
+            setAddFileMessage(
+                "⚠️ Saved information deleted, but the cloud file may still exist.",
+                false
+            );
+
+        } else {
+
+            setAddFileMessage(
+                "✔️ File deleted successfully.",
+                true
+            );
+        }
     }
 
     await loadSecurityItems();
 
     updateStorage();
-
 }
 
 /* =====================================================
@@ -4859,6 +5162,10 @@ if (accountChangeBtn) {
 
     accountChangeBtn.onclick =
         function () {
+
+            if (!accountChangeBox) {
+                return;
+            }
 
             var isOpen =
                 accountChangeBox.classList.toggle(
@@ -4872,7 +5179,6 @@ if (accountChangeBtn) {
                 updateProfile();
             }
         };
-
 }
 
 /* =====================================================
@@ -5017,7 +5323,6 @@ async function displayAccounts() {
 
         i++;
     }
-
 }
 
 /* =====================================================
@@ -5034,14 +5339,20 @@ function createSwitchHandler(
             return;
         }
 
-        loginEmail.value =
-            account.email;
+        if (loginEmail) {
+            loginEmail.value =
+                account.email;
+        }
 
-        loginPhone.value =
-            account.phone || "";
+        if (loginPhone) {
+            loginPhone.value =
+                account.phone || "";
+        }
 
-        loginPassword.value =
-            "";
+        if (loginPassword) {
+            loginPassword.value =
+                "";
+        }
 
         showLogin();
 
@@ -5111,7 +5422,6 @@ if (helpCenterBtn) {
                 "_blank"
             );
         };
-
 }
 
 /* =====================================================
@@ -5166,21 +5476,26 @@ if (removeAccountBtn) {
             githubOAuthLogin =
                 false;
 
-            loginEmail.value =
-                "";
+            if (loginEmail) {
+                loginEmail.value =
+                    "";
+            }
 
-            loginPhone.value =
-                "";
+            if (loginPhone) {
+                loginPhone.value =
+                    "";
+            }
 
-            loginPassword.value =
-                "";
+            if (loginPassword) {
+                loginPassword.value =
+                    "";
+            }
 
             showLogin();
 
             message.textContent =
                 "✔️ Account removed from this device.";
         };
-
 }
 
 /* =====================================================
@@ -5229,7 +5544,6 @@ async function handleOAuthCallbackSession() {
                     resolve,
                     250
                 );
-
             }
         );
 
@@ -5452,18 +5766,27 @@ async function checkExistingSession() {
 
         showLogin();
 
-        loginEmail.value =
-            accounts[
-                accounts.length - 1
-            ].email || "";
+        if (loginEmail) {
 
-        loginPhone.value =
-            accounts[
-                accounts.length - 1
-            ].phone || "";
+            loginEmail.value =
+                accounts[
+                    accounts.length - 1
+                ].email || "";
+        }
 
-        loginPassword.value =
-            "";
+        if (loginPhone) {
+
+            loginPhone.value =
+                accounts[
+                    accounts.length - 1
+                ].phone || "";
+        }
+
+        if (loginPassword) {
+
+            loginPassword.value =
+                "";
+        }
 
         message.textContent =
             "Welcome back❗Please Login ♻️";
@@ -5475,7 +5798,6 @@ async function checkExistingSession() {
         message.textContent =
             "Please login to continue❗";
     }
-
 }
 
 /* =====================================================
@@ -5504,10 +5826,8 @@ if (supabaseClient) {
                     currentUser =
                         null;
                 }
-
             }
         );
-
 }
 
 /* =====================================================
