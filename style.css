@@ -756,3 +756,273 @@ body{       padding:12px;   }    .container{       width:96%;       min-height:6
     }
 
 }
+/* =====================================================
+   CYBER CORE - SECURITY CENTER
+   ===================================================== */
+
+#securityMenuButton{
+    position:fixed;
+    top:18px;
+    right:18px;
+    width:52px;
+    height:52px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    margin:0;
+    background:linear-gradient(
+        135deg,
+        rgba(255,255,255,.14),
+        rgba(0,0,0,.42)
+    );
+    border:1px solid rgba(0,255,0,.72);
+    border-radius:16px;
+    color:#fff;
+    font-family:"Share Tech Mono",monospace;
+    font-size:27px;
+    line-height:1;
+    cursor:pointer;
+    z-index:1000012;
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+}
+
+#securityMenuButton:active{
+    background:rgba(255,255,255,.14);
+    color:#fff;
+    transform:scale(.96);
+}
+
+#securityCenterOverlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.18);
+    backdrop-filter:blur(2px);
+    -webkit-backdrop-filter:blur(2px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .25s ease,visibility .25s ease;
+    z-index:1000010;
+}
+
+#securityCenterOverlay.show-security-overlay{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+}
+
+#securityCenterPanel{
+    position:fixed;
+    top:0;
+    right:0;
+    width:min(390px,92vw);
+    height:100vh;
+    padding:22px 18px 105px;
+    overflow-y:auto;
+
+    background:linear-gradient(
+        135deg,
+        rgba(255,255,255,.14),
+        rgba(0,0,0,.72)
+    );
+
+    border-left:1px solid rgba(0,255,0,.65);
+
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+
+    transform:translateX(105%);
+    transition:transform .3s ease;
+
+    z-index:1000011;
+}
+
+#securityCenterPanel.show-security-panel{
+    transform:translateX(0);
+}
+
+.security-center-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:22px;
+}
+
+.security-center-title{
+    color:#fff;
+    font-family:"Orbitron",sans-serif;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+.security-center-subtitle{
+    margin-top:6px;
+    color:rgba(255,255,255,.65);
+    font-family:"Share Tech Mono",monospace;
+    font-size:12px;
+}
+
+.security-center-close{
+    width:40px;
+    height:40px;
+    flex:none;
+    border:1px solid rgba(0,255,0,.55);
+    border-radius:13px;
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    font-size:22px;
+    cursor:pointer;
+}
+
+.security-center-close:active{
+    background:rgba(255,255,255,.14);
+}
+
+.security-center-card{
+    width:100%;
+    margin-bottom:13px;
+    padding:16px;
+    background:linear-gradient(
+        135deg,
+        rgba(255,255,255,.10),
+        rgba(0,0,0,.40)
+    );
+    border:1px solid rgba(0,255,0,.34);
+    border-radius:18px;
+}
+
+.security-center-card-title{
+    color:#fff;
+    font-family:"Orbitron",sans-serif;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.8px;
+    margin-bottom:11px;
+}
+
+.security-center-line{
+    width:100%;
+    height:1px;
+    background:rgba(0,255,0,.35);
+    margin-bottom:12px;
+}
+
+.security-status-row{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:7px 0;
+    font-size:12px;
+}
+
+.security-status-label{
+    color:rgba(255,255,255,.62);
+}
+
+.security-status-value{
+    color:#fff;
+    text-align:right;
+    word-break:break-word;
+}
+
+.security-status-secure{
+    color:#00ff66;
+}
+
+.security-status-warning{
+    color:#ffd34d;
+}
+
+.security-activity-item{
+    padding:9px 0;
+    border-bottom:1px solid rgba(255,255,255,.10);
+}
+
+.security-activity-item:last-child{
+    border-bottom:0;
+}
+
+.security-activity-email{
+    color:#00ff66;
+    font-size:12px;
+    word-break:break-word;
+}
+
+.security-activity-time{
+    color:rgba(255,255,255,.55);
+    font-size:11px;
+    margin-top:3px;
+}
+
+.security-alert{
+    padding:10px 12px;
+    margin-top:8px;
+    border:1px solid rgba(0,255,0,.25);
+    border-radius:12px;
+    background:rgba(255,255,255,.05);
+    color:rgba(255,255,255,.78);
+    font-size:12px;
+    line-height:1.5;
+}
+
+.security-center-action{
+    width:100%;
+    min-height:45px;
+    margin-top:9px;
+    padding:10px 14px;
+
+    background:linear-gradient(
+        135deg,
+        rgba(255,255,255,.11),
+        rgba(0,0,0,.40)
+    );
+
+    border:1px solid rgba(0,255,0,.48);
+    border-radius:13px;
+    color:#fff;
+    font-family:"Share Tech Mono",monospace;
+    font-size:12px;
+    cursor:pointer;
+}
+
+.security-center-action:active{
+    background:rgba(255,255,255,.14);
+    color:#fff;
+}
+
+.security-center-action.danger{
+    border-color:rgba(255,80,80,.55);
+}
+
+.security-center-message{
+    min-height:18px;
+    margin-top:8px;
+    color:#00ff66;
+    font-size:11px;
+    line-height:1.4;
+}
+
+@media(max-width:600px){
+
+    #securityMenuButton{
+        top:12px;
+        right:12px;
+        width:48px;
+        height:48px;
+        font-size:25px;
+    }
+
+    #securityCenterPanel{
+        width:94vw;
+        padding:18px 14px 100px;
+    }
+
+    .security-center-title{
+        font-size:17px;
+    }
+
+}
