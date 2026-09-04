@@ -4118,8 +4118,8 @@ function openSecurityCenter() {
 
     if (securityMenuButton) {
 
-        securityMenuButton.innerHTML =
-            "×";
+        securityMenuButton.style.display =
+            "none";
 
         securityMenuButton.setAttribute(
             "aria-expanded",
@@ -4156,6 +4156,9 @@ function closeSecurityCenter() {
     }
 
     if (securityMenuButton) {
+
+        securityMenuButton.style.display =
+            "";
 
         securityMenuButton.innerHTML =
             "☰";
