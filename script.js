@@ -779,6 +779,14 @@ function getTrackedStorageUsage() {
         return 0;
     }
 
+    if (
+        value >
+        USER_STORAGE_LIMIT_BYTES
+    ) {
+
+        return USER_STORAGE_LIMIT_BYTES;
+    }
+
     return value;
 }
 
@@ -798,6 +806,15 @@ function saveTrackedStorageUsage(
 
     if (value < 0) {
         value = 0;
+    }
+
+    if (
+        value >
+        USER_STORAGE_LIMIT_BYTES
+    ) {
+
+        value =
+            USER_STORAGE_LIMIT_BYTES;
     }
 
     localStorage.setItem(
@@ -878,6 +895,196 @@ function canUploadFileSize(
         getRemainingStorageBytes();
 
     return size <= remaining;
+}
+
+/* =====================================================
+PER-FILE STORAGE SIZE LEDGER
+===================================================== */
+
+function storageFileLedgerKey() {
+
+    if (!currentUser) {
+        return "";
+    }
+
+    return (
+        "cyberCoreStorageFiles_" +
+        currentUser.id
+    );
+}
+
+function getStorageFileLedger() {
+
+    var key =
+        storageFileLedgerKey();
+
+    if (key === "") {
+        return {};
+    }
+
+    var saved =
+        localStorage.getItem(key);
+
+    if (!saved) {
+        return {};
+    }
+
+    try {
+
+        var parsed =
+            JSON.parse(saved);
+
+        if (
+            parsed &&
+            typeof parsed === "object" &&
+            !Array.isArray(parsed)
+        ) {
+
+            return parsed;
+        }
+
+    } catch (error) {
+
+        console.log(
+            "Storage file ledger read error:",
+            error
+        );
+    }
+
+    return {};
+}
+
+function saveStorageFileLedger(
+    ledger
+) {
+
+    var key =
+        storageFileLedgerKey();
+
+    if (key === "") {
+        return;
+    }
+
+    try {
+
+        localStorage.setItem(
+            key,
+            JSON.stringify(
+                ledger || {}
+            )
+        );
+
+    } catch (error) {
+
+        console.log(
+            "Storage file ledger save error:",
+            error
+        );
+    }
+}
+
+function createStorageFileKey(
+    filePath
+) {
+
+    return String(
+        filePath || ""
+    );
+}
+
+function saveStorageFileSize(
+    filePath,
+    fileSize
+) {
+
+    var key =
+        createStorageFileKey(
+            filePath
+        );
+
+    if (key === "") {
+        return;
+    }
+
+    var size =
+        Number(fileSize) || 0;
+
+    if (size <= 0) {
+        return;
+    }
+
+    var ledger =
+        getStorageFileLedger();
+
+    ledger[key] =
+        size;
+
+    saveStorageFileLedger(
+        ledger
+    );
+}
+
+function getStorageFileSize(
+    filePath
+) {
+
+    var key =
+        createStorageFileKey(
+            filePath
+        );
+
+    if (key === "") {
+        return 0;
+    }
+
+    var ledger =
+        getStorageFileLedger();
+
+    var size =
+        Number(
+            ledger[key]
+        ) || 0;
+
+    if (
+        !isFinite(size) ||
+        size < 0
+    ) {
+
+        return 0;
+    }
+
+    return size;
+}
+
+function removeStorageFileSize(
+    filePath
+) {
+
+    var key =
+        createStorageFileKey(
+            filePath
+        );
+
+    if (key === "") {
+        return;
+    }
+
+    var ledger =
+        getStorageFileLedger();
+
+    if (
+        Object.prototype.hasOwnProperty.call(
+            ledger,
+            key
+        )
+    ) {
+
+        delete ledger[key];
+
+        saveStorageFileLedger(
+            ledger
+        );
+    }
 }
 
 /* =====================================================
@@ -3642,18 +3849,154 @@ function createSafeFileName(
     fileName
 ) {
 
+    var original =
+        String(fileName || "");
+
     var safeName =
-        String(fileName || "")
+        original
             .replace(
                 /[^\w.\-]/g,
                 "_"
             );
 
-    if (safeName === "") {
-        safeName = "file";
+    /*
+     * Prevent path-like or hidden-name problems.
+     */
+
+    safeName =
+        safeName.replace(
+            /\.\./g,
+            "_"
+        );
+
+    safeName =
+        safeName.replace(
+            /^[/\\]+/g,
+            ""
+        );
+
+    safeName =
+        safeName.replace(
+            /[/\\]+/g,
+            "_"
+        );
+
+    safeName =
+        safeName.trim();
+
+    if (
+        safeName === "" ||
+        safeName === "." ||
+        safeName === ".."
+    ) {
+
+        safeName =
+            "file";
+    }
+
+    /*
+     * Keep filenames reasonably small.
+     */
+
+    if (
+        safeName.length >
+        180
+    ) {
+
+        var lastDot =
+            safeName.lastIndexOf(".");
+
+        if (
+            lastDot > 0 &&
+            lastDot <
+            safeName.length - 1
+        ) {
+
+            var extension =
+                safeName.slice(
+                    lastDot
+                );
+
+            var base =
+                safeName.slice(
+                    0,
+                    lastDot
+                );
+
+            safeName =
+                base.slice(
+                    0,
+                    180 -
+                    extension.length
+                ) +
+                extension;
+
+        } else {
+
+            safeName =
+                safeName.slice(
+                    0,
+                    180
+                );
+        }
     }
 
     return safeName;
+}
+
+/* =====================================================
+CREATE SAFE UPLOAD FILE
+===================================================== */
+
+function createSafeUploadFile(
+    file
+) {
+
+    if (!file) {
+        return file;
+    }
+
+    var safeName =
+        createSafeFileName(
+            file.name
+        );
+
+    /*
+     * If browser supports File(), create a new File
+     * with the sanitized filename.
+     *
+     * If not supported, FormData can still receive
+     * the original file with the safe name separately.
+     */
+
+    try {
+
+        if (
+            typeof File ===
+            "function"
+        ) {
+
+            return new File(
+                [file],
+                safeName,
+                {
+                    type:
+                        file.type || "",
+                    lastModified:
+                        file.lastModified || Date.now()
+                }
+            );
+        }
+
+    } catch (error) {
+
+        console.log(
+            "Safe File creation skipped:",
+            error
+        );
+    }
+
+    return file;
 }
 
 /* =====================================================
@@ -3786,10 +4129,6 @@ function isVideoFile(
         return false;
     }
 
-    /* ---------------------------------------------
-       FIRST CHECK MIME TYPE
-       --------------------------------------------- */
-
     var mimeType =
         String(
             file.type || ""
@@ -3803,12 +4142,6 @@ function isVideoFile(
 
         return true;
     }
-
-    /* ---------------------------------------------
-       SECOND CHECK FILE EXTENSION
-       This protects against Android/browser MIME
-       type problems.
-       --------------------------------------------- */
 
     var fileName =
         String(
@@ -4232,6 +4565,34 @@ function createSecurityItemElement(
         );
     }
 
+    var knownFileSize =
+        getStorageFileSize(
+            item.file_path
+        );
+
+    if (
+        knownFileSize > 0
+    ) {
+
+        var sizeElement =
+            document.createElement(
+                "div"
+            );
+
+        sizeElement.className =
+            "security-item-file";
+
+        sizeElement.textContent =
+            "SIZE: " +
+            formatFileSize(
+                knownFileSize
+            );
+
+        itemBox.appendChild(
+            sizeElement
+        );
+    }
+
     var infoBox =
         document.createElement(
             "div"
@@ -4364,10 +4725,6 @@ async function cleanupRemoteFile(
         return;
     }
 
-    /* ---------------------------------------------
-       B2 FILE
-       --------------------------------------------- */
-
     if (
         isBackblazeB2FilePath(
             filePath
@@ -4409,10 +4766,6 @@ async function cleanupRemoteFile(
 
         return;
     }
-
-    /* ---------------------------------------------
-       CLOUDINARY FILE
-       --------------------------------------------- */
 
     if (
         isCloudinaryFilePath(
@@ -4530,11 +4883,27 @@ if (saveFileBtn) {
             }
 
             /* =====================================
-               1.4 GB QUOTA CHECK
+               FILE SIZE
                ===================================== */
 
             var fileSize =
                 Number(file.size) || 0;
+
+            if (
+                fileSize <= 0
+            ) {
+
+                setAddFileMessage(
+                    "❌ The selected file is empty or invalid.",
+                    false
+                );
+
+                return;
+            }
+
+            /* =====================================
+               1.4 GB QUOTA CHECK
+               ===================================== */
 
             var remainingBytes =
                 getRemainingStorageBytes();
@@ -4565,6 +4934,22 @@ if (saveFileBtn) {
                 return;
             }
 
+            /*
+             * Create a sanitized filename for remote
+             * upload while keeping the original local
+             * File input untouched.
+             */
+
+            var safeFile =
+                createSafeUploadFile(
+                    file
+                );
+
+            var safeFileName =
+                createSafeFileName(
+                    file.name
+                );
+
             saveFileBtn.disabled =
                 true;
 
@@ -4575,6 +4960,9 @@ if (saveFileBtn) {
                 false;
 
             var uploadedToCloudinary =
+                false;
+
+            var usageWasAdded =
                 false;
 
             try {
@@ -4604,7 +4992,8 @@ if (saveFileBtn) {
 
                     b2FormData.append(
                         "file",
-                        file
+                        safeFile,
+                        safeFileName
                     );
 
                     b2FormData.append(
@@ -4684,7 +5073,8 @@ if (saveFileBtn) {
 
                     cloudinaryFormData.append(
                         "file",
-                        file
+                        safeFile,
+                        safeFileName
                     );
 
                     cloudinaryFormData.append(
@@ -4771,11 +5161,11 @@ if (saveFileBtn) {
                     insertResult.error
                 ) {
 
-                    /* ---------------------------------
-                       IMPORTANT:
-                       Remove uploaded remote file if
-                       database save fails.
-                       --------------------------------- */
+                    /*
+                     * Database save failed.
+                     * Remove remote file so we do not
+                     * leave an orphaned upload.
+                     */
 
                     await cleanupRemoteFile(
                         filePath
@@ -4795,13 +5185,28 @@ if (saveFileBtn) {
 
                 /*
                  * Database save succeeded.
-                 * Now add the exact uploaded file size
-                 * to this user's local quota ledger.
+                 *
+                 * Store exact file size in the local
+                 * per-file ledger FIRST.
+                 */
+
+                saveStorageFileSize(
+                    filePath,
+                    fileSize
+                );
+
+                /*
+                 * Increase total usage only after the
+                 * remote upload and database save both
+                 * succeeded.
                  */
 
                 increaseTrackedStorageUsage(
                     fileSize
                 );
+
+                usageWasAdded =
+                    true;
 
                 if (addFileInput) {
 
@@ -4865,12 +5270,16 @@ if (saveFileBtn) {
                     error
                 );
 
-                /* ---------------------------------
-                   If upload succeeded but another
-                   operation failed, clean it up.
-                   --------------------------------- */
+                /*
+                 * If database save succeeded and usage
+                 * was already added, do not clean the
+                 * remote file here.
+                 */
 
-                if (filePath) {
+                if (
+                    filePath &&
+                    !usageWasAdded
+                ) {
 
                     await cleanupRemoteFile(
                         filePath
@@ -5060,25 +5469,21 @@ async function deleteSecurityItem(
         false;
 
     /* ================================================
-       GET TRACKED FILE SIZE BEFORE DELETE
+       GET EXACT FILE SIZE
        ================================================ */
 
     var trackedFileSize =
-        0;
+        getStorageFileSize(
+            item.file_path
+        );
 
     /*
-     * The security_items table currently does not
-     * require a file_size column, so the quota ledger
-     * keeps the total usage. For the exact deleted
-     * item's size, the browser can only know it if the
-     * current item has a stored size property.
-     *
-     * If an older/current item does not contain size,
-     * we keep the ledger unchanged rather than
-     * incorrectly subtracting an unknown amount.
+     * Compatibility with any future/current item
+     * that may already contain file_size.
      */
 
     if (
+        trackedFileSize <= 0 &&
         item.file_size &&
         Number(item.file_size) > 0
     ) {
@@ -5219,6 +5624,30 @@ async function deleteSecurityItem(
             if (!continueCloudinaryDelete) {
                 return;
             }
+
+        } else {
+
+            var cloudinaryDeleteData =
+                cloudinaryDeleteResult.data || {};
+
+            if (
+                cloudinaryDeleteData.success ===
+                false
+            ) {
+
+                remoteDeleteFailed =
+                    true;
+
+                var continueCloudinaryDelete2 =
+                    window.confirm(
+                        "The cloud file could not be removed.\n\n" +
+                        "Do you still want to remove its saved information?"
+                    );
+
+                if (!continueCloudinaryDelete2) {
+                    return;
+                }
+            }
         }
 
     } else if (
@@ -5295,14 +5724,15 @@ async function deleteSecurityItem(
     }
 
     /*
-     * Only reduce tracked quota when we know the
-     * deleted item's size.
-     *
-     * New uploads from this updated script can store
-     * their size in the local quota ledger, but the
-     * current security_items schema has no file_size
-     * field. Therefore unknown old items are not
-     * guessed.
+     * Remove exact per-file ledger entry.
+     */
+
+    removeStorageFileSize(
+        item.file_path
+    );
+
+    /*
+     * Reduce total quota only when exact size is known.
      */
 
     if (
