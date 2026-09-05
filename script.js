@@ -106,6 +106,255 @@ var OAUTH_REDIRECT_URL =
     "https://diluka-ui.github.io/cyber-core/";
 
 /* =====================================================
+HCAPTCHA CONFIG
+===================================================== */
+
+var HCAPTCHA_SITEKEY =
+    "9a4e0fdc-a874-44fa-bc64-3880526246ea";
+
+var HCAPTCHA_VERIFY_FUNCTION =
+    "verify-hcaptcha";
+
+var hcaptchaRegisterWidgetId =
+    null;
+
+var hcaptchaLoginWidgetId =
+    null;
+
+var hcaptchaWidgetsRendered =
+    false;
+
+/* =====================================================
+HCAPTCHA HELPERS
+===================================================== */
+
+function isHCaptchaReady() {
+
+    return (
+        typeof window.hcaptcha !==
+        "undefined" &&
+        window.hcaptcha !==
+        null
+    );
+}
+
+function renderHCaptchaWidgets() {
+
+    if (
+        hcaptchaWidgetsRendered ||
+        !isHCaptchaReady()
+    ) {
+        return;
+    }
+
+    var registerContainer =
+        document.getElementById(
+            "hcaptchaRegisterContainer"
+        );
+
+    var loginContainer =
+        document.getElementById(
+            "hcaptchaLoginContainer"
+        );
+
+    try {
+
+        if (registerContainer) {
+
+            hcaptchaRegisterWidgetId =
+                window.hcaptcha.render(
+                    registerContainer,
+                    {
+                        sitekey:
+                            HCAPTCHA_SITEKEY,
+                        size:
+                            "invisible"
+                    }
+                );
+        }
+
+        if (loginContainer) {
+
+            hcaptchaLoginWidgetId =
+                window.hcaptcha.render(
+                    loginContainer,
+                    {
+                        sitekey:
+                            HCAPTCHA_SITEKEY,
+                        size:
+                            "invisible"
+                    }
+                );
+        }
+
+        hcaptchaWidgetsRendered =
+            true;
+
+    } catch (error) {
+
+        console.log(
+            "hCaptcha render error:",
+            error
+        );
+    }
+}
+
+function waitForHCaptchaAndRender(
+    retries
+) {
+
+    if (isHCaptchaReady()) {
+
+        renderHCaptchaWidgets();
+
+        return;
+    }
+
+    if (retries <= 0) {
+
+        console.log(
+            "hCaptcha library did not load in time."
+        );
+
+        return;
+    }
+
+    setTimeout(
+        function () {
+
+            waitForHCaptchaAndRender(
+                retries - 1
+            );
+        },
+        300
+    );
+}
+
+async function runHCaptcha(
+    widgetId
+) {
+
+    if (
+        !isHCaptchaReady() ||
+        widgetId === null ||
+        widgetId === undefined
+    ) {
+
+        console.log(
+            "hCaptcha widget is not ready."
+        );
+
+        return "";
+    }
+
+    var token =
+        "";
+
+    try {
+
+        var result =
+            await window.hcaptcha.execute(
+                widgetId,
+                {
+                    async:
+                        true
+                }
+            );
+
+        token =
+            result &&
+            result.response
+                ? result.response
+                : "";
+
+    } catch (error) {
+
+        console.log(
+            "hCaptcha execute error:",
+            error
+        );
+
+        token =
+            "";
+
+    } finally {
+
+        try {
+
+            window.hcaptcha.reset(
+                widgetId
+            );
+
+        } catch (resetError) {
+
+            console.log(
+                "hCaptcha reset error:",
+                resetError
+            );
+        }
+    }
+
+    return token;
+}
+
+async function verifyHCaptchaToken(
+    token
+) {
+
+    if (
+        !token ||
+        !supabaseClient
+    ) {
+
+        return false;
+    }
+
+    try {
+
+        var result =
+            await supabaseClient
+                .functions
+                .invoke(
+                    HCAPTCHA_VERIFY_FUNCTION,
+                    {
+                        body: {
+                            token:
+                                token
+                        }
+                    }
+                );
+
+        if (result.error) {
+
+            console.log(
+                "hCaptcha verify function error:",
+                result.error.message
+            );
+
+            return false;
+        }
+
+        var data =
+            result.data ||
+            {};
+
+        return (
+            data.success ===
+            true
+        );
+
+    } catch (error) {
+
+        console.log(
+            "hCaptcha verify error:",
+            error
+        );
+
+        return false;
+    }
+}
+
+/* =====================================================
 VARIABLES
 ===================================================== */
 
@@ -1742,6 +1991,48 @@ if (sendBtn) {
                 return;
             }
 
+            sendBtn.disabled =
+                true;
+
+            message.textContent =
+                "Verifying security check...";
+
+            var registerCaptchaToken =
+                await runHCaptcha(
+                    hcaptchaRegisterWidgetId
+                );
+
+            if (
+                !registerCaptchaToken
+            ) {
+
+                sendBtn.disabled =
+                    false;
+
+                message.textContent =
+                    "❌ Security verification failed. Please try again.";
+
+                return;
+            }
+
+            var registerCaptchaVerified =
+                await verifyHCaptchaToken(
+                    registerCaptchaToken
+                );
+
+            if (
+                !registerCaptchaVerified
+            ) {
+
+                sendBtn.disabled =
+                    false;
+
+                message.textContent =
+                    "❌ Security verification failed. Please try again.";
+
+                return;
+            }
+
             var otpToSend =
                 Math.floor(
                     100000 +
@@ -2673,6 +2964,48 @@ if (loginBtn) {
 
                 message.textContent =
                     "Please enter your Password❗";
+
+                return;
+            }
+
+            loginBtn.disabled =
+                true;
+
+            message.textContent =
+                "Verifying security check...";
+
+            var loginCaptchaToken =
+                await runHCaptcha(
+                    hcaptchaLoginWidgetId
+                );
+
+            if (
+                !loginCaptchaToken
+            ) {
+
+                loginBtn.disabled =
+                    false;
+
+                message.textContent =
+                    "❌ Security verification failed. Please try again.";
+
+                return;
+            }
+
+            var loginCaptchaVerified =
+                await verifyHCaptchaToken(
+                    loginCaptchaToken
+                );
+
+            if (
+                !loginCaptchaVerified
+            ) {
+
+                loginBtn.disabled =
+                    false;
+
+                message.textContent =
+                    "❌ Security verification failed. Please try again.";
 
                 return;
             }
@@ -7839,6 +8172,10 @@ document.addEventListener(
     function () {
 
         checkExistingSession();
+
+        waitForHCaptchaAndRender(
+            30
+        );
 
     }
 );
