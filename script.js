@@ -1775,17 +1775,41 @@ if (sendBtn) {
                 sendBtn.disabled =
                     false;
 
+                console.log(
+                    "OTP FUNCTION FULL RESULT:",
+                    sendResult
+                );
+
                 if (
                     sendResult.error
                 ) {
 
-                    message.textContent =
-                        "❌ Failed to send OTP email. Please try again.";
-
-                    console.log(
-                        "send-otp-email invoke error:",
+                    console.error(
+                        "OTP FUNCTION ERROR:",
                         sendResult.error
                     );
+
+                    console.error(
+                        "OTP FUNCTION ERROR MESSAGE:",
+                        sendResult.error.message
+                    );
+
+                    console.error(
+                        "OTP FUNCTION ERROR CONTEXT:",
+                        sendResult.error.context
+                    );
+
+                    console.error(
+                        "OTP FUNCTION DATA:",
+                        sendResult.data
+                    );
+
+                    message.textContent =
+                        "❌ " +
+                        (
+                            sendResult.error.message ||
+                            "Failed to send OTP email."
+                        );
 
                     return;
                 }
@@ -1797,6 +1821,11 @@ if (sendBtn) {
                 if (
                     !sendData.success
                 ) {
+
+                    console.error(
+                        "OTP FUNCTION UNSUCCESSFUL DATA:",
+                        sendData
+                    );
 
                     message.textContent =
                         "❌ " +
