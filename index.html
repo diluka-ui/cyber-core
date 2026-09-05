@@ -39,10 +39,10 @@
     href="./manifest.json">
 
 <meta property="og:title"
-    content="Cyber Core | Cyber Security Data Base">
+    content="Cyber Security Data Base">
 
 <meta property="og:description"
-    content="Secure cyber security data platform for protected storage, account security and digital security resources.">
+    content="Cyber Core - Future Cyber Security Data Base">
 
 <meta property="og:image"
     content="https://diluka-ui.github.io/cyber-core/cyber-core-logo.jpg">
@@ -53,17 +53,14 @@
 <meta property="og:type"
     content="website">
 
-<meta property="og:site_name"
-    content="Cyber Core">
-
 <meta name="twitter:card"
     content="summary">
 
 <meta name="twitter:title"
-    content="Cyber Core | Cyber Security Data Base">
+    content="Cyber Security Data Base">
 
 <meta name="twitter:description"
-    content="Secure cyber security data platform for protected storage, account security and digital security resources.">
+    content="Cyber Core - Future Cyber Security Data Base">
 
 <meta name="twitter:image"
     content="https://diluka-ui.github.io/cyber-core/cyber-core-logo.jpg">
@@ -75,33 +72,50 @@
   "name": "Cyber Core",
   "alternateName": "Cyber Security Data Base",
   "url": "https://diluka-ui.github.io/cyber-core/",
-  "description": "Secure cyber security data platform for protected storage, account security and digital security resources."
+  "description": "Secure cyber security data platform for protected storage, account security, login history and digital security resources."
 }
 </script>
-
 
 <link rel="stylesheet"
     href="style.css">
 
+<!-- ORIGINAL CYBER CORE FONTS -->
+<link rel="preconnect"
+    href="https://fonts.googleapis.com">
+
+<link rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin>
+
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Chakra+Petch:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Oxanium:wght@400;600;700&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=VT323&display=swap"
     rel="stylesheet">
 
-</head><body><!-- =================================================
-     BACKGROUND MUSIC
-     ================================================= --><audio id="backgroundMusic" loop><source src="song.mp3"
-    type="audio/mpeg">
+</head><body>
 
-</audio><!-- =================================================
+<!-- =================================================
+     BACKGROUND MUSIC
+     ================================================= -->
+
+<audio id="backgroundMusic" loop>
+
+    <source src="song.mp3"
+        type="audio/mpeg">
+
+</audio>
+
+<!-- =================================================
      LOGIN / REGISTER CONTAINER
-     ================================================= --><div class="container"><h1>
+     ================================================= -->
+
+<div class="container">
+
+<h1>
     Cyber Core
 </h1>
 
 <p>
     CYBER SECURITY SYSTEM
 </p>
-
-
 
 <!-- =================================================
      REGISTER
@@ -131,8 +145,6 @@
 
 </div>
 
-
-
 <!-- =================================================
      OTP
      ================================================= -->
@@ -145,7 +157,6 @@
 
     </div>
 
-
     <div class="otp-inputs">
 
         <input class="otp-digit" id="otp1" type="text" maxlength="1" inputmode="numeric">
@@ -156,7 +167,6 @@
         <input class="otp-digit" id="otp6" type="text" maxlength="1" inputmode="numeric">
 
     </div>
-
 
     <input
         id="otp"
@@ -172,8 +182,6 @@
     </button>
 
 </div>
-
-
 
 <!-- =================================================
      CREATE PASSWORD
@@ -207,8 +215,6 @@
 
 </div>
 
-
-
 <!-- =================================================
      LOGIN
      ================================================= -->
@@ -241,8 +247,6 @@
 
     </button>
 
-
-
     <!-- =================================================
          SOCIAL LOGIN
          ================================================= -->
@@ -260,8 +264,6 @@
             <span></span>
 
         </div>
-
-
 
         <!-- GOOGLE LOGIN -->
 
@@ -314,8 +316,6 @@
 
         </button>
 
-
-
         <!-- GITHUB LOGIN -->
 
         <button
@@ -354,8 +354,6 @@
 
     </div>
 
-
-
     <!-- CREATE NEW ACCOUNT -->
 
     <button
@@ -366,16 +364,11 @@
 
     </button>
 
-
 </div>
-
-
 
 <!-- MESSAGE -->
 
 <div id="message"></div>
-
-
 
 <!-- =================================================
      HCAPTCHA (INVISIBLE / PASSIVE)
@@ -385,676 +378,130 @@
 
 <div id="hcaptchaLoginContainer"></div>
 
-</div><!-- =====================================================
+</div>
+
+<!-- =====================================================
      DASHBOARD
-     ===================================================== --><div id="dashboard"><div class="dashboard-badge">
+     ===================================================== -->
+
+<div id="dashboard">
+
+<div class="dashboard-badge">
     SYSTEM ONLINE
 </div>
 
-
 <div class="dashboard-content">
 
+<div id="dashboardPage">
 
-    <div id="dashboardPage">
+<!-- HOME -->
 
+<div
+    id="homePage"
+    class="dashboard-page active-page">
 
-        <!-- HOME -->
+    <div class="home-scroll">
 
-        <div
-            id="homePage"
-            class="dashboard-page active-page">
+        <div class="home-welcome-card">
 
-            <div class="home-scroll">
-
-                <div class="home-glass-box">
-
-                    <div class="home-box-title">
-                        DATA BASE
-                    </div>
-
-                    <div class="home-box-line"></div>
-
-                    <div class="home-box-text">
-                        Cyber Security Data Base
-                    </div>
-
-                    <div class="database-status-text">
-                        PROTECTED DATA STORAGE
-                    </div>
-
-                </div>
-
-
-                <button
-                    id="loginHistoryBtn"
-                    class="home-glass-button"
-                    type="button">
-
-                    <span class="home-button-icon">
-                        ◷
-                    </span>
-
-                    <span>
-                        LOGIN HISTORY
-                    </span>
-
-                    <span class="home-button-arrow">
-                        ›
-                    </span>
-
-                </button>
-
-
-                <div
-                    id="loginHistoryBox"
-                    class="home-glass-box expandable-box">
-
-                    <div class="home-box-title">
-                        LOGIN HISTORY
-                    </div>
-
-                    <div class="home-box-line"></div>
-
-                    <div
-                        id="loginHistoryContent"
-                        class="home-box-text history-green">
-
-                        No login history yet.
-
-                    </div>
-
-                    <button
-                        id="clearHistoryBtn"
-                        class="small-glass-button"
-                        type="button">
-
-                        CLEAR HISTORY
-
-                    </button>
-
-                </div>
-
-
-                <div
-                    class="home-glass-box video-card">
-
-                    <div class="home-box-title">
-                        SYSTEM TOURTRIAL VIDEO
-                    </div>
-
-                    <div class="home-box-line"></div>
-
-                    <div class="home-box-text">
-                        Account security guide
-                    </div>
-
-                    <video
-                        id="accountDevelopVideo"
-                        class="account-video"
-                        controls
-                        playsinline>
-
-                        <source
-                            src="login video.mp4"
-                            type="video/mp4">
-
-                        Your browser does not support
-                        video playback.
-
-                    </video>
-
-                </div>
-
-
-                <button
-                    id="changePasswordBtn"
-                    class="home-glass-button"
-                    type="button">
-
-                    <span class="home-button-icon">
-                        🔐
-                    </span>
-
-                    <span>
-                        CHANGE PASSWORD
-                    </span>
-
-                    <span class="home-button-arrow">
-                        ›
-                    </span>
-
-                </button>
-
-
-                <div
-                    id="changePasswordBox"
-                    class="home-glass-box expandable-box">
-
-                    <div class="home-box-title">
-                        CHANGE PASSWORD
-                    </div>
-
-                    <div class="home-box-line"></div>
-
-                    <input
-                        type="password"
-                        id="oldPassword"
-                        class="dashboard-input"
-                        placeholder="Current Password">
-
-                    <input
-                        type="password"
-                        id="changeNewPassword"
-                        class="dashboard-input"
-                        placeholder="New Password">
-
-                    <input
-                        type="password"
-                        id="changeConfirmPassword"
-                        class="dashboard-input"
-                        placeholder="Confirm New Password">
-
-                    <button
-                        id="saveChangedPasswordBtn"
-                        class="small-glass-button"
-                        type="button">
-
-                        SAVE NEW PASSWORD
-
-                    </button>
-
-                    <div
-                        id="changePasswordMessage"
-                        class="inner-message">
-                    </div>
-
-                </div>
-
-
-                <button
-                    id="storageBtn"
-                    class="home-glass-button"
-                    type="button">
-
-                    <span class="home-button-icon">
-                        💾
-                    </span>
-
-                    <span>
-                        STORAGE
-                    </span>
-
-                    <span class="home-button-arrow">
-                        ›
-                    </span>
-
-                </button>
-
-
-                <div
-                    id="storageBox"
-                    class="home-glass-box expandable-box">
-
-                    <div class="home-box-title">
-                        STORAGE
-                    </div>
-
-                    <div class="home-box-line"></div>
-
-                    <div class="storage-info">
-
-                        <span>
-                            CLOUD STORAGE
-                        </span>
-
-                        <strong id="storageUsed">
-                            0 KB
-                        </strong>
-
-                    </div>
-
-                    <div class="storage-bar">
-
-                        <div
-                            id="storageProgress"
-                            class="storage-progress">
-                        </div>
-
-                    </div>
-
-                    <div
-                        id="storageDetails"
-                        class="storage-details">
-
-                        Checking storage...
-
-                    </div>
-
-                </div>
-
+            <div class="home-card-title">
+                WELCOME TO CYBER CORE
             </div>
 
-        </div>
+            <div class="home-card-line"></div>
 
-
-        <!-- SEARCH -->
-
-        <div
-            id="searchPage"
-            class="dashboard-page">
-
-            <div class="page-title">
-                SEARCH
-            </div>
-
-            <div class="page-text">
-                Search Cyber Core
-            </div>
-
-        </div>
-
-
-        <!-- ADD -->
-
-        <div
-            id="addPage"
-            class="dashboard-page">
-
-            <div class="add-scroll">
-
-                <div class="page-title">
-                    ADD
-                </div>
-
-                <div class="page-text">
-                    Add new security item
-                </div>
-
-
-                <div class="add-glass-box">
-
-                    <div class="add-box-title">
-                        FILE
-                    </div>
-
-                    <div class="add-box-line"></div>
-
-                    <label class="add-file-label">
-
-                        SELECT FILE
-
-                        <input
-                            id="addFileInput"
-                            type="file"
-                            accept="*/*"
-                            hidden>
-
-                    </label>
-
-
-                    <div
-                        id="addFileName"
-                        class="add-file-name">
-
-                        No file selected
-
-                    </div>
-
-
-                    <div
-                        class="add-box-title add-title-space">
-
-                        TITLE
-
-                    </div>
-
-                    <input
-                        id="addTitle"
-                        class="dashboard-input"
-                        type="text"
-                        placeholder="Enter File Title"
-                        autocomplete="off">
-
-
-                    <div
-                        class="add-box-title add-title-space">
-
-                        CATEGORY
-
-                    </div>
-
-                    <select
-                        id="addCategory"
-                        class="add-category">
-
-                        <option value="">
-                            Select Category
-                        </option>
-
-                        <option value="Documents">
-                            Documents
-                        </option>
-
-                        <option value="Photos">
-                            Photos
-                        </option>
-
-                        <option value="Videos">
-                            Videos
-                        </option>
-
-                        <option value="Accounts">
-                            Accounts
-                        </option>
-
-                        <option value="Security">
-                            Security
-                        </option>
-
-                        <option value="Personal">
-                            Personal
-                        </option>
-
-                        <option value="Other">
-                            Other
-                        </option>
-
-                    </select>
-
-
-                    <button
-                        id="saveFileBtn"
-                        class="small-glass-button"
-                        type="button">
-
-                        SAVE FILE
-
-                    </button>
-
-
-                    <div
-                        id="addFileMessage"
-                        class="inner-message">
-
-                    </div>
-
-                </div>
-
-
-                <div class="add-glass-box">
-
-                    <div class="add-box-title">
-                        SAVED FILES
-                    </div>
-
-                    <div class="add-box-line"></div>
-
-                    <div
-                        id="securityItemsList"
-                        class="security-items-list">
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- SETTING -->
-
-        <div
-            id="settingPage"
-            class="dashboard-page">
-
-            <div class="page-title">
-                SETTING
-            </div>
-
-            <div class="page-text">
-                System settings
+            <div class="home-card-text">
+                FUTURE CYBER SECURITY DATA BASE
             </div>
 
             <button
-                id="removeAccountBtn"
-                class="remove-account-btn"
+                id="homeDatabaseBtn"
+                class="home-action-button"
                 type="button">
 
-                REMOVE ACCOUNT
+                DATA BASE
 
             </button>
 
         </div>
 
+        <div class="home-welcome-card">
 
-        <!-- PROFILE -->
+            <div class="home-card-title">
+                LOGIN ACTIVITY
+            </div>
 
-        <div
-            id="profilePage"
-            class="dashboard-page">
+            <div class="home-card-line"></div>
 
-            <div class="profile-scroll">
+            <div class="home-card-text">
+                VIEW YOUR ACCOUNT LOGIN HISTORY
+            </div>
 
+            <button
+                id="homeLoginHistoryBtn"
+                class="home-action-button"
+                type="button">
 
-                <div
-                    class="profile-glass-box profile-picture-box">
+                LOGIN HISTORY
 
-                    <div class="profile-box-title">
-                        PROFILE PICTURE
-                    </div>
+            </button>
 
-                    <div class="profile-box-line"></div>
+        </div>
 
-                    <div class="profile-picture-wrapper">
+        <div class="home-welcome-card">
 
-                        <img
-                            id="profilePicture"
-                            src=""
-                            alt="Profile Picture">
+            <div class="home-card-title">
+                SECURITY TIPS
+            </div>
 
-                        <div
-                            id="profilePicturePlaceholder">
+            <div class="home-card-line"></div>
 
-                            👤
+            <div class="home-card-text">
+                ACCOUNT SECURITY GUIDE
+            </div>
 
-                        </div>
+            <div class="video-container">
 
-                    </div>
+                <video
+                    id="accountDevelopVideo"
+                    controls
+                    playsinline
+                    preload="metadata">
 
-                    <label
-                        class="profile-upload-button">
+                    <source
+                        src="account-security.mp4"
+                        type="video/mp4">
 
-                        CHANGE PICTURE
+                </video>
 
-                        <input
-                            id="profilePictureInput"
-                            type="file"
-                            accept="image/*"
-                            hidden>
-
-                    </label>
-
+                <div class="video-title">
+                    SYSTEM TOURTRIAL VIDEO
                 </div>
-
-
-                <div class="profile-glass-box">
-
-                    <div class="profile-box-title">
-                        USERNAME
-                    </div>
-
-                    <div class="profile-box-line"></div>
-
-                    <div
-                        id="profileUsername"
-                        class="profile-value">
-
-                        USER
-
-                    </div>
-
-                </div>
-
-
-                <div class="profile-glass-box">
-
-                    <div class="profile-box-title">
-                        EMAIL
-                    </div>
-
-                    <div class="profile-box-line"></div>
-
-                    <div
-                        id="profileEmail"
-                        class="profile-value">
-
-                        -
-
-                    </div>
-
-                </div>
-
-
-                <div class="profile-glass-box">
-
-                    <div class="profile-box-title">
-                        PHONE NUMBER
-                    </div>
-
-                    <div class="profile-box-line"></div>
-
-                    <div
-                        id="profilePhone"
-                        class="profile-value">
-
-                        -
-
-                    </div>
-
-                </div>
-
-
-                <div class="profile-glass-box">
-
-                    <div class="profile-box-title">
-                        BIRTHDAY
-                    </div>
-
-                    <div class="profile-box-line"></div>
-
-                    <div
-                        id="profileBirthday"
-                        class="profile-value">
-
-                        Not added
-
-                    </div>
-
-                </div>
-
-
-                <button
-                    id="accountChangeBtn"
-                    class="profile-glass-button"
-                    type="button">
-
-                    <span>
-                        ⚙️ ACCOUNT CHANGE
-                    </span>
-
-                    <span class="profile-arrow">
-                        ›
-                    </span>
-
-                </button>
-
-
-                <div
-                    id="accountChangeBox"
-                    class="profile-glass-box expandable-box">
-
-                    <div class="profile-box-title">
-                        ACCOUNT CHANGE
-                    </div>
-
-                    <div class="profile-box-line"></div>
-
-                    <div class="profile-edit-label">
-                        USERNAME
-                    </div>
-
-                    <input
-                        id="editUsername"
-                        class="dashboard-input"
-                        type="text"
-                        placeholder="Enter Username"
-                        autocomplete="off">
-
-                    <div class="profile-edit-label">
-                        BIRTHDAY
-                    </div>
-
-                    <input
-                        id="editBirthday"
-                        class="dashboard-input birthday-input"
-                        type="date">
-
-                    <button
-                        id="saveProfileBtn"
-                        class="small-glass-button"
-                        type="button">
-
-                        SAVE ACCOUNT
-
-                    </button>
-
-                    <div
-                        id="profileMessage"
-                        class="inner-message">
-                    </div>
-
-                    <div class="profile-section-space"></div>
-
-                    <div class="profile-box-title">
-                        SWITCH ACCOUNT
-                    </div>
-
-                    <div class="profile-box-line"></div>
-
-                    <div
-                        id="accountList"
-                        class="account-list">
-                    </div>
-
-                    <button
-                        id="addAccountBtn"
-                        class="small-glass-button"
-                        type="button">
-
-                        ＋ ADD ACCOUNT
-
-                    </button>
-
-                </div>
-
-
-                <button
-                    id="helpCenterBtn"
-                    class="profile-glass-button"
-                    type="button">
-
-                    <span>
-                        🆘 HELP CENTER
-                    </span>
-
-                    <span class="profile-arrow">
-                        ›
-                    </span>
-
-                </button>
 
             </div>
+
+        </div>
+
+        <div class="home-welcome-card">
+
+            <div class="home-card-title">
+                PASSWORD SECURITY
+            </div>
+
+            <div class="home-card-line"></div>
+
+            <div class="home-card-text">
+                UPDATE YOUR ACCOUNT PASSWORD
+            </div>
+
+            <button
+                id="homeChangePasswordBtn"
+                class="home-action-button"
+                type="button">
+
+                CHANGE PASSWORD
+
+            </button>
 
         </div>
 
@@ -1062,6 +509,382 @@
 
 </div>
 
+<!-- SEARCH -->
+
+<div
+    id="searchPage"
+    class="dashboard-page">
+
+    <div class="database-scroll">
+
+        <div class="database-title">
+            SEARCH DATABASE
+        </div>
+
+        <div class="database-line"></div>
+
+        <input
+            id="searchInput"
+            class="dashboard-input"
+            type="text"
+            placeholder="Search database..."
+            autocomplete="off">
+
+        <div
+            id="searchResults"
+            class="database-results">
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ADD -->
+
+<div
+    id="addPage"
+    class="dashboard-page">
+
+    <div class="database-scroll">
+
+        <div class="database-title">
+            ADD DATA
+        </div>
+
+        <div class="database-line"></div>
+
+        <input
+            id="addTitle"
+            class="dashboard-input"
+            type="text"
+            placeholder="Title">
+
+        <textarea
+            id="addDescription"
+            class="dashboard-input"
+            placeholder="Description"></textarea>
+
+        <button
+            id="addDataBtn"
+            class="small-glass-button"
+            type="button">
+
+            ADD DATA
+
+        </button>
+
+        <div
+            id="addMessage"
+            class="inner-message">
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SETTING -->
+
+<div
+    id="settingPage"
+    class="dashboard-page">
+
+    <div class="settings-scroll">
+
+        <div class="settings-title">
+            SETTINGS
+        </div>
+
+        <div class="settings-line"></div>
+
+        <button
+            id="changePasswordBtn"
+            class="profile-glass-button"
+            type="button">
+
+            <span>
+                🔐 CHANGE PASSWORD
+            </span>
+
+            <span class="profile-arrow">
+                ›
+            </span>
+
+        </button>
+
+        <button
+            id="switchAccountBtn"
+            class="profile-glass-button"
+            type="button">
+
+            <span>
+                🔄 SWITCH ACCOUNT
+            </span>
+
+            <span class="profile-arrow">
+                ›
+            </span>
+
+        </button>
+
+        <button
+            id="storageBtn"
+            class="profile-glass-button"
+            type="button">
+
+            <span>
+                ☁️ STORAGE
+            </span>
+
+            <span class="profile-arrow">
+                ›
+            </span>
+
+        </button>
+
+        <button
+            id="removeAccountBtn"
+            class="profile-glass-button remove-account-button"
+            type="button">
+
+            <span>
+                🗑️ REMOVE ACCOUNT
+            </span>
+
+            <span class="profile-arrow">
+                ›
+            </span>
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- PROFILE -->
+
+<div
+    id="profilePage"
+    class="dashboard-page">
+
+    <div class="profile-scroll">
+
+        <div
+            class="profile-glass-box profile-picture-box">
+
+            <div class="profile-box-title">
+                PROFILE PICTURE
+            </div>
+
+            <div class="profile-box-line"></div>
+
+            <div class="profile-picture-wrapper">
+
+                <img
+                    id="profilePicture"
+                    src=""
+                    alt="Profile Picture">
+
+                <div
+                    id="profilePicturePlaceholder">
+
+                    👤
+
+                </div>
+
+            </div>
+
+            <label
+                class="profile-upload-button">
+
+                CHANGE PICTURE
+
+                <input
+                    id="profilePictureInput"
+                    type="file"
+                    accept="image/*"
+                    hidden>
+
+            </label>
+
+        </div>
+
+        <div class="profile-glass-box">
+
+            <div class="profile-box-title">
+                USERNAME
+            </div>
+
+            <div class="profile-box-line"></div>
+
+            <div
+                id="profileUsername"
+                class="profile-value">
+
+                USER
+
+            </div>
+
+        </div>
+
+        <div class="profile-glass-box">
+
+            <div class="profile-box-title">
+                EMAIL
+            </div>
+
+            <div class="profile-box-line"></div>
+
+            <div
+                id="profileEmail"
+                class="profile-value">
+
+                -
+
+            </div>
+
+        </div>
+
+        <div class="profile-glass-box">
+
+            <div class="profile-box-title">
+                PHONE NUMBER
+            </div>
+
+            <div class="profile-box-line"></div>
+
+            <div
+                id="profilePhone"
+                class="profile-value">
+
+                -
+
+            </div>
+
+        </div>
+
+        <div class="profile-glass-box">
+
+            <div class="profile-box-title">
+                BIRTHDAY
+            </div>
+
+            <div class="profile-box-line"></div>
+
+            <div
+                id="profileBirthday"
+                class="profile-value">
+
+                Not added
+
+            </div>
+
+        </div>
+
+        <button
+            id="accountChangeBtn"
+            class="profile-glass-button"
+            type="button">
+
+            <span>
+                ⚙️ ACCOUNT CHANGE
+            </span>
+
+            <span class="profile-arrow">
+                ›
+            </span>
+
+        </button>
+
+        <div
+            id="accountChangeBox"
+            class="profile-glass-box expandable-box">
+
+            <div class="profile-box-title">
+                ACCOUNT CHANGE
+            </div>
+
+            <div class="profile-box-line"></div>
+
+            <div class="profile-edit-label">
+                USERNAME
+            </div>
+
+            <input
+                id="editUsername"
+                class="dashboard-input"
+                type="text"
+                placeholder="Enter Username"
+                autocomplete="off">
+
+            <div class="profile-edit-label">
+                BIRTHDAY
+            </div>
+
+            <input
+                id="editBirthday"
+                class="dashboard-input birthday-input"
+                type="date">
+
+            <button
+                id="saveProfileBtn"
+                class="small-glass-button"
+                type="button">
+
+                SAVE ACCOUNT
+
+            </button>
+
+            <div
+                id="profileMessage"
+                class="inner-message">
+            </div>
+
+            <div class="profile-section-space"></div>
+
+            <div class="profile-box-title">
+                SWITCH ACCOUNT
+            </div>
+
+            <div class="profile-box-line"></div>
+
+            <div
+                id="accountList"
+                class="account-list">
+            </div>
+
+            <button
+                id="addAccountBtn"
+                class="small-glass-button"
+                type="button">
+
+                ＋ ADD ACCOUNT
+
+            </button>
+
+        </div>
+
+        <button
+            id="helpCenterBtn"
+            class="profile-glass-button"
+            type="button">
+
+            <span>
+                🆘 HELP CENTER
+            </span>
+
+            <span class="profile-arrow">
+                ›
+            </span>
+
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+</div>
 
 <!-- MAGIC NAVIGATION -->
 
@@ -1084,7 +907,6 @@
 
     </button>
 
-
     <button
         class="nav-item"
         data-page="searchPage"
@@ -1101,7 +923,6 @@
         </span>
 
     </button>
-
 
     <button
         class="nav-item"
@@ -1120,7 +941,6 @@
 
     </button>
 
-
     <button
         class="nav-item"
         data-page="settingPage"
@@ -1137,7 +957,6 @@
         </span>
 
     </button>
-
 
     <button
         class="nav-item"
@@ -1158,122 +977,133 @@
 
 </nav>
 
-</div><!-- =====================================================
+</div>
+
+<!-- =====================================================
      BACKGROUND MUSIC + VIDEO CONTROL
-     ===================================================== --><script>
+     ===================================================== -->
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
+<script>
 
-            var music =
-                document.getElementById(
-                    "backgroundMusic"
-                );
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-            var video =
-                document.getElementById(
-                    "accountDevelopVideo"
-                );
-
-
-            if (music) {
-
-                music.volume = 1;
-
-                music.play().catch(
-                    function () {}
-                );
-
-            }
-
-
-            function startMusic() {
-
-                if (!music) {
-                    return;
-                }
-
-                music.play().catch(
-                    function () {}
-                );
-
-            }
-
-
-            document.addEventListener(
-                "click",
-                startMusic,
-                {
-                    once: true
-                }
+        var music =
+            document.getElementById(
+                "backgroundMusic"
             );
 
-
-            document.addEventListener(
-                "touchstart",
-                startMusic,
-                {
-                    once: true
-                }
+        var video =
+            document.getElementById(
+                "accountDevelopVideo"
             );
 
+        if (music) {
 
-            if (
-                video &&
-                music
-            ) {
+            music.volume = 1;
 
-                video.addEventListener(
-                    "play",
-                    function () {
-
-                        music.pause();
-
-                    }
-                );
-
-
-                video.addEventListener(
-                    "pause",
-                    function () {
-
-                        music.play().catch(
-                            function () {}
-                        );
-
-                    }
-                );
-
-
-                video.addEventListener(
-                    "ended",
-                    function () {
-
-                        music.play().catch(
-                            function () {}
-                        );
-
-                    }
-                );
-
-            }
+            music.play().catch(
+                function () {}
+            );
 
         }
-    );
 
-</script><!-- =====================================================
+        function startMusic() {
+
+            if (!music) {
+                return;
+            }
+
+            music.play().catch(
+                function () {}
+            );
+
+        }
+
+        document.addEventListener(
+            "click",
+            startMusic,
+            {
+                once: true
+            }
+        );
+
+        document.addEventListener(
+            "touchstart",
+            startMusic,
+            {
+                once: true
+            }
+        );
+
+        if (
+            video &&
+            music
+        ) {
+
+            video.addEventListener(
+                "play",
+                function () {
+
+                    music.pause();
+
+                }
+            );
+
+            video.addEventListener(
+                "pause",
+                function () {
+
+                    music.play().catch(
+                        function () {}
+                    );
+
+                }
+            );
+
+            video.addEventListener(
+                "ended",
+                function () {
+
+                    music.play().catch(
+                        function () {}
+                    );
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+<!-- =====================================================
      HCAPTCHA
      LOADED BEFORE SCRIPT.JS
-     ===================================================== --><script
+     ===================================================== -->
+
+<script
     src="https://js.hcaptcha.com/1/api.js"
     async
     defer>
-</script><!-- =====================================================
+</script>
+
+<!-- =====================================================
      SUPABASE
      MUST COME BEFORE SCRIPT.JS
-     ===================================================== --><script
+     ===================================================== -->
+
+<script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-</script><!-- =====================================================
+</script>
+
+<!-- =====================================================
      CYBER CORE JAVASCRIPT
-     ===================================================== --><script src="script.js"></script></body></html>
+     ===================================================== -->
+
+<script src="script.js"></script>
+
+</body></html>
