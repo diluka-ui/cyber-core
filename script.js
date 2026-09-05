@@ -3404,6 +3404,57 @@ if (googleLoginBtn) {
             }
 
             message.textContent =
+                "Verifying security check...";
+
+            var googleCaptchaToken =
+                await runHCaptcha(
+                    hcaptchaLoginWidgetId
+                );
+
+            if (
+                !googleCaptchaToken
+            ) {
+
+                googleLoginBtn.disabled =
+                    false;
+
+                if (githubLoginBtn) {
+
+                    githubLoginBtn.disabled =
+                        false;
+                }
+
+                message.textContent =
+                    "❌ Security verification failed. Please try again.";
+
+                return;
+            }
+
+            var googleCaptchaVerified =
+                await verifyHCaptchaToken(
+                    googleCaptchaToken
+                );
+
+            if (
+                !googleCaptchaVerified
+            ) {
+
+                googleLoginBtn.disabled =
+                    false;
+
+                if (githubLoginBtn) {
+
+                    githubLoginBtn.disabled =
+                        false;
+                }
+
+                message.textContent =
+                    "❌ Security verification failed. Please try again.";
+
+                return;
+            }
+
+            message.textContent =
                 "Opening Google...";
 
             try {
@@ -3483,6 +3534,57 @@ if (githubLoginBtn) {
 
                 googleLoginBtn.disabled =
                     true;
+            }
+
+            message.textContent =
+                "Verifying security check...";
+
+            var githubCaptchaToken =
+                await runHCaptcha(
+                    hcaptchaLoginWidgetId
+                );
+
+            if (
+                !githubCaptchaToken
+            ) {
+
+                githubLoginBtn.disabled =
+                    false;
+
+                if (googleLoginBtn) {
+
+                    googleLoginBtn.disabled =
+                        false;
+                }
+
+                message.textContent =
+                    "❌ Security verification failed. Please try again.";
+
+                return;
+            }
+
+            var githubCaptchaVerified =
+                await verifyHCaptchaToken(
+                    githubCaptchaToken
+                );
+
+            if (
+                !githubCaptchaVerified
+            ) {
+
+                githubLoginBtn.disabled =
+                    false;
+
+                if (googleLoginBtn) {
+
+                    googleLoginBtn.disabled =
+                        false;
+                }
+
+                message.textContent =
+                    "❌ Security verification failed. Please try again.";
+
+                return;
             }
 
             message.textContent =
