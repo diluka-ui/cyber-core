@@ -2,8282 +2,2157 @@
 "use strict";
 
 /* =====================================================
-CYBER CORE - SUPABASE VERSION
-GOOGLE + GITHUB OAUTH
-BACKBLAZE B2 VIDEO STORAGE
-CLOUDINARY OTHER FILE STORAGE
-SECURITY CENTER
+   CYBER CORE - SUPABASE VERSION
+   Rewired to match the actual HTML structure.
 ===================================================== */
 
 /* =====================================================
-SUPABASE CONFIG
+   SUPABASE CONFIG
 ===================================================== */
 
-var SUPABASE_URL =
-    "https://zlysjkpstaushfjgnvxi.supabase.co";
-
-var SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_45K-dyeWhUXpjOioTgPw_A_7R-t1gKu";
-
+var SUPABASE_URL = "https://zlysjkpstaushfjgnvxi.supabase.co";
+var SUPABASE_PUBLISHABLE_KEY = "sb_publishable_45K-dyeWhUXpjOioTgPw_A_7R-t1gKu";
 var supabaseClient = null;
 
-if (
-    window.supabase &&
-    typeof window.supabase.createClient ===
-    "function"
-) {
-    supabaseClient =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_PUBLISHABLE_KEY,
-            {
-                auth: {
-                    persistSession: true,
-                    autoRefreshToken: true,
-                    detectSessionInUrl: true
-                }
-            }
-        );
+if (window.supabase && typeof window.supabase.createClient === "function") {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
 }
 
 /* =====================================================
-CONFIG
+   CONFIG
 ===================================================== */
 
-var HELP_WHATSAPP_NUMBER =
-    "94715874334";
+var STORAGE_BUCKET = "cyber-files";
+var MAX_ACCOUNTS = 5;
 
-var STORAGE_BUCKET =
-    "cyber-files";
+var USER_STORAGE_LIMIT_GB = 1.4;
+var USER_STORAGE_LIMIT_BYTES = USER_STORAGE_LIMIT_GB * 1024 * 1024 * 1024;
 
-var MAX_ACCOUNTS =
-    5;
+var CLOUDINARY_CLOUD_NAME = "am04nwhi";
+var CLOUDINARY_UPLOAD_PRESET = "cyber_core_upload";
+var CLOUDINARY_FOLDER = "cyber-core";
 
-var STORAGE_REFERENCE_GB =
-    36;
+var B2_FUNCTION_UPLOAD = "b2-video-upload";
+var B2_FUNCTION_DELETE = "b2-video-delete";
+var B2_ENDPOINT = "s3.us-east-005.backblazeb2.com";
+var B2_BUCKET_NAME = "cyber-core-videos";
 
-/* =====================================================
-1.4 GB PER USER STORAGE QUOTA
-===================================================== */
+var OAUTH_REDIRECT_URL = "https://diluka-ui.github.io/cyber-core/";
 
-var USER_STORAGE_LIMIT_GB =
-    1.4;
+var HCAPTCHA_SITEKEY = "9a4e0fdc-a874-44fa-bc64-3880526246ea";
+var HCAPTCHA_VERIFY_FUNCTION = "verify-hcaptcha";
 
-var USER_STORAGE_LIMIT_BYTES =
-    USER_STORAGE_LIMIT_GB *
-    1024 *
-    1024 *
-    1024;
-
-/* =====================================================
-CLOUDINARY CONFIG
-===================================================== */
-
-var CLOUDINARY_CLOUD_NAME =
-    "am04nwhi";
-
-var CLOUDINARY_UPLOAD_PRESET =
-    "cyber_core_upload";
-
-var CLOUDINARY_FOLDER =
-    "cyber-core";
+var hcaptchaRegisterWidgetId = null;
+var hcaptchaLoginWidgetId = null;
+var hcaptchaWidgetsRendered = false;
 
 /* =====================================================
-BACKBLAZE B2 CONFIG
-===================================================== */
-
-var B2_FUNCTION_UPLOAD =
-    "b2-video-upload";
-
-var B2_FUNCTION_DELETE =
-    "b2-video-delete";
-
-var B2_ENDPOINT =
-    "s3.us-east-005.backblazeb2.com";
-
-var B2_BUCKET_NAME =
-    "cyber-core-videos";
-
-/* =====================================================
-OAUTH CONFIG
-===================================================== */
-
-var OAUTH_REDIRECT_URL =
-    "https://diluka-ui.github.io/cyber-core/";
-
-/* =====================================================
-HCAPTCHA CONFIG
-===================================================== */
-
-var HCAPTCHA_SITEKEY =
-    "9a4e0fdc-a874-44fa-bc64-3880526246ea";
-
-var HCAPTCHA_VERIFY_FUNCTION =
-    "verify-hcaptcha";
-
-var hcaptchaRegisterWidgetId =
-    null;
-
-var hcaptchaLoginWidgetId =
-    null;
-
-var hcaptchaWidgetsRendered =
-    false;
-
-/* =====================================================
-HCAPTCHA HELPERS
+   HCAPTCHA HELPERS
 ===================================================== */
 
 function isHCaptchaReady() {
-
-    return (
-        typeof window.hcaptcha !==
-        "undefined" &&
-        window.hcaptcha !==
-        null
-    );
+    return typeof window.hcaptcha !== "undefined" && window.hcaptcha !== null;
 }
 
 function renderHCaptchaWidgets() {
+    if (hcaptchaWidgetsRendered || !isHCaptchaReady()) return;
 
-    if (
-        hcaptchaWidgetsRendered ||
-        !isHCaptchaReady()
-    ) {
-        return;
-    }
-
-    var registerContainer =
-        document.getElementById(
-            "hcaptchaRegisterContainer"
-        );
-
-    var loginContainer =
-        document.getElementById(
-            "hcaptchaLoginContainer"
-        );
+    var registerContainer = document.getElementById("hcaptchaRegisterContainer");
+    var loginContainer = document.getElementById("hcaptchaLoginContainer");
 
     try {
-
         if (registerContainer) {
-
-            hcaptchaRegisterWidgetId =
-                window.hcaptcha.render(
-                    registerContainer,
-                    {
-                        sitekey:
-                            HCAPTCHA_SITEKEY,
-                        size:
-                            "invisible"
-                    }
-                );
+            hcaptchaRegisterWidgetId = window.hcaptcha.render(registerContainer, { sitekey: HCAPTCHA_SITEKEY, size: "invisible" });
         }
-
         if (loginContainer) {
-
-            hcaptchaLoginWidgetId =
-                window.hcaptcha.render(
-                    loginContainer,
-                    {
-                        sitekey:
-                            HCAPTCHA_SITEKEY,
-                        size:
-                            "invisible"
-                    }
-                );
+            hcaptchaLoginWidgetId = window.hcaptcha.render(loginContainer, { sitekey: HCAPTCHA_SITEKEY, size: "invisible" });
         }
-
-        hcaptchaWidgetsRendered =
-            true;
-
+        hcaptchaWidgetsRendered = true;
     } catch (error) {
-
-        console.log(
-            "hCaptcha render error:",
-            error
-        );
+        console.log("hCaptcha render error:", error);
     }
 }
 
-function waitForHCaptchaAndRender(
-    retries
-) {
-
-    if (isHCaptchaReady()) {
-
-        renderHCaptchaWidgets();
-
-        return;
-    }
-
-    if (retries <= 0) {
-
-        console.log(
-            "hCaptcha library did not load in time."
-        );
-
-        return;
-    }
-
-    setTimeout(
-        function () {
-
-            waitForHCaptchaAndRender(
-                retries - 1
-            );
-        },
-        300
-    );
+function waitForHCaptchaAndRender(retries) {
+    if (isHCaptchaReady()) { renderHCaptchaWidgets(); return; }
+    if (retries <= 0) { console.log("hCaptcha library did not load in time."); return; }
+    setTimeout(function () { waitForHCaptchaAndRender(retries - 1); }, 300);
 }
 
-async function runHCaptcha(
-    widgetId
-) {
-
-    if (
-        !isHCaptchaReady() ||
-        widgetId === null ||
-        widgetId === undefined
-    ) {
-
-        console.log(
-            "hCaptcha widget is not ready."
-        );
-
-        return "";
-    }
-
-    var token =
-        "";
-
+async function runHCaptcha(widgetId) {
+    if (!isHCaptchaReady() || widgetId === null || widgetId === undefined) return "";
+    var token = "";
     try {
-
-        var result =
-            await window.hcaptcha.execute(
-                widgetId,
-                {
-                    async:
-                        true
-                }
-            );
-
-        token =
-            result &&
-            result.response
-                ? result.response
-                : "";
-
+        var result = await window.hcaptcha.execute(widgetId, { async: true });
+        token = result && result.response ? result.response : "";
     } catch (error) {
-
-        console.log(
-            "hCaptcha execute error:",
-            error
-        );
-
-        token =
-            "";
-
+        console.log("hCaptcha execute error:", error);
+        token = "";
     } finally {
-
-        try {
-
-            window.hcaptcha.reset(
-                widgetId
-            );
-
-        } catch (resetError) {
-
-            console.log(
-                "hCaptcha reset error:",
-                resetError
-            );
-        }
+        try { window.hcaptcha.reset(widgetId); } catch (resetError) { console.log("hCaptcha reset error:", resetError); }
     }
-
     return token;
 }
 
-async function verifyHCaptchaToken(
-    token
-) {
-
-    if (
-        !token ||
-        !supabaseClient
-    ) {
-
-        return false;
-    }
-
+async function verifyHCaptchaToken(token) {
+    if (!token || !supabaseClient) return false;
     try {
-
-        var result =
-            await supabaseClient
-                .functions
-                .invoke(
-                    HCAPTCHA_VERIFY_FUNCTION,
-                    {
-                        body: {
-                            token:
-                                token
-                        }
-                    }
-                );
-
-        if (result.error) {
-
-            console.log(
-                "hCaptcha verify function error:",
-                result.error.message
-            );
-
-            return false;
-        }
-
-        var data =
-            result.data ||
-            {};
-
-        return (
-            data.success ===
-            true
-        );
-
+        var result = await supabaseClient.functions.invoke(HCAPTCHA_VERIFY_FUNCTION, { body: { token: token } });
+        if (result.error) { console.log("hCaptcha verify function error:", result.error.message); return false; }
+        var data = result.data || {};
+        return data.success === true;
     } catch (error) {
-
-        console.log(
-            "hCaptcha verify error:",
-            error
-        );
-
+        console.log("hCaptcha verify error:", error);
         return false;
     }
 }
 
 /* =====================================================
-VARIABLES
+   STATE
 ===================================================== */
 
 var generatedOTP = "";
-
 var countdown = null;
-
 var timeLeft = 60;
-
 var verifiedEmail = "";
-
 var verifiedPhone = "";
-
 var currentUser = null;
-
 var currentProfile = null;
-
-var rememberedAccounts = [];
-
 var currentAccountEmail = "";
-
 var currentAccountPhone = "";
-
 var googleOAuthLogin = false;
-
 var githubOAuthLogin = false;
-
 var oauthHandling = false;
-
-var oauthCallbackHandled = false;
+var securityCenterInitialized = false;
 
 /* =====================================================
-SECURITY CENTER VARIABLES
+   ELEMENTS — matched to the actual HTML
 ===================================================== */
 
-var securityCenterInitialized =
-    false;
+var container = document.querySelector(".container");
 
-var securityMenuButton =
-    null;
+var registerBox = document.getElementById("registerBox");
+var email = document.getElementById("email");
+var phone = document.getElementById("phone");
+var sendBtn = document.getElementById("sendBtn");
 
-var securityCenterPanel =
-    null;
+var otpBox = document.getElementById("otpBox");
+var timer = document.getElementById("timer");
+var otpInputs = document.querySelectorAll(".otp-digit");
+var verifyBtn = document.getElementById("verifyBtn");
 
-var securityCenterOverlay =
-    null;
+var passwordBox = document.getElementById("passwordBox");
+var newPassword = document.getElementById("newPassword");
+var confirmPassword = document.getElementById("confirmPassword");
+var savePasswordBtn = document.getElementById("savePasswordBtn");
 
-/* =====================================================
-ELEMENTS
-===================================================== */
+var loginBox = document.getElementById("loginBox");
+var loginEmail = document.getElementById("loginEmail");
+var loginPhone = document.getElementById("loginPhone");
+var loginPassword = document.getElementById("loginPassword");
+var loginBtn = document.getElementById("loginBtn");
 
-var container =
-    document.querySelector(".container");
+var googleLoginBtn = document.getElementById("googleLoginBtn");
+var githubLoginBtn = document.getElementById("githubLoginBtn");
+var createAccountBtn = document.getElementById("createAccountBtn");
 
-var registerBox =
-    document.getElementById("registerBox");
+var message = document.getElementById("message");
 
-var email =
-    document.getElementById("email");
+var dashboard = document.getElementById("dashboard");
+var securityMenuButton = document.getElementById("securityMenuButton");
 
-var phone =
-    document.getElementById("phone");
+/* HOME PAGE */
+var homeLoginHistory = document.getElementById("homeLoginHistory");
+var loginHistoryEmpty = document.getElementById("loginHistoryEmpty");
+var loginHistoryToggleBtn = document.getElementById("loginHistoryToggleBtn");
+var loginHistoryPanel = document.getElementById("loginHistoryPanel");
+var loginHistoryArrow = document.getElementById("loginHistoryArrow");
+var clearHistoryBtn = document.getElementById("clearHistoryBtn");
 
-var sendBtn =
-    document.getElementById("sendBtn");
+var changePasswordToggleBtn = document.getElementById("changePasswordToggleBtn");
+var changePasswordPanel = document.getElementById("changePasswordPanel");
+var changePasswordArrow = document.getElementById("changePasswordArrow");
+var currentPasswordField = document.getElementById("currentPasswordField");
+var newPasswordField = document.getElementById("newPasswordField");
+var confirmNewPasswordField = document.getElementById("confirmNewPasswordField");
+var savePasswordChangeBtn = document.getElementById("savePasswordChangeBtn");
+var changePasswordHomeMessage = document.getElementById("changePasswordHomeMessage");
 
-var otpBox =
-    document.getElementById("otpBox");
+var storageUsed = document.getElementById("storageUsed");
+var storageProgress = document.getElementById("storageProgress");
+var storageDetails = document.getElementById("storageDetails");
 
-var verifyBtn =
-    document.getElementById("verifyBtn");
+/* ADD PAGE */
+var securityFileInput = document.getElementById("securityFileInput");
+var selectedFileName = document.getElementById("selectedFileName");
+var securityFileTitle = document.getElementById("securityFileTitle");
+var securityFileCategory = document.getElementById("securityFileCategory");
+var securityAddFileBtn = document.getElementById("securityAddFileBtn");
+var securityAddMessage = document.getElementById("securityAddMessage");
+var securityItemsList = document.getElementById("securityItemsList");
 
-var timer =
-    document.getElementById("timer");
+/* PROFILE PAGE */
+var profileDisplayName = document.getElementById("profileDisplayName");
+var profileDisplayEmail = document.getElementById("profileDisplayEmail");
+var profileDisplayPhone = document.getElementById("profileDisplayPhone");
+var profilePicture = document.getElementById("profilePicture");
+var profilePicturePlaceholder = document.getElementById("profilePicturePlaceholder");
+var profilePictureInput = document.getElementById("profilePictureInput");
+var profileNameInput = document.getElementById("profileNameInput");
+var profileBirthdayInput = document.getElementById("profileBirthdayInput");
+var profileBioInput = document.getElementById("profileBioInput");
+var saveProfileBtn = document.getElementById("saveProfileBtn");
+var profileMessage = document.getElementById("profileMessage");
+var accountList = document.getElementById("accountList");
+var addAccountProfileBtn = document.getElementById("addAccountProfileBtn");
 
-var passwordBox =
-    document.getElementById("passwordBox");
+/* SETTINGS PAGE */
+var settingsChangePasswordBtn = document.getElementById("settingsChangePasswordBtn");
+var logoutBtn = document.getElementById("logoutBtn");
+var removeAccountBtn = document.getElementById("removeAccountBtn");
+var removeAccountMessage = document.getElementById("removeAccountMessage");
 
-var newPassword =
-    document.getElementById("newPassword");
+/* SECURITY PAGE (in-dashboard tab) */
+var securityAccountStatus = document.getElementById("securityAccountStatus");
+var securityActivityList = document.getElementById("securityActivityList");
 
-var confirmPassword =
-    document.getElementById("confirmPassword");
-
-var saveBtn =
-    document.getElementById("savePasswordBtn");
-
-var loginBox =
-    document.getElementById("loginBox");
-
-var loginEmail =
-    document.getElementById("loginEmail");
-
-var loginPhone =
-    document.getElementById("loginPhone");
-
-var loginPassword =
-    document.getElementById("loginPassword");
-
-var loginBtn =
-    document.getElementById("loginBtn");
-
-var googleLoginBtn =
-    document.getElementById("googleLoginBtn");
-
-var githubLoginBtn =
-    document.getElementById("githubLoginBtn");
-
-var createAccountBtn =
-    document.getElementById("createAccountBtn");
-
-var message =
-    document.getElementById("message");
-
-var dashboard =
-    document.getElementById("dashboard");
-
-/* =====================================================
-HOME
-===================================================== */
-
-var loginHistoryBtn =
-    document.getElementById(
-        "loginHistoryBtn"
-    );
-
-var loginHistoryBox =
-    document.getElementById(
-        "loginHistoryBox"
-    );
-
-var loginHistoryContent =
-    document.getElementById(
-        "loginHistoryContent"
-    );
-
-var clearHistoryBtn =
-    document.getElementById(
-        "clearHistoryBtn"
-    );
-
-var changePasswordBtn =
-    document.getElementById(
-        "changePasswordBtn"
-    );
-
-var changePasswordBox =
-    document.getElementById(
-        "changePasswordBox"
-    );
-
-var oldPassword =
-    document.getElementById(
-        "oldPassword"
-    );
-
-var changeNewPassword =
-    document.getElementById(
-        "changeNewPassword"
-    );
-
-var changeConfirmPassword =
-    document.getElementById(
-        "changeConfirmPassword"
-    );
-
-var saveChangedPasswordBtn =
-    document.getElementById(
-        "saveChangedPasswordBtn"
-    );
-
-var changePasswordMessage =
-    document.getElementById(
-        "changePasswordMessage"
-    );
-
-var storageBtn =
-    document.getElementById(
-        "storageBtn"
-    );
-
-var storageBox =
-    document.getElementById(
-        "storageBox"
-    );
-
-var storageUsed =
-    document.getElementById(
-        "storageUsed"
-    );
-
-var storageProgress =
-    document.getElementById(
-        "storageProgress"
-    );
-
-var storageDetails =
-    document.getElementById(
-        "storageDetails"
-    );
+/* SECURITY CENTER (slide-out panel) */
+var securityCenterOverlay = document.getElementById("securityCenterOverlay");
+var securityCenterPanel = document.getElementById("securityCenterPanel");
+var securityCenterClose = document.getElementById("securityCenterClose");
+var securityStatusAccount = document.getElementById("securityStatusAccount");
+var securityStatusSession = document.getElementById("securityStatusSession");
+var securityStatusStorage = document.getElementById("securityStatusStorage");
+var securityCenterActivity = document.getElementById("securityCenterActivity");
+var securityCenterActivityEmpty = document.getElementById("securityCenterActivityEmpty");
+var securityRefreshBtn = document.getElementById("securityRefreshBtn");
+var securityLogoutBtn = document.getElementById("securityLogoutBtn");
+var securityCenterMessage = document.getElementById("securityCenterMessage");
 
 /* =====================================================
-ADD PAGE
-===================================================== */
-
-var addFileInput =
-    document.getElementById(
-        "addFileInput"
-    );
-
-var addFileName =
-    document.getElementById(
-        "addFileName"
-    );
-
-var addTitle =
-    document.getElementById(
-        "addTitle"
-    );
-
-var addCategory =
-    document.getElementById(
-        "addCategory"
-    );
-
-var saveFileBtn =
-    document.getElementById(
-        "saveFileBtn"
-    );
-
-var addFileMessage =
-    document.getElementById(
-        "addFileMessage"
-    );
-
-var securityItemsList =
-    document.getElementById(
-        "securityItemsList"
-    );
-
-/* =====================================================
-PROFILE
-===================================================== */
-
-var profilePicture =
-    document.getElementById(
-        "profilePicture"
-    );
-
-var profilePicturePlaceholder =
-    document.getElementById(
-        "profilePicturePlaceholder"
-    );
-
-var profilePictureInput =
-    document.getElementById(
-        "profilePictureInput"
-    );
-
-var profileUsername =
-    document.getElementById(
-        "profileUsername"
-    );
-
-var profileEmail =
-    document.getElementById(
-        "profileEmail"
-    );
-
-var profilePhone =
-    document.getElementById(
-        "profilePhone"
-    );
-
-var profileBirthday =
-    document.getElementById(
-        "profileBirthday"
-    );
-
-var editUsername =
-    document.getElementById(
-        "editUsername"
-    );
-
-var editBirthday =
-    document.getElementById(
-        "editBirthday"
-    );
-
-var saveProfileBtn =
-    document.getElementById(
-        "saveProfileBtn"
-    );
-
-var profileMessage =
-    document.getElementById(
-        "profileMessage"
-    );
-
-var accountChangeBtn =
-    document.getElementById(
-        "accountChangeBtn"
-    );
-
-var accountChangeBox =
-    document.getElementById(
-        "accountChangeBox"
-    );
-
-var accountList =
-    document.getElementById(
-        "accountList"
-    );
-
-var addAccountBtn =
-    document.getElementById(
-        "addAccountBtn"
-    );
-
-var helpCenterBtn =
-    document.getElementById(
-        "helpCenterBtn"
-    );
-
-var removeAccountBtn =
-    document.getElementById(
-        "removeAccountBtn"
-    );
-
-/* =====================================================
-OTP INPUTS
-===================================================== */
-
-var otpInputs =
-    document.querySelectorAll(
-        ".otp-digit"
-    );
-
-/* =====================================================
-REMEMBERED ACCOUNTS
+   REMEMBERED ACCOUNTS (localStorage)
 ===================================================== */
 
 function getRememberedAccounts() {
-
-    var saved =
-        localStorage.getItem(
-            "cyberCoreAccounts"
-        );
-
-    if (!saved) {
-        return [];
-    }
-
+    var saved = localStorage.getItem("cyberCoreAccounts");
+    if (!saved) return [];
     try {
-
-        var parsed =
-            JSON.parse(saved);
-
-        if (Array.isArray(parsed)) {
-            return parsed;
-        }
-
+        var parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
     } catch (error) {
-
-        localStorage.removeItem(
-            "cyberCoreAccounts"
-        );
+        localStorage.removeItem("cyberCoreAccounts");
     }
-
     return [];
 }
 
-function saveRememberedAccounts(
-    accounts
-) {
-
-    localStorage.setItem(
-        "cyberCoreAccounts",
-        JSON.stringify(accounts)
-    );
+function saveRememberedAccounts(accounts) {
+    localStorage.setItem("cyberCoreAccounts", JSON.stringify(accounts));
 }
 
-function rememberAccount(
-    userEmail,
-    userPhone
-) {
-
-    if (!userEmail) {
-        return;
-    }
-
-    var accounts =
-        getRememberedAccounts();
-
+function rememberAccount(userEmail, userPhone) {
+    if (!userEmail) return;
+    var accounts = getRememberedAccounts();
     var found = false;
 
-    var i = 0;
-
-    while (i < accounts.length) {
-
-        if (
-            accounts[i] &&
-            accounts[i].email &&
-            accounts[i].email.toLowerCase() ===
-            userEmail.toLowerCase()
-        ) {
-
-            accounts[i].phone =
-                userPhone ||
-                accounts[i].phone ||
-                "";
-
+    for (var i = 0; i < accounts.length; i++) {
+        if (accounts[i] && accounts[i].email && accounts[i].email.toLowerCase() === userEmail.toLowerCase()) {
+            accounts[i].phone = userPhone || accounts[i].phone || "";
             found = true;
-
             break;
         }
-
-        i++;
     }
 
-    if (!found) {
+    if (!found) accounts.push({ email: userEmail, phone: userPhone || "" });
+    if (accounts.length > MAX_ACCOUNTS) accounts = accounts.slice(accounts.length - MAX_ACCOUNTS);
 
-        accounts.push({
-            email:
-                userEmail,
-            phone:
-                userPhone || ""
-        });
-    }
-
-    if (
-        accounts.length >
-        MAX_ACCOUNTS
-    ) {
-
-        accounts =
-            accounts.slice(
-                accounts.length -
-                MAX_ACCOUNTS
-            );
-    }
-
-    saveRememberedAccounts(
-        accounts
-    );
+    saveRememberedAccounts(accounts);
 }
 
-function removeRememberedAccount(
-    userEmail
-) {
-
-    if (!userEmail) {
-        return;
-    }
-
-    var accounts =
-        getRememberedAccounts();
-
-    var filtered = [];
-
-    var i = 0;
-
-    while (i < accounts.length) {
-
-        if (
-            !accounts[i] ||
-            !accounts[i].email ||
-            accounts[i].email.toLowerCase() !==
-            userEmail.toLowerCase()
-        ) {
-
-            filtered.push(
-                accounts[i]
-            );
-        }
-
-        i++;
-    }
-
-    saveRememberedAccounts(
-        filtered
-    );
+function removeRememberedAccount(userEmail) {
+    if (!userEmail) return;
+    var accounts = getRememberedAccounts();
+    var filtered = accounts.filter(function (a) {
+        return !(a && a.email && a.email.toLowerCase() === userEmail.toLowerCase());
+    });
+    saveRememberedAccounts(filtered);
 }
 
 /* =====================================================
-SAFE OLD LOCAL ACCOUNT CLEANUP
-===================================================== */
-
-function removeOldLocalTestAccounts() {
-
-    var saved =
-        localStorage.getItem(
-            "cyberCoreAccounts"
-        );
-
-    if (!saved) {
-        return;
-    }
-
-    try {
-
-        var accounts =
-            JSON.parse(saved);
-
-        if (!Array.isArray(accounts)) {
-            return;
-        }
-
-        var cleanAccounts = [];
-
-        var i = 0;
-
-        while (i < accounts.length) {
-
-            var account =
-                accounts[i];
-
-            if (
-                account &&
-                Object.prototype.hasOwnProperty.call(
-                    account,
-                    "password"
-                )
-            ) {
-
-                i++;
-
-                continue;
-            }
-
-            cleanAccounts.push(
-                account
-            );
-
-            i++;
-        }
-
-        localStorage.setItem(
-            "cyberCoreAccounts",
-            JSON.stringify(cleanAccounts)
-        );
-
-    } catch (error) {
-
-        console.log(
-            "Old local account cleanup error:",
-            error
-        );
-    }
-}
-
-removeOldLocalTestAccounts();
-
-/* =====================================================
-LOGIN HISTORY
+   LOGIN HISTORY (localStorage, per user)
 ===================================================== */
 
 function historyKey() {
-
-    if (!currentUser) {
-        return "";
-    }
-
-    return (
-        "cyberCoreLoginHistory_" +
-        currentUser.id
-    );
+    if (!currentUser) return "";
+    return "cyberCoreLoginHistory_" + currentUser.id;
 }
 
 function getLoginHistory() {
-
-    var key =
-        historyKey();
-
-    if (key === "") {
-        return [];
-    }
-
-    var saved =
-        localStorage.getItem(key);
-
-    if (!saved) {
-        return [];
-    }
-
+    var key = historyKey();
+    if (key === "") return [];
+    var saved = localStorage.getItem(key);
+    if (!saved) return [];
     try {
-
-        var parsed =
-            JSON.parse(saved);
-
-        if (Array.isArray(parsed)) {
-            return parsed;
-        }
-
+        var parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
     } catch (error) {
-
         localStorage.removeItem(key);
     }
-
     return [];
 }
 
-function saveLoginHistory(
-    history
-) {
+function saveLoginHistory(history) {
+    var key = historyKey();
+    if (key === "") return;
+    localStorage.setItem(key, JSON.stringify(history));
+}
 
-    var key =
-        historyKey();
+function addLoginHistory(accountEmail) {
+    var history = getLoginHistory();
+    var now = new Date();
+    history.unshift({ email: accountEmail || "OAuth Account", date: now.toLocaleDateString(), time: now.toLocaleTimeString() });
+    if (history.length > 20) history.length = 20;
+    saveLoginHistory(history);
+}
 
-    if (key === "") {
+function displayLoginHistory() {
+    if (!homeLoginHistory) return;
+    var history = getLoginHistory();
+
+    if (history.length === 0) {
+        homeLoginHistory.innerHTML = "";
+        if (loginHistoryEmpty) loginHistoryEmpty.style.display = "block";
+        if (clearHistoryBtn) clearHistoryBtn.style.display = "none";
         return;
     }
 
-    localStorage.setItem(
-        key,
-        JSON.stringify(history)
-    );
-}
+    if (loginHistoryEmpty) loginHistoryEmpty.style.display = "none";
+    if (clearHistoryBtn) clearHistoryBtn.style.display = "block";
+    homeLoginHistory.innerHTML = "";
 
-function addLoginHistory(
-    accountEmail
-) {
-
-    var history =
-        getLoginHistory();
-
-    var now =
-        new Date();
-
-    history.unshift({
-        email:
-            accountEmail ||
-            "OAuth Account",
-        date:
-            now.toLocaleDateString(),
-        time:
-            now.toLocaleTimeString()
-    });
-
-    if (history.length > 20) {
-        history.length = 20;
+    for (var i = 0; i < history.length; i++) {
+        var item = history[i];
+        var row = document.createElement("div");
+        row.className = "history-item";
+        row.innerHTML =
+            '<span class="history-number">#' + (i + 1) + "</span><br>" +
+            "LOGIN SUCCESSFUL<br>" +
+            "Email: " + escapeHTML(item.email) + "<br>" +
+            escapeHTML(item.date) + " • " + escapeHTML(item.time);
+        homeLoginHistory.appendChild(row);
     }
-
-    saveLoginHistory(
-        history
-    );
 }
 
 /* =====================================================
-1.4 GB STORAGE TRACKING
+   STORAGE QUOTA TRACKING (localStorage ledger)
 ===================================================== */
 
 function storageUsageKey() {
-
-    if (!currentUser) {
-        return "";
-    }
-
-    return (
-        "cyberCoreStorageUsage_" +
-        currentUser.id
-    );
+    if (!currentUser) return "";
+    return "cyberCoreStorageUsage_" + currentUser.id;
 }
 
 function getTrackedStorageUsage() {
-
-    var key =
-        storageUsageKey();
-
-    if (key === "") {
-        return 0;
-    }
-
-    var saved =
-        localStorage.getItem(key);
-
-    if (!saved) {
-        return 0;
-    }
-
-    var value =
-        Number(saved);
-
-    if (
-        !isFinite(value) ||
-        value < 0
-    ) {
-
-        return 0;
-    }
-
-    if (
-        value >
-        USER_STORAGE_LIMIT_BYTES
-    ) {
-
-        return USER_STORAGE_LIMIT_BYTES;
-    }
-
+    var key = storageUsageKey();
+    if (key === "") return 0;
+    var saved = localStorage.getItem(key);
+    if (!saved) return 0;
+    var value = Number(saved);
+    if (!isFinite(value) || value < 0) return 0;
+    if (value > USER_STORAGE_LIMIT_BYTES) return USER_STORAGE_LIMIT_BYTES;
     return value;
 }
 
-function saveTrackedStorageUsage(
-    bytes
-) {
-
-    var key =
-        storageUsageKey();
-
-    if (key === "") {
-        return;
-    }
-
-    var value =
-        Number(bytes) || 0;
-
-    if (value < 0) {
-        value = 0;
-    }
-
-    if (
-        value >
-        USER_STORAGE_LIMIT_BYTES
-    ) {
-
-        value =
-            USER_STORAGE_LIMIT_BYTES;
-    }
-
-    localStorage.setItem(
-        key,
-        String(value)
-    );
+function saveTrackedStorageUsage(bytes) {
+    var key = storageUsageKey();
+    if (key === "") return;
+    var value = Number(bytes) || 0;
+    if (value < 0) value = 0;
+    if (value > USER_STORAGE_LIMIT_BYTES) value = USER_STORAGE_LIMIT_BYTES;
+    localStorage.setItem(key, String(value));
 }
 
-function increaseTrackedStorageUsage(
-    bytes
-) {
-
-    var amount =
-        Number(bytes) || 0;
-
-    if (amount <= 0) {
-        return;
-    }
-
-    var current =
-        getTrackedStorageUsage();
-
-    saveTrackedStorageUsage(
-        current + amount
-    );
+function increaseTrackedStorageUsage(bytes) {
+    var amount = Number(bytes) || 0;
+    if (amount <= 0) return;
+    saveTrackedStorageUsage(getTrackedStorageUsage() + amount);
 }
 
-function decreaseTrackedStorageUsage(
-    bytes
-) {
-
-    var amount =
-        Number(bytes) || 0;
-
-    if (amount <= 0) {
-        return;
-    }
-
-    var current =
-        getTrackedStorageUsage();
-
-    var updated =
-        current - amount;
-
-    if (updated < 0) {
-        updated = 0;
-    }
-
-    saveTrackedStorageUsage(
-        updated
-    );
+function decreaseTrackedStorageUsage(bytes) {
+    var amount = Number(bytes) || 0;
+    if (amount <= 0) return;
+    var updated = getTrackedStorageUsage() - amount;
+    if (updated < 0) updated = 0;
+    saveTrackedStorageUsage(updated);
 }
 
 function getRemainingStorageBytes() {
-
-    var used =
-        getTrackedStorageUsage();
-
-    var remaining =
-        USER_STORAGE_LIMIT_BYTES -
-        used;
-
-    if (remaining < 0) {
-        remaining = 0;
-    }
-
-    return remaining;
+    var remaining = USER_STORAGE_LIMIT_BYTES - getTrackedStorageUsage();
+    return remaining < 0 ? 0 : remaining;
 }
 
-function canUploadFileSize(
-    fileSize
-) {
-
-    var size =
-        Number(fileSize) || 0;
-
-    return (
-        size <=
-        getRemainingStorageBytes()
-    );
+function formatFileSize(bytes) {
+    var b = Number(bytes) || 0;
+    if (b <= 0) return "0 MB";
+    var kb = 1024, mb = kb * 1024, gb = mb * 1024;
+    if (b >= gb) return (b / gb).toFixed(2) + " GB";
+    if (b >= mb) return (b / mb).toFixed(2) + " MB";
+    if (b >= kb) return (b / kb).toFixed(2) + " KB";
+    return b + " B";
 }
 
-/* =====================================================
-PER-FILE STORAGE SIZE LEDGER
-===================================================== */
+/* PER-FILE SIZE LEDGER */
 
 function storageFileLedgerKey() {
-
-    if (!currentUser) {
-        return "";
-    }
-
-    return (
-        "cyberCoreStorageFiles_" +
-        currentUser.id
-    );
+    if (!currentUser) return "";
+    return "cyberCoreStorageFiles_" + currentUser.id;
 }
 
 function getStorageFileLedger() {
-
-    var key =
-        storageFileLedgerKey();
-
-    if (key === "") {
-        return {};
-    }
-
-    var saved =
-        localStorage.getItem(key);
-
-    if (!saved) {
-        return {};
-    }
-
+    var key = storageFileLedgerKey();
+    if (key === "") return {};
+    var saved = localStorage.getItem(key);
+    if (!saved) return {};
     try {
-
-        var parsed =
-            JSON.parse(saved);
-
-        if (
-            parsed &&
-            typeof parsed === "object" &&
-            !Array.isArray(parsed)
-        ) {
-
-            return parsed;
-        }
-
+        var parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
     } catch (error) {
-
-        console.log(
-            "Storage ledger read error:",
-            error
-        );
+        console.log("Storage ledger read error:", error);
     }
-
     return {};
 }
 
-function saveStorageFileLedger(
-    ledger
-) {
-
-    var key =
-        storageFileLedgerKey();
-
-    if (key === "") {
-        return;
-    }
-
-    try {
-
-        localStorage.setItem(
-            key,
-            JSON.stringify(
-                ledger || {}
-            )
-        );
-
-    } catch (error) {
-
-        console.log(
-            "Storage ledger save error:",
-            error
-        );
-    }
+function saveStorageFileLedger(ledger) {
+    var key = storageFileLedgerKey();
+    if (key === "") return;
+    try { localStorage.setItem(key, JSON.stringify(ledger || {})); } catch (error) { console.log("Storage ledger save error:", error); }
 }
 
-function createStorageFileKey(
-    filePath
-) {
-
-    return String(
-        filePath || ""
-    );
+function saveStorageFileSize(filePath, fileSize) {
+    var key = String(filePath || "");
+    if (key === "") return;
+    var size = Number(fileSize) || 0;
+    if (!isFinite(size) || size <= 0) return;
+    var ledger = getStorageFileLedger();
+    ledger[key] = size;
+    saveStorageFileLedger(ledger);
 }
 
-function saveStorageFileSize(
-    filePath,
-    fileSize
-) {
-
-    var key =
-        createStorageFileKey(
-            filePath
-        );
-
-    if (key === "") {
-        return;
-    }
-
-    var size =
-        Number(fileSize) || 0;
-
-    if (
-        !isFinite(size) ||
-        size <= 0
-    ) {
-        return;
-    }
-
-    var ledger =
-        getStorageFileLedger();
-
-    ledger[key] =
-        size;
-
-    saveStorageFileLedger(
-        ledger
-    );
+function getStorageFileSize(filePath) {
+    var key = String(filePath || "");
+    if (key === "") return 0;
+    var ledger = getStorageFileLedger();
+    var size = Number(ledger[key]) || 0;
+    return (!isFinite(size) || size <= 0) ? 0 : size;
 }
 
-function getStorageFileSize(
-    filePath
-) {
-
-    var key =
-        createStorageFileKey(
-            filePath
-        );
-
-    if (key === "") {
-        return 0;
-    }
-
-    var ledger =
-        getStorageFileLedger();
-
-    var size =
-        Number(
-            ledger[key]
-        ) || 0;
-
-    if (
-        !isFinite(size) ||
-        size <= 0
-    ) {
-        return 0;
-    }
-
-    return size;
-}
-
-function removeStorageFileSize(
-    filePath
-) {
-
-    var key =
-        createStorageFileKey(
-            filePath
-        );
-
-    if (key === "") {
-        return 0;
-    }
-
-    var ledger =
-        getStorageFileLedger();
-
-    var size =
-        Number(
-            ledger[key]
-        ) || 0;
-
-    if (
-        Object.prototype.hasOwnProperty.call(
-            ledger,
-            key
-        )
-    ) {
-
+function removeStorageFileSize(filePath) {
+    var key = String(filePath || "");
+    if (key === "") return 0;
+    var ledger = getStorageFileLedger();
+    var size = Number(ledger[key]) || 0;
+    if (Object.prototype.hasOwnProperty.call(ledger, key)) {
         delete ledger[key];
-
-        saveStorageFileLedger(
-            ledger
-        );
+        saveStorageFileLedger(ledger);
     }
-
-    if (
-        !isFinite(size) ||
-        size <= 0
-    ) {
-        return 0;
-    }
-
-    return size;
+    return (!isFinite(size) || size <= 0) ? 0 : size;
 }
-
-/* =====================================================
-STORAGE RECONCILIATION FIX
-===================================================== */
 
 async function reconcileStorageUsage() {
-
-    if (
-        !supabaseClient ||
-        !currentUser
-    ) {
-        return;
-    }
-
+    if (!supabaseClient || !currentUser) return;
     try {
+        var result = await supabaseClient.from("security_items").select("file_path").eq("user_id", currentUser.id);
+        if (result.error) { console.log("Storage reconciliation error:", result.error.message); return; }
 
-        var result =
-            await supabaseClient
-                .from("security_items")
-                .select(
-                    "file_path"
-                )
-                .eq(
-                    "user_id",
-                    currentUser.id
-                );
-
-        if (result.error) {
-
-            console.log(
-                "Storage reconciliation error:",
-                result.error.message
-            );
-
-            return;
-        }
-
-        var items =
-            result.data || [];
-
+        var items = result.data || [];
         var existingPaths = {};
-
-        var i = 0;
-
-        while (
-            i < items.length
-        ) {
-
-            var path =
-                items[i] &&
-                items[i].file_path
-                    ? String(
-                        items[i].file_path
-                    )
-                    : "";
-
-            if (
-                path !== ""
-            ) {
-
-                existingPaths[path] =
-                    true;
-            }
-
-            i++;
+        for (var i = 0; i < items.length; i++) {
+            var path = items[i] && items[i].file_path ? String(items[i].file_path) : "";
+            if (path !== "") existingPaths[path] = true;
         }
 
-        var ledger =
-            getStorageFileLedger();
-
+        var ledger = getStorageFileLedger();
         var cleanLedger = {};
+        var totalBytes = 0;
+        var keys = Object.keys(ledger);
 
-        var totalBytes =
-            0;
-
-        var keys =
-            Object.keys(
-                ledger
-            );
-
-        i = 0;
-
-        while (
-            i < keys.length
-        ) {
-
-            var filePath =
-                keys[i];
-
-            var fileSize =
-                Number(
-                    ledger[filePath]
-                ) || 0;
-
-            if (
-                existingPaths[filePath] &&
-                isFinite(fileSize) &&
-                fileSize > 0
-            ) {
-
-                cleanLedger[filePath] =
-                    fileSize;
-
-                totalBytes +=
-                    fileSize;
+        for (var j = 0; j < keys.length; j++) {
+            var filePath = keys[j];
+            var fileSize = Number(ledger[filePath]) || 0;
+            if (existingPaths[filePath] && isFinite(fileSize) && fileSize > 0) {
+                cleanLedger[filePath] = fileSize;
+                totalBytes += fileSize;
             }
-
-            i++;
         }
 
-        saveStorageFileLedger(
-            cleanLedger
-        );
-
-        saveTrackedStorageUsage(
-            totalBytes
-        );
-
+        saveStorageFileLedger(cleanLedger);
+        saveTrackedStorageUsage(totalBytes);
     } catch (error) {
+        console.log("Storage reconciliation failed:", error);
+    }
+}
 
-        console.log(
-            "Storage reconciliation failed:",
-            error
-        );
+async function updateStorage() {
+    if (!currentUser) return;
+    await reconcileStorageUsage();
+    var used = getTrackedStorageUsage();
+    var pct = USER_STORAGE_LIMIT_BYTES > 0 ? Math.min(100, (used / USER_STORAGE_LIMIT_BYTES) * 100) : 0;
+
+    if (storageUsed) storageUsed.textContent = formatFileSize(used);
+    if (storageProgress) storageProgress.style.width = pct.toFixed(1) + "%";
+    if (storageDetails) {
+        storageDetails.textContent = formatFileSize(used) + " used of " + USER_STORAGE_LIMIT_GB + " GB limit (" + formatFileSize(getRemainingStorageBytes()) + " free)";
     }
 }
 
 /* =====================================================
-ESCAPE HTML
+   ESCAPE HTML
 ===================================================== */
 
-function escapeHTML(
-    text
-) {
-
-    var div =
-        document.createElement(
-            "div"
-        );
-
-    div.textContent =
-        text == null
-            ? ""
-            : String(text);
-
+function escapeHTML(text) {
+    var div = document.createElement("div");
+    div.textContent = text == null ? "" : String(text);
     return div.innerHTML;
 }
 
 /* =====================================================
-DISPLAY LOGIN HISTORY
-===================================================== */
-
-function displayLoginHistory() {
-
-    if (!loginHistoryContent) {
-        return;
-    }
-
-    var history =
-        getLoginHistory();
-
-    if (
-        history.length ===
-        0
-    ) {
-
-        loginHistoryContent.textContent =
-            "No login history yet.";
-
-        return;
-    }
-
-    loginHistoryContent.innerHTML =
-        "";
-
-    var i = 0;
-
-    while (
-        i < history.length
-    ) {
-
-        var item =
-            history[i];
-
-        var row =
-            document.createElement(
-                "div"
-            );
-
-        row.className =
-            "history-item";
-
-        row.innerHTML =
-            '<span class="history-number">' +
-            "#" +
-            (i + 1) +
-            "</span><br>" +
-            "LOGIN SUCCESSFUL<br>" +
-            "Email: " +
-            escapeHTML(
-                item.email
-            ) +
-            "<br>" +
-            escapeHTML(
-                item.date
-            ) +
-            " • " +
-            escapeHTML(
-                item.time
-            );
-
-        loginHistoryContent.appendChild(
-            row
-        );
-
-        i++;
-    }
-}
-
-/* =====================================================
-UI
+   AUTH SCREEN UI
 ===================================================== */
 
 function showRegister() {
-
-    clearInterval(
-        countdown
-    );
-
-    if (container) {
-        container.style.display =
-            "flex";
-    }
-
-    if (dashboard) {
-        dashboard.style.display =
-            "none";
-    }
-
-    document.body.style.overflow =
-        "";
-
-    if (registerBox) {
-        registerBox.style.display =
-            "block";
-    }
-
-    if (otpBox) {
-        otpBox.style.display =
-            "none";
-    }
-
-    if (passwordBox) {
-        passwordBox.style.display =
-            "none";
-    }
-
-    if (loginBox) {
-        loginBox.style.display =
-            "none";
-    }
+    clearInterval(countdown);
+    if (container) container.style.display = "flex";
+    if (dashboard) dashboard.style.display = "none";
+    document.body.style.overflow = "";
+    if (registerBox) registerBox.style.display = "block";
+    if (otpBox) otpBox.style.display = "none";
+    if (passwordBox) passwordBox.style.display = "none";
+    if (loginBox) loginBox.style.display = "none";
 }
 
 function showOTP() {
-
-    if (container) {
-        container.style.display =
-            "flex";
-    }
-
-    if (dashboard) {
-        dashboard.style.display =
-            "none";
-    }
-
-    if (registerBox) {
-        registerBox.style.display =
-            "none";
-    }
-
-    if (otpBox) {
-        otpBox.style.display =
-            "block";
-    }
-
-    if (passwordBox) {
-        passwordBox.style.display =
-            "none";
-    }
-
-    if (loginBox) {
-        loginBox.style.display =
-            "none";
-    }
+    if (container) container.style.display = "flex";
+    if (dashboard) dashboard.style.display = "none";
+    if (registerBox) registerBox.style.display = "none";
+    if (otpBox) otpBox.style.display = "block";
+    if (passwordBox) passwordBox.style.display = "none";
+    if (loginBox) loginBox.style.display = "none";
 }
 
 function showPassword() {
-
-    if (container) {
-        container.style.display =
-            "flex";
-    }
-
-    if (dashboard) {
-        dashboard.style.display =
-            "none";
-    }
-
-    if (registerBox) {
-        registerBox.style.display =
-            "none";
-    }
-
-    if (otpBox) {
-        otpBox.style.display =
-            "none";
-    }
-
-    if (passwordBox) {
-        passwordBox.style.display =
-            "block";
-    }
-
-    if (loginBox) {
-        loginBox.style.display =
-            "none";
-    }
+    if (container) container.style.display = "flex";
+    if (dashboard) dashboard.style.display = "none";
+    if (registerBox) registerBox.style.display = "none";
+    if (otpBox) otpBox.style.display = "none";
+    if (passwordBox) passwordBox.style.display = "block";
+    if (loginBox) loginBox.style.display = "none";
 }
 
 function showLogin() {
-
-    if (container) {
-        container.style.display =
-            "flex";
-    }
-
-    if (dashboard) {
-        dashboard.style.display =
-            "none";
-    }
-
-    document.body.style.overflow =
-        "";
-
-    if (registerBox) {
-        registerBox.style.display =
-            "none";
-    }
-
-    if (otpBox) {
-        otpBox.style.display =
-            "none";
-    }
-
-    if (passwordBox) {
-        passwordBox.style.display =
-            "none";
-    }
-
-    if (loginBox) {
-        loginBox.style.display =
-            "block";
-    }
-
+    if (container) container.style.display = "flex";
+    if (dashboard) dashboard.style.display = "none";
+    document.body.style.overflow = "";
+    if (registerBox) registerBox.style.display = "none";
+    if (otpBox) otpBox.style.display = "none";
+    if (passwordBox) passwordBox.style.display = "none";
+    if (loginBox) loginBox.style.display = "block";
     closeSecurityCenter();
 }
 
-/* =====================================================
-RESET REGISTRATION
-===================================================== */
-
 function resetRegistrationForm() {
-
-    clearInterval(
-        countdown
-    );
-
-    generatedOTP =
-        "";
-
-    verifiedEmail =
-        "";
-
-    verifiedPhone =
-        "";
-
-    if (email) {
-        email.value =
-            "";
-    }
-
-    if (phone) {
-        phone.value =
-            "";
-    }
-
-    if (newPassword) {
-        newPassword.value =
-            "";
-    }
-
-    if (confirmPassword) {
-        confirmPassword.value =
-            "";
-    }
-
+    clearInterval(countdown);
+    generatedOTP = "";
+    verifiedEmail = "";
+    verifiedPhone = "";
+    if (email) email.value = "";
+    if (phone) phone.value = "";
+    if (newPassword) newPassword.value = "";
+    if (confirmPassword) confirmPassword.value = "";
     clearOTP();
-
-    timeLeft =
-        60;
-
-    if (timer) {
-
-        timer.textContent =
-            "OTP expires in: 60s";
-    }
+    timeLeft = 60;
+    if (timer) timer.textContent = "OTP expires in: 60s";
 }
 
 /* =====================================================
-OTP
+   OTP INPUTS
 ===================================================== */
 
 function clearOTP() {
-
-    var i = 0;
-
-    while (
-        i < otpInputs.length
-    ) {
-
-        otpInputs[i].value =
-            "";
-
-        i++;
-    }
+    for (var i = 0; i < otpInputs.length; i++) otpInputs[i].value = "";
 }
 
 function getEnteredOTP() {
-
-    var result =
-        "";
-
-    var i = 0;
-
-    while (
-        i < otpInputs.length
-    ) {
-
-        result +=
-            otpInputs[i].value;
-
-        i++;
-    }
-
+    var result = "";
+    for (var i = 0; i < otpInputs.length; i++) result += otpInputs[i].value;
     return result;
 }
 
-var otpIndex =
-    0;
+for (var otpIndex = 0; otpIndex < otpInputs.length; otpIndex++) {
+    (function (currentIndex) {
+        var currentBox = otpInputs[currentIndex];
 
-while (
-    otpIndex <
-    otpInputs.length
-) {
+        currentBox.oninput = function () {
+            currentBox.value = currentBox.value.replace(/\D/g, "").slice(0, 1);
+            if (currentBox.value !== "" && currentIndex < otpInputs.length - 1) {
+                otpInputs[currentIndex + 1].focus();
+            }
+        };
 
-    (function (
-        currentIndex
-    ) {
-
-        var currentBox =
-            otpInputs[
-                currentIndex
-            ];
-
-        currentBox.oninput =
-            function () {
-
-                currentBox.value =
-                    currentBox.value
-                        .replace(
-                            /\D/g,
-                            ""
-                        )
-                        .slice(
-                            0,
-                            1
-                        );
-
-                if (
-                    currentBox.value !==
-                    "" &&
-                    currentIndex <
-                    otpInputs.length - 1
-                ) {
-
-                    otpInputs[
-                        currentIndex + 1
-                    ].focus();
-                }
-            };
-
-        currentBox.onkeydown =
-            function (
-                event
-            ) {
-
-                if (
-                    event.key ===
-                    "Backspace" &&
-                    currentBox.value ===
-                    "" &&
-                    currentIndex > 0
-                ) {
-
-                    otpInputs[
-                        currentIndex - 1
-                    ].focus();
-                }
-            };
-
+        currentBox.onkeydown = function (event) {
+            if (event.key === "Backspace" && currentBox.value === "" && currentIndex > 0) {
+                otpInputs[currentIndex - 1].focus();
+            }
+        };
     })(otpIndex);
+}
 
-    otpIndex++;
+function startTimer() {
+    clearInterval(countdown);
+    timeLeft = 60;
+    if (timer) timer.textContent = "OTP expires in: 60s";
+
+    countdown = setInterval(function () {
+        timeLeft--;
+        if (timeLeft > 0 && timer) {
+            timer.textContent = "OTP expires in: " + timeLeft + "s";
+        }
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            generatedOTP = "";
+            if (timer) timer.textContent = "OTP EXPIRED";
+            if (message) message.textContent = "❌ OTP expired. Please request a new OTP.";
+        }
+    }, 1000);
 }
 
 /* =====================================================
-SEND OTP
+   SEND OTP
 ===================================================== */
 
 if (sendBtn) {
+    sendBtn.onclick = async function () {
+        var enteredEmail = email ? email.value.trim() : "";
+        var enteredPhone = phone ? phone.value.trim() : "";
+        var accounts = getRememberedAccounts();
 
-    sendBtn.onclick =
-        async function () {
+        if (accounts.length >= MAX_ACCOUNTS) { message.textContent = "❌ Maximum 5 accounts allowed."; return; }
+        if (enteredEmail === "") { message.textContent = "Please enter your Email❗"; return; }
+        if (!enteredEmail.includes("@") || !enteredEmail.includes(".")) { message.textContent = "Please enter a valid Email❗"; return; }
+        if (enteredPhone === "") { message.textContent = "Please enter your Phone Number❗"; return; }
 
-            var enteredEmail =
-                email
-                    ? email.value.trim()
-                    : "";
-
-            var enteredPhone =
-                phone
-                    ? phone.value.trim()
-                    : "";
-
-            var accounts =
-                getRememberedAccounts();
-
-            if (
-                accounts.length >=
-                MAX_ACCOUNTS
-            ) {
-
-                message.textContent =
-                    "❌ Maximum 5 accounts allowed.";
-
+        for (var i = 0; i < accounts.length; i++) {
+            if (accounts[i] && accounts[i].email && accounts[i].email.toLowerCase() === enteredEmail.toLowerCase()) {
+                message.textContent = "❌ This Email is already registered.";
                 return;
             }
+        }
 
-            if (
-                enteredEmail ===
-                ""
-            ) {
+        if (!supabaseClient) { message.textContent = "❌ Supabase could not be loaded."; return; }
 
-                message.textContent =
-                    "Please enter your Email❗";
+        sendBtn.disabled = true;
+        message.textContent = "Verifying security check...";
 
-                return;
-            }
+        var captchaToken = await runHCaptcha(hcaptchaRegisterWidgetId);
+        if (!captchaToken) { sendBtn.disabled = false; message.textContent = "❌ Security verification failed. Please try again."; return; }
 
-            if (
-                !enteredEmail.includes("@") ||
-                !enteredEmail.includes(".")
-            ) {
+        var captchaVerified = await verifyHCaptchaToken(captchaToken);
+        if (!captchaVerified) { sendBtn.disabled = false; message.textContent = "❌ Security verification failed. Please try again."; return; }
 
-                message.textContent =
-                    "Please enter a valid Email❗";
+        var otpToSend = Math.floor(100000 + Math.random() * 900000).toString();
+        message.textContent = "Sending OTP to your email...";
 
-                return;
-            }
+        try {
+            var sendResult = await supabaseClient.functions.invoke("send-otp-email", { body: { email: enteredEmail, otp: otpToSend } });
+            sendBtn.disabled = false;
 
-            if (
-                enteredPhone ===
-                ""
-            ) {
+            if (sendResult.error) { message.textContent = "❌ " + (sendResult.error.message || "Failed to send OTP."); return; }
 
-                message.textContent =
-                    "Please enter your Phone Number❗";
+            var sendData = sendResult.data || {};
+            if (sendData.success === false) { message.textContent = "❌ " + (sendData.error || "Failed to send OTP."); return; }
 
-                return;
-            }
+            generatedOTP = otpToSend;
+            verifiedEmail = enteredEmail;
+            verifiedPhone = enteredPhone;
 
-            var i =
-                0;
+            clearOTP();
+            showOTP();
+            startTimer();
 
-            while (
-                i < accounts.length
-            ) {
-
-                if (
-                    accounts[i] &&
-                    accounts[i].email &&
-                    accounts[i].email.toLowerCase() ===
-                    enteredEmail.toLowerCase()
-                ) {
-
-                    message.textContent =
-                        "❌ This Email is already registered.";
-
-                    return;
-                }
-
-                i++;
-            }
-
-            if (!supabaseClient) {
-
-                message.textContent =
-                    "❌ Supabase could not be loaded.";
-
-                return;
-            }
-
-            sendBtn.disabled =
-                true;
-
-            message.textContent =
-                "Verifying security check...";
-
-            var registerCaptchaToken =
-                await runHCaptcha(
-                    hcaptchaRegisterWidgetId
-                );
-
-            if (
-                !registerCaptchaToken
-            ) {
-
-                sendBtn.disabled =
-                    false;
-
-                message.textContent =
-                    "❌ Security verification failed. Please try again.";
-
-                return;
-            }
-
-            var registerCaptchaVerified =
-                await verifyHCaptchaToken(
-                    registerCaptchaToken
-                );
-
-            if (
-                !registerCaptchaVerified
-            ) {
-
-                sendBtn.disabled =
-                    false;
-
-                message.textContent =
-                    "❌ Security verification failed. Please try again.";
-
-                return;
-            }
-
-            var otpToSend =
-                Math.floor(
-                    100000 +
-                    Math.random() *
-                    900000
-                ).toString();
-
-            sendBtn.disabled =
-                true;
-
-            message.textContent =
-                "Sending OTP to your email...";
-
-            try {
-
-                var sendResult =
-                    await supabaseClient
-                        .functions
-                        .invoke(
-                            "send-otp-email",
-                            {
-                                body: {
-                                    email:
-                                        enteredEmail,
-                                    otp:
-                                        otpToSend
-                                }
-                            }
-                        );
-
-                sendBtn.disabled =
-                    false;
-
-                console.log(
-                    "OTP FUNCTION FULL RESULT:",
-                    sendResult
-                );
-
-                if (
-                    sendResult.error
-                ) {
-
-                    console.error(
-                        "OTP FUNCTION ERROR:",
-                        sendResult.error
-                    );
-
-                    console.error(
-                        "OTP FUNCTION ERROR MESSAGE:",
-                        sendResult.error.message
-                    );
-
-                    console.error(
-                        "OTP FUNCTION ERROR CONTEXT:",
-                        sendResult.error.context
-                    );
-
-                    console.error(
-                        "OTP FUNCTION DATA:",
-                        sendResult.data
-                    );
-
-                    message.textContent =
-                        "❌ " +
-                        (
-                            sendResult.error.message ||
-                            "Failed to send OTP email."
-                        );
-
-                    return;
-                }
-
-                var sendData =
-                    sendResult.data ||
-                    {};
-
-                if (
-                    !sendData.success
-                ) {
-
-                    console.error(
-                        "OTP FUNCTION UNSUCCESSFUL DATA:",
-                        sendData
-                    );
-
-                    message.textContent =
-                        "❌ " +
-                        (
-                            sendData.error ||
-                            "Failed to send OTP email."
-                        );
-
-                    return;
-                }
-
-                generatedOTP =
-                    otpToSend;
-
-                verifiedEmail =
-                    enteredEmail;
-
-                verifiedPhone =
-                    enteredPhone;
-
-                clearOTP();
-
-                showOTP();
-
-                message.textContent =
-                    "📧 OTP sent to " +
-                    enteredEmail +
-                    ". Please check your inbox.";
-
-                startTimer();
-
-            } catch (error) {
-
-                sendBtn.disabled =
-                    false;
-
-                message.textContent =
-                    "❌ Failed to send OTP email. Please try again.";
-
-                console.log(
-                    "Send OTP error:",
-                    error
-                );
-            }
-        };
+            if (otpInputs.length > 0) otpInputs[0].focus();
+            message.textContent = "📧 OTP sent to " + enteredEmail + ". Please check your inbox.";
+        } catch (error) {
+            sendBtn.disabled = false;
+            console.log("Send OTP error:", error);
+            message.textContent = "❌ Failed to send OTP. Please try again.";
+        }
+    };
 }
 
 /* =====================================================
-OTP TIMER
-===================================================== */
-
-function startTimer() {
-
-    clearInterval(
-        countdown
-    );
-
-    timeLeft =
-        60;
-
-    if (timer) {
-
-        timer.textContent =
-            "OTP expires in: 60s";
-    }
-
-    countdown =
-        setInterval(
-            function () {
-
-                timeLeft--;
-
-                if (
-                    timeLeft > 0 &&
-                    timer
-                ) {
-
-                    timer.textContent =
-                        "OTP expires in: " +
-                        timeLeft +
-                        "s";
-                }
-
-                if (
-                    timeLeft <=
-                    0
-                ) {
-
-                    clearInterval(
-                        countdown
-                    );
-
-                    generatedOTP =
-                        "";
-
-                    if (timer) {
-
-                        timer.textContent =
-                            "OTP EXPIRED❗";
-                    }
-
-                    if (message) {
-
-                        message.textContent =
-                            "❌ OTP expired. Please request a new OTP♻️";
-                    }
-                }
-
-            },
-            1000
-        );
-}
-
-/* =====================================================
-VERIFY OTP
+   VERIFY OTP
 ===================================================== */
 
 if (verifyBtn) {
-
-    verifyBtn.onclick =
-        function () {
-
-            var enteredOTP =
-                getEnteredOTP();
-
-            if (
-                enteredOTP.length !==
-                6
-            ) {
-
-                message.textContent =
-                    "Please enter all 6 OTP numbers⚠";
-
-                return;
-            }
-
-            if (
-                generatedOTP ===
-                ""
-            ) {
-
-                message.textContent =
-                    "❌ OTP expired❗";
-
-                return;
-            }
-
-            if (
-                enteredOTP ===
-                generatedOTP
-            ) {
-
-                clearInterval(
-                    countdown
-                );
-
-                generatedOTP =
-                    "";
-
-                showPassword();
-
-                message.textContent =
-                    "✔️ OTP Verified! Create your password❗";
-
-            } else {
-
-                message.textContent =
-                    "❌ Incorrect OTP❗";
-            }
-        };
-}
-
-/* =====================================================
-CREATE / UPDATE PROFILE
-===================================================== */
-
-async function createOrUpdateProfile(
-    user,
-    userPhone
-) {
-
-    if (
-        !supabaseClient ||
-        !user
-    ) {
-        return null;
-    }
-
-    var defaultUsername =
-        "USER";
-
-    if (
-        user.user_metadata &&
-        user.user_metadata.full_name
-    ) {
-
-        defaultUsername =
-            user.user_metadata.full_name;
-
-    } else if (
-        user.user_metadata &&
-        user.user_metadata.name
-    ) {
-
-        defaultUsername =
-            user.user_metadata.name;
-    }
-
-    var result =
-        await supabaseClient
-            .from("profiles")
-            .select(
-                "id, username, birthday, phone, profile_picture"
-            )
-            .eq(
-                "id",
-                user.id
-            )
-            .maybeSingle();
-
-    if (result.error) {
-
-        console.log(
-            "Profile select error:",
-            result.error.message
-        );
-
-        return null;
-    }
-
-    if (result.data) {
-
-        if (
-            userPhone &&
-            result.data.phone !==
-            userPhone
-        ) {
-
-            var updateResult =
-                await supabaseClient
-                    .from("profiles")
-                    .update({
-                        phone:
-                            userPhone
-                    })
-                    .eq(
-                        "id",
-                        user.id
-                    );
-
-            if (
-                updateResult.error
-            ) {
-
-                console.log(
-                    "Phone update error:",
-                    updateResult.error.message
-                );
-            }
-        }
-
-        currentProfile =
-            result.data;
-
-        return result.data;
-    }
-
-    var insertResult =
-        await supabaseClient
-            .from("profiles")
-            .insert({
-                id:
-                    user.id,
-                username:
-                    defaultUsername,
-                phone:
-                    userPhone || "",
-                birthday:
-                    null,
-                profile_picture:
-                    null
-            })
-            .select(
-                "id, username, birthday, phone, profile_picture"
-            )
-            .single();
-
-    if (
-        insertResult.error
-    ) {
-
-        console.log(
-            "Profile insert error:",
-            insertResult.error.message
-        );
-
-        return null;
-    }
-
-    currentProfile =
-        insertResult.data;
-
-    return insertResult.data;
-}
-
-/* =====================================================
-LOAD PROFILE
-===================================================== */
-
-async function loadProfile() {
-
-    if (
-        !supabaseClient ||
-        !currentUser
-    ) {
-        return null;
-    }
-
-    var result =
-        await supabaseClient
-            .from("profiles")
-            .select(
-                "id, username, birthday, phone, profile_picture"
-            )
-            .eq(
-                "id",
-                currentUser.id
-            )
-            .maybeSingle();
-
-    if (result.error) {
-
-        console.log(
-            "Profile load error:",
-            result.error.message
-        );
-
-        return null;
-    }
-
-    currentProfile =
-        result.data;
-
-    return currentProfile;
-}
-
-/* =====================================================
-PROFILE PICTURE URL
-===================================================== */
-
-async function getProfilePictureURL(
-    path
-) {
-
-    if (
-        !supabaseClient ||
-        !path
-    ) {
-        return "";
-    }
-
-    var result =
-        await supabaseClient
-            .storage
-            .from(
-                STORAGE_BUCKET
-            )
-            .createSignedUrl(
-                path,
-                3600
-            );
-
-    if (result.error) {
-
-        console.log(
-            "Signed URL error:",
-            result.error.message
-        );
-
-        return "";
-    }
-
-    return (
-        result.data &&
-        result.data.signedUrl
-            ? result.data.signedUrl
-            : ""
-    );
-}
-
-/* =====================================================
-UPDATE PROFILE UI
-===================================================== */
-
-async function updateProfile() {
-
-    if (!currentUser) {
-        return;
-    }
-
-    var profile =
-        await loadProfile();
-
-    if (!profile) {
-
-        profile =
-            await createOrUpdateProfile(
-                currentUser,
-                currentAccountPhone
-            );
-    }
-
-    if (!profile) {
-
-        if (profileMessage) {
-
-            profileMessage.textContent =
-                "⚠️ Profile data could not be loaded.";
-        }
-
-        return;
-    }
-
-    currentProfile =
-        profile;
-
-    if (profileUsername) {
-
-        profileUsername.textContent =
-            profile.username ||
-            "USER";
-    }
-
-    if (profileEmail) {
-
-        profileEmail.textContent =
-            currentUser.email ||
-            "-";
-    }
-
-    if (profilePhone) {
-
-        profilePhone.textContent =
-            profile.phone ||
-            currentAccountPhone ||
-            "-";
-    }
-
-    if (profileBirthday) {
-
-        profileBirthday.textContent =
-            profile.birthday ||
-            "Not added";
-    }
-
-    if (editUsername) {
-
-        editUsername.value =
-            profile.username ||
-            "USER";
-    }
-
-    if (editBirthday) {
-
-        editBirthday.value =
-            profile.birthday ||
-            "";
-    }
-
-    if (
-        profile.profile_picture &&
-        profilePicture
-    ) {
-
-        var pictureURL =
-            await getProfilePictureURL(
-                profile.profile_picture
-            );
-
-        if (
-            pictureURL !==
-            ""
-        ) {
-
-            profilePicture.src =
-                pictureURL;
-
-            profilePicture.style.display =
-                "block";
-
-            if (
-                profilePicturePlaceholder
-            ) {
-
-                profilePicturePlaceholder.style.display =
-                    "none";
-            }
-
+    verifyBtn.onclick = function () {
+        var enteredOTP = getEnteredOTP();
+
+        if (enteredOTP.length !== 6) { message.textContent = "Please enter all 6 OTP digits❗"; return; }
+        if (generatedOTP === "") { message.textContent = "❌ OTP expired❗"; return; }
+
+        if (enteredOTP === generatedOTP) {
+            clearInterval(countdown);
+            generatedOTP = "";
+            showPassword();
+            message.textContent = "✔️ OTP Verified! Create your password.";
+            if (newPassword) newPassword.focus();
         } else {
-
-            profilePicture.src =
-                "";
-
-            profilePicture.style.display =
-                "none";
-
-            if (
-                profilePicturePlaceholder
-            ) {
-
-                profilePicturePlaceholder.style.display =
-                    "block";
-            }
+            message.textContent = "❌ Incorrect OTP❗";
         }
-
-    } else {
-
-        if (profilePicture) {
-
-            profilePicture.src =
-                "";
-
-            profilePicture.style.display =
-                "none";
-        }
-
-        if (
-            profilePicturePlaceholder
-        ) {
-
-            profilePicturePlaceholder.style.display =
-                "block";
-        }
-    }
+    };
 }
 
 /* =====================================================
-SAVE PROFILE
+   CREATE PASSWORD (finish registration)
 ===================================================== */
 
-if (saveProfileBtn) {
+if (savePasswordBtn) {
+    savePasswordBtn.onclick = async function () {
+        var pass = newPassword ? newPassword.value : "";
+        var confirm = confirmPassword ? confirmPassword.value : "";
 
-    saveProfileBtn.onclick =
-        async function () {
+        if (pass === "") { message.textContent = "Please create a password❗"; return; }
+        if (pass.length < 6) { message.textContent = "Password must be at least 6 characters❗"; return; }
+        if (pass !== confirm) { message.textContent = "❌ Passwords do not match❗"; return; }
+        if (verifiedEmail === "") { message.textContent = "❌ Registration session expired. Start again."; showRegister(); return; }
+        if (!supabaseClient) { message.textContent = "❌ Supabase could not be loaded."; return; }
 
-            if (
-                !supabaseClient ||
-                !currentUser
-            ) {
-                return;
-            }
+        savePasswordBtn.disabled = true;
+        message.textContent = "Creating your account...";
 
-            var username =
-                editUsername
-                    ? editUsername.value.trim()
-                    : "";
+        try {
+            var signupResult = await supabaseClient.auth.signUp({
+                email: verifiedEmail,
+                password: pass,
+                options: { data: { phone: verifiedPhone } }
+            });
 
-            var birthday =
-                editBirthday
-                    ? editBirthday.value
-                    : "";
+            if (signupResult.error) { savePasswordBtn.disabled = false; message.textContent = "❌ " + signupResult.error.message; return; }
+            if (!signupResult.data.user) { savePasswordBtn.disabled = false; message.textContent = "❌ Account could not be created."; return; }
 
-            if (
-                username ===
-                ""
-            ) {
+            rememberAccount(verifiedEmail, verifiedPhone);
 
-                profileMessage.textContent =
-                    "Please enter a username.";
+            if (signupResult.data.session) { await supabaseClient.auth.signOut(); }
 
-                return;
-            }
+            currentUser = null;
+            currentProfile = null;
+            currentAccountEmail = "";
+            currentAccountPhone = "";
 
-            if (
-                username.length >
-                30
-            ) {
+            if (newPassword) newPassword.value = "";
+            if (confirmPassword) confirmPassword.value = "";
 
-                profileMessage.textContent =
-                    "Username must be 30 characters or less.";
+            savePasswordBtn.disabled = false;
 
-                return;
-            }
+            if (loginEmail) loginEmail.value = verifiedEmail;
+            if (loginPhone) loginPhone.value = verifiedPhone;
+            if (loginPassword) loginPassword.value = "";
 
-            saveProfileBtn.disabled =
-                true;
+            verifiedEmail = "";
+            verifiedPhone = "";
+            generatedOTP = "";
+            clearInterval(countdown);
 
-            profileMessage.textContent =
-                "Saving...";
-
-            var result =
-                await supabaseClient
-                    .from("profiles")
-                    .upsert({
-                        id:
-                            currentUser.id,
-                        username:
-                            username,
-                        birthday:
-                            birthday ||
-                            null,
-                        phone:
-                            currentAccountPhone ||
-                            ""
-                    })
-                    .select(
-                        "id, username, birthday, phone, profile_picture"
-                    )
-                    .single();
-
-            saveProfileBtn.disabled =
-                false;
-
-            if (result.error) {
-
-                profileMessage.textContent =
-                    "❌ " +
-                    result.error.message;
-
-                return;
-            }
-
-            currentProfile =
-                result.data;
-
-            await updateProfile();
-
-            profileMessage.textContent =
-                "✔️ Profile updated successfully.";
-        };
+            showLogin();
+            message.textContent = "✔️ Account created successfully! Please LOGIN.";
+        } catch (error) {
+            savePasswordBtn.disabled = false;
+            console.log("Signup error:", error);
+            message.textContent = "❌ Account creation failed.";
+        }
+    };
 }
 
 /* =====================================================
-PROFILE PICTURE UPLOAD
-===================================================== */
-
-if (profilePictureInput) {
-
-    profilePictureInput.onchange =
-        async function () {
-
-            var file =
-                profilePictureInput.files[0];
-
-            if (!file) {
-                return;
-            }
-
-            if (!currentUser) {
-
-                alert(
-                    "Please login first."
-                );
-
-                return;
-            }
-
-            if (
-                !file.type.startsWith(
-                    "image/"
-                )
-            ) {
-
-                alert(
-                    "Please select an image."
-                );
-
-                return;
-            }
-
-            if (
-                file.size >
-                5 *
-                1024 *
-                1024
-            ) {
-
-                alert(
-                    "Please select an image smaller than 5 MB."
-                );
-
-                return;
-            }
-
-            var extension =
-                "jpg";
-
-            if (
-                file.type ===
-                "image/png"
-            ) {
-
-                extension =
-                    "png";
-
-            } else if (
-                file.type ===
-                "image/webp"
-            ) {
-
-                extension =
-                    "webp";
-
-            } else if (
-                file.type ===
-                "image/gif"
-            ) {
-
-                extension =
-                    "gif";
-            }
-
-            var path =
-                currentUser.id +
-                "/profile-picture." +
-                extension;
-
-            profileMessage.textContent =
-                "Uploading profile picture...";
-
-            var uploadResult =
-                await supabaseClient
-                    .storage
-                    .from(
-                        STORAGE_BUCKET
-                    )
-                    .upload(
-                        path,
-                        file,
-                        {
-                            upsert:
-                                true,
-                            contentType:
-                                file.type
-                        }
-                    );
-
-            if (
-                uploadResult.error
-            ) {
-
-                profileMessage.textContent =
-                    "❌ Upload failed: " +
-                    uploadResult.error.message;
-
-                profilePictureInput.value =
-                    "";
-
-                return;
-            }
-
-            var updateResult =
-                await supabaseClient
-                    .from("profiles")
-                    .update({
-                        profile_picture:
-                            path
-                    })
-                    .eq(
-                        "id",
-                        currentUser.id
-                    );
-
-            if (
-                updateResult.error
-            ) {
-
-                profileMessage.textContent =
-                    "❌ Picture saved, but profile update failed: " +
-                    updateResult.error.message;
-
-                return;
-            }
-
-            profilePictureInput.value =
-                "";
-
-            await updateProfile();
-
-            profileMessage.textContent =
-                "✔️ Profile picture updated successfully.";
-
-            updateStorage();
-        };
-}
-
-/* =====================================================
-NORMAL LOGIN
+   LOGIN
 ===================================================== */
 
 if (loginBtn) {
+    loginBtn.onclick = async function () {
+        if (!supabaseClient) { message.textContent = "❌ Supabase could not be loaded."; return; }
 
-    loginBtn.onclick =
-        async function () {
+        var enteredEmail = loginEmail ? loginEmail.value.trim() : "";
+        var enteredPhone = loginPhone ? loginPhone.value.trim() : "";
+        var enteredPassword = loginPassword ? loginPassword.value : "";
 
-            if (!supabaseClient) {
+        if (enteredEmail === "") { message.textContent = "Please enter your Email❗"; return; }
+        if (enteredPhone === "") { message.textContent = "Please enter your Phone Number❗"; return; }
+        if (enteredPassword === "") { message.textContent = "Please enter your Password❗"; return; }
 
-                message.textContent =
-                    "❌ Supabase could not be loaded.";
+        loginBtn.disabled = true;
+        message.textContent = "Verifying security check...";
 
-                return;
-            }
+        var captchaToken = await runHCaptcha(hcaptchaLoginWidgetId);
+        if (!captchaToken) { loginBtn.disabled = false; message.textContent = "❌ Security verification failed. Please try again."; return; }
 
-            var enteredEmail =
-                loginEmail
-                    ? loginEmail.value.trim()
-                    : "";
+        var captchaVerified = await verifyHCaptchaToken(captchaToken);
+        if (!captchaVerified) { loginBtn.disabled = false; message.textContent = "❌ Security verification failed. Please try again."; return; }
 
-            var enteredPhone =
-                loginPhone
-                    ? loginPhone.value.trim()
-                    : "";
+        message.textContent = "Checking account...";
 
-            var enteredPassword =
-                loginPassword
-                    ? loginPassword.value
-                    : "";
+        var loginResult = await supabaseClient.auth.signInWithPassword({ email: enteredEmail, password: enteredPassword });
+        loginBtn.disabled = false;
 
-            if (
-                enteredEmail ===
-                ""
-            ) {
+        if (loginResult.error) { message.textContent = "❌ " + loginResult.error.message; return; }
 
-                message.textContent =
-                    "Please enter your Email❗";
+        currentUser = loginResult.data.user;
+        currentAccountEmail = enteredEmail;
+        currentAccountPhone = enteredPhone;
+        verifiedEmail = enteredEmail;
+        verifiedPhone = enteredPhone;
+        googleOAuthLogin = false;
+        githubOAuthLogin = false;
 
-                return;
-            }
+        rememberAccount(enteredEmail, enteredPhone);
+        await createOrUpdateProfile(currentUser, enteredPhone);
+        addLoginHistory(enteredEmail);
 
-            if (
-                enteredPhone ===
-                ""
-            ) {
+        if (loginPassword) loginPassword.value = "";
+        message.textContent = "✔️ LOGIN SUCCESSFUL❗";
 
-                message.textContent =
-                    "Please enter your Phone Number❗";
-
-                return;
-            }
-
-            if (
-                enteredPassword ===
-                ""
-            ) {
-
-                message.textContent =
-                    "Please enter your Password❗";
-
-                return;
-            }
-
-            loginBtn.disabled =
-                true;
-
-            message.textContent =
-                "Verifying security check...";
-
-            var loginCaptchaToken =
-                await runHCaptcha(
-                    hcaptchaLoginWidgetId
-                );
-
-            if (
-                !loginCaptchaToken
-            ) {
-
-                loginBtn.disabled =
-                    false;
-
-                message.textContent =
-                    "❌ Security verification failed. Please try again.";
-
-                return;
-            }
-
-            var loginCaptchaVerified =
-                await verifyHCaptchaToken(
-                    loginCaptchaToken
-                );
-
-            if (
-                !loginCaptchaVerified
-            ) {
-
-                loginBtn.disabled =
-                    false;
-
-                message.textContent =
-                    "❌ Security verification failed. Please try again.";
-
-                return;
-            }
-
-            loginBtn.disabled =
-                true;
-
-            message.textContent =
-                "Checking account...";
-
-            var loginResult =
-                await supabaseClient.auth
-                    .signInWithPassword({
-                        email:
-                            enteredEmail,
-                        password:
-                            enteredPassword
-                    });
-
-            loginBtn.disabled =
-                false;
-
-            if (
-                loginResult.error
-            ) {
-
-                message.textContent =
-                    "❌ " +
-                    loginResult.error.message;
-
-                return;
-            }
-
-            currentUser =
-                loginResult.data.user;
-
-            currentAccountEmail =
-                enteredEmail;
-
-            currentAccountPhone =
-                enteredPhone;
-
-            verifiedEmail =
-                enteredEmail;
-
-            verifiedPhone =
-                enteredPhone;
-
-            googleOAuthLogin =
-                false;
-
-            githubOAuthLogin =
-                false;
-
-            rememberAccount(
-                enteredEmail,
-                enteredPhone
-            );
-
-            await createOrUpdateProfile(
-                currentUser,
-                enteredPhone
-            );
-
-            addLoginHistory(
-                enteredEmail
-            );
-
-            if (loginPassword) {
-
-                loginPassword.value =
-                    "";
-            }
-
-            message.textContent =
-                "✔️ LOGIN SUCCESSFUL❗";
-
-            await showDashboard();
-        };
-}
-
-/* =====================================================
-OAUTH PROVIDER DETECTION
-===================================================== */
-
-function getOAuthProvider(
-    user
-) {
-
-    if (!user) {
-        return "";
-    }
-
-    var metadata =
-        user.app_metadata ||
-        {};
-
-    var provider =
-        metadata.provider ||
-        "";
-
-    var providers =
-        metadata.providers ||
-        [];
-
-    if (
-        provider ===
-        "google"
-    ) {
-
-        return "google";
-    }
-
-    if (
-        provider ===
-        "github"
-    ) {
-
-        return "github";
-    }
-
-    if (
-        Array.isArray(
-            providers
-        )
-    ) {
-
-        if (
-            providers.indexOf(
-                "google"
-            ) !==
-            -1
-        ) {
-
-            return "google";
-        }
-
-        if (
-            providers.indexOf(
-                "github"
-            ) !==
-            -1
-        ) {
-
-            return "github";
-        }
-    }
-
-    return "";
-}
-
-function isGoogleUser(
-    user
-) {
-
-    return (
-        getOAuthProvider(
-            user
-        ) ===
-        "google"
-    );
-}
-
-function isGithubUser(
-    user
-) {
-
-    return (
-        getOAuthProvider(
-            user
-        ) ===
-        "github"
-    );
-}
-
-function isOAuthUser(
-    user
-) {
-
-    return (
-        getOAuthProvider(
-            user
-        ) !==
-        ""
-    );
-}
-
-/* =====================================================
-OAUTH CALLBACK DETECTION
-===================================================== */
-
-function isOAuthCallback() {
-
-    var hash =
-        window.location.hash ||
-        "";
-
-    var search =
-        window.location.search ||
-        "";
-
-    return (
-        hash.indexOf(
-            "access_token="
-        ) !==
-        -1 ||
-        hash.indexOf(
-            "refresh_token="
-        ) !==
-        -1 ||
-        search.indexOf(
-            "code="
-        ) !==
-        -1
-    );
-}
-
-/* =====================================================
-OAUTH REDIRECT OPTIONS
-===================================================== */
-
-function getOAuthOptions() {
-
-    return {
-
-        queryParams: {
-            prompt:
-                "select_account"
-        },
-
-        redirectTo:
-            OAUTH_REDIRECT_URL
+        await showDashboard();
     };
 }
 
 /* =====================================================
-HANDLE OAUTH USER
-===================================================== */
-
-async function handleOAuthUser(
-    user,
-    provider
-) {
-
-    if (
-        !user ||
-        oauthHandling
-    ) {
-        return;
-    }
-
-    oauthHandling =
-        true;
-
-    currentUser =
-        user;
-
-    currentAccountEmail =
-        user.email ||
-        "";
-
-    currentAccountPhone =
-        "";
-
-    verifiedEmail =
-        currentAccountEmail;
-
-    verifiedPhone =
-        "";
-
-    googleOAuthLogin =
-        provider ===
-        "google";
-
-    githubOAuthLogin =
-        provider ===
-        "github";
-
-    if (
-        currentAccountEmail
-    ) {
-
-        rememberAccount(
-            currentAccountEmail,
-            ""
-        );
-    }
-
-    await createOrUpdateProfile(
-        currentUser,
-        ""
-    );
-
-    addLoginHistory(
-        currentAccountEmail ||
-        provider.toUpperCase() +
-        " ACCOUNT"
-    );
-
-    if (loginEmail) {
-
-        loginEmail.value =
-            currentAccountEmail;
-    }
-
-    if (loginPhone) {
-
-        loginPhone.value =
-            "";
-    }
-
-    if (loginPassword) {
-
-        loginPassword.value =
-            "";
-    }
-
-    if (
-        provider ===
-        "google"
-    ) {
-
-        message.textContent =
-            "✔️ GOOGLE LOGIN SUCCESSFUL❗";
-
-    } else if (
-        provider ===
-        "github"
-    ) {
-
-        message.textContent =
-            "✔️ GITHUB LOGIN SUCCESSFUL❗";
-    }
-
-    await showDashboard();
-
-    oauthCallbackHandled =
-        true;
-
-    oauthHandling =
-        false;
-}
-
-/* =====================================================
-HANDLE GOOGLE USER
-===================================================== */
-
-async function handleGoogleUser(
-    user
-) {
-
-    await handleOAuthUser(
-        user,
-        "google"
-    );
-}
-
-/* =====================================================
-HANDLE GITHUB USER
-===================================================== */
-
-async function handleGithubUser(
-    user
-) {
-
-    await handleOAuthUser(
-        user,
-        "github"
-    );
-}
-
-/* =====================================================
-GOOGLE LOGIN
-===================================================== */
-
-if (googleLoginBtn) {
-
-    googleLoginBtn.onclick =
-        async function () {
-
-            if (!supabaseClient) {
-
-                message.textContent =
-                    "❌ Supabase could not be loaded.";
-
-                return;
-            }
-
-            googleLoginBtn.disabled =
-                true;
-
-            if (githubLoginBtn) {
-
-                githubLoginBtn.disabled =
-                    true;
-            }
-
-            message.textContent =
-                "Verifying security check...";
-
-            var googleCaptchaToken =
-                await runHCaptcha(
-                    hcaptchaLoginWidgetId
-                );
-
-            if (
-                !googleCaptchaToken
-            ) {
-
-                googleLoginBtn.disabled =
-                    false;
-
-                if (githubLoginBtn) {
-
-                    githubLoginBtn.disabled =
-                        false;
-                }
-
-                message.textContent =
-                    "❌ Security verification failed. Please try again.";
-
-                return;
-            }
-
-            var googleCaptchaVerified =
-                await verifyHCaptchaToken(
-                    googleCaptchaToken
-                );
-
-            if (
-                !googleCaptchaVerified
-            ) {
-
-                googleLoginBtn.disabled =
-                    false;
-
-                if (githubLoginBtn) {
-
-                    githubLoginBtn.disabled =
-                        false;
-                }
-
-                message.textContent =
-                    "❌ Security verification failed. Please try again.";
-
-                return;
-            }
-
-            message.textContent =
-                "Opening Google...";
-
-            try {
-
-                var result =
-                    await supabaseClient.auth
-                        .signInWithOAuth({
-                            provider:
-                                "google",
-                            options:
-                                getOAuthOptions()
-                        });
-
-                if (
-                    result.error
-                ) {
-
-                    googleLoginBtn.disabled =
-                        false;
-
-                    if (githubLoginBtn) {
-
-                        githubLoginBtn.disabled =
-                            false;
-                    }
-
-                    message.textContent =
-                        "❌ " +
-                        result.error.message;
-
-                    return;
-                }
-
-            } catch (error) {
-
-                googleLoginBtn.disabled =
-                    false;
-
-                if (githubLoginBtn) {
-
-                    githubLoginBtn.disabled =
-                        false;
-                }
-
-                message.textContent =
-                    "❌ Google login failed.";
-
-                console.log(
-                    "Google OAuth error:",
-                    error
-                );
-            }
-        };
-}
-
-/* =====================================================
-GITHUB LOGIN
-===================================================== */
-
-if (githubLoginBtn) {
-
-    githubLoginBtn.onclick =
-        async function () {
-
-            if (!supabaseClient) {
-
-                message.textContent =
-                    "❌ Supabase could not be loaded.";
-
-                return;
-            }
-
-            githubLoginBtn.disabled =
-                true;
-
-            if (googleLoginBtn) {
-
-                googleLoginBtn.disabled =
-                    true;
-            }
-
-            message.textContent =
-                "Verifying security check...";
-
-            var githubCaptchaToken =
-                await runHCaptcha(
-                    hcaptchaLoginWidgetId
-                );
-
-            if (
-                !githubCaptchaToken
-            ) {
-
-                githubLoginBtn.disabled =
-                    false;
-
-                if (googleLoginBtn) {
-
-                    googleLoginBtn.disabled =
-                        false;
-                }
-
-                message.textContent =
-                    "❌ Security verification failed. Please try again.";
-
-                return;
-            }
-
-            var githubCaptchaVerified =
-                await verifyHCaptchaToken(
-                    githubCaptchaToken
-                );
-
-            if (
-                !githubCaptchaVerified
-            ) {
-
-                githubLoginBtn.disabled =
-                    false;
-
-                if (googleLoginBtn) {
-
-                    googleLoginBtn.disabled =
-                        false;
-                }
-
-                message.textContent =
-                    "❌ Security verification failed. Please try again.";
-
-                return;
-            }
-
-            message.textContent =
-                "Opening GitHub...";
-
-            try {
-
-                var result =
-                    await supabaseClient.auth
-                        .signInWithOAuth({
-                            provider:
-                                "github",
-                            options:
-                                getOAuthOptions()
-                        });
-
-                if (
-                    result.error
-                ) {
-
-                    githubLoginBtn.disabled =
-                        false;
-
-                    if (googleLoginBtn) {
-
-                        googleLoginBtn.disabled =
-                            false;
-                    }
-
-                    message.textContent =
-                        "❌ " +
-                        result.error.message;
-
-                    return;
-                }
-
-            } catch (error) {
-
-                githubLoginBtn.disabled =
-                    false;
-
-                if (googleLoginBtn) {
-
-                    googleLoginBtn.disabled =
-                        false;
-                }
-
-                message.textContent =
-                    "❌ GitHub login failed.";
-
-                console.log(
-                    "GitHub OAuth error:",
-                    error
-                );
-            }
-        };
-}
-
-/* =====================================================
-CREATE ACCOUNT
-===================================================== */
-
-if (saveBtn) {
-
-    saveBtn.onclick =
-        async function () {
-
-            if (!supabaseClient) {
-
-                message.textContent =
-                    "❌ Supabase could not be loaded.";
-
-                return;
-            }
-
-            var pass =
-                newPassword
-                    ? newPassword.value
-                    : "";
-
-            var confirm =
-                confirmPassword
-                    ? confirmPassword.value
-                    : "";
-
-            if (
-                pass ===
-                ""
-            ) {
-
-                message.textContent =
-                    "Please create a password❗";
-
-                return;
-            }
-
-            if (
-                pass.length <
-                6
-            ) {
-
-                message.textContent =
-                    "Password must be at least 6 characters❗";
-
-                return;
-            }
-
-            if (
-                pass !==
-                confirm
-            ) {
-
-                message.textContent =
-                    "❌ Passwords do not match❗";
-
-                return;
-            }
-
-            if (
-                verifiedEmail ===
-                ""
-            ) {
-
-                message.textContent =
-                    "❌ Registration session expired. Start again.";
-
-                showRegister();
-
-                return;
-            }
-
-            saveBtn.disabled =
-                true;
-
-            message.textContent =
-                "Creating Supabase account...";
-
-            try {
-
-                var signupResult =
-                    await supabaseClient.auth
-                        .signUp({
-                            email:
-                                verifiedEmail,
-                            password:
-                                pass,
-                            options: {
-                                data: {
-                                    phone:
-                                        verifiedPhone
-                                }
-                            }
-                        });
-
-                if (
-                    signupResult.error
-                ) {
-
-                    saveBtn.disabled =
-                        false;
-
-                    message.textContent =
-                        "❌ " +
-                        signupResult.error.message;
-
-                    return;
-                }
-
-                var newUser =
-                    signupResult.data.user;
-
-                var newSession =
-                    signupResult.data.session;
-
-                if (!newUser) {
-
-                    saveBtn.disabled =
-                        false;
-
-                    message.textContent =
-                        "❌ Account could not be created.";
-
-                    return;
-                }
-
-                rememberAccount(
-                    verifiedEmail,
-                    verifiedPhone
-                );
-
-                if (newSession) {
-
-                    await supabaseClient.auth
-                        .signOut();
-                }
-
-                currentUser =
-                    null;
-
-                currentProfile =
-                    null;
-
-                currentAccountEmail =
-                    "";
-
-                currentAccountPhone =
-                    "";
-
-                newPassword.value =
-                    "";
-
-                confirmPassword.value =
-                    "";
-
-                saveBtn.disabled =
-                    false;
-
-                loginEmail.value =
-                    verifiedEmail;
-
-                loginPhone.value =
-                    verifiedPhone;
-
-                loginPassword.value =
-                    "";
-
-                verifiedEmail =
-                    "";
-
-                verifiedPhone =
-                    "";
-
-                generatedOTP =
-                    "";
-
-                clearInterval(
-                    countdown
-                );
-
-                showLogin();
-
-                message.textContent =
-                    "✔️ Account created successfully! Please LOGIN.";
-
-            } catch (error) {
-
-                saveBtn.disabled =
-                    false;
-
-                message.textContent =
-                    "❌ Account creation failed.";
-
-                console.log(
-                    "Signup error:",
-                    error
-                );
-            }
-        };
-}
-
-/* =====================================================
-CREATE NEW ACCOUNT
+   CREATE NEW ACCOUNT (button on login screen)
 ===================================================== */
 
 if (createAccountBtn) {
-
-    createAccountBtn.onclick =
-        function () {
-
-            var accounts =
-                getRememberedAccounts();
-
-            if (
-                accounts.length >=
-                MAX_ACCOUNTS
-            ) {
-
-                message.textContent =
-                    "❌ Maximum 5 accounts allowed.";
-
-                return;
-            }
-
-            resetRegistrationForm();
-
-            if (loginEmail) {
-                loginEmail.value =
-                    "";
-            }
-
-            if (loginPhone) {
-                loginPhone.value =
-                    "";
-            }
-
-            if (loginPassword) {
-                loginPassword.value =
-                    "";
-            }
-
-            message.textContent =
-                "Create your new account❗";
-
-            showRegister();
-        };
-}
-
-/* =====================================================
-ADD ACCOUNT
-===================================================== */
-
-if (addAccountBtn) {
-
-    addAccountBtn.onclick =
-        function () {
-
-            var accounts =
-                getRememberedAccounts();
-
-            if (
-                accounts.length >=
-                MAX_ACCOUNTS
-            ) {
-
-                alert(
-                    "❌ Maximum 5 accounts allowed."
-                );
-
-                return;
-            }
-
-            resetRegistrationForm();
-
-            if (loginEmail) {
-                loginEmail.value =
-                    "";
-            }
-
-            if (loginPhone) {
-                loginPhone.value =
-                    "";
-            }
-
-            if (loginPassword) {
-                loginPassword.value =
-                    "";
-            }
-
-            showRegister();
-
-            message.textContent =
-                "➕ Add a new account.";
-        };
-}
-
-/* =====================================================
-DASHBOARD
-===================================================== */
-
-async function showDashboard() {
-
-    if (!dashboard) {
-        return;
-    }
-
-    if (!currentUser) {
-
-        showLogin();
-
-        return;
-    }
-
-    if (container) {
-
-        container.style.display =
-            "none";
-    }
-
-    dashboard.style.display =
-        "block";
-
-    document.body.style.overflow =
-        "hidden";
-
-    await updateProfile();
-
-    displayLoginHistory();
-
-    await updateStorage();
-
-    closeAllProfileBoxes();
-
-    setupSecurityCenter();
-
-    setupNavigation();
-
-    activateHome();
-}
-
-/* =====================================================
-NAVIGATION
-===================================================== */
-
-function activateHome() {
-
-    var navItems =
-        document.querySelectorAll(
-            ".magic-nav .nav-item"
-        );
-
-    var pages =
-        document.querySelectorAll(
-            ".dashboard-page"
-        );
-
-    var i =
-        0;
-
-    while (
-        i < navItems.length
-    ) {
-
-        navItems[i].classList.remove(
-            "active"
-        );
-
-        i++;
-    }
-
-    i =
-        0;
-
-    while (
-        i < pages.length
-    ) {
-
-        pages[i].classList.remove(
-            "active-page"
-        );
-
-        i++;
-    }
-
-    var homeNav =
-        document.querySelector(
-            '.nav-item[data-page="homePage"]'
-        );
-
-    var homePage =
-        document.getElementById(
-            "homePage"
-        );
-
-    if (homeNav) {
-
-        homeNav.classList.add(
-            "active"
-        );
-    }
-
-    if (homePage) {
-
-        homePage.classList.add(
-            "active-page"
-        );
-    }
-}
-
-function setupNavigation() {
-
-    var navItems =
-        document.querySelectorAll(
-            ".magic-nav .nav-item"
-        );
-
-    var pages =
-        document.querySelectorAll(
-            ".dashboard-page"
-        );
-
-    var i =
-        0;
-
-    while (
-        i < navItems.length
-    ) {
-
-        (function (
-            currentNav
-        ) {
-
-            currentNav.onclick =
-                async function () {
-
-                    var pageId =
-                        currentNav.getAttribute(
-                            "data-page"
-                        );
-
-                    var j =
-                        0;
-
-                    while (
-                        j <
-                        navItems.length
-                    ) {
-
-                        navItems[j]
-                            .classList
-                            .remove(
-                                "active"
-                            );
-
-                        j++;
-                    }
-
-                    j =
-                        0;
-
-                    while (
-                        j <
-                        pages.length
-                    ) {
-
-                        pages[j]
-                            .classList
-                            .remove(
-                                "active-page"
-                            );
-
-                        j++;
-                    }
-
-                    currentNav
-                        .classList
-                        .add(
-                            "active"
-                        );
-
-                    var target =
-                        document.getElementById(
-                            pageId
-                        );
-
-                    if (target) {
-
-                        target.classList.add(
-                            "active-page"
-                        );
-                    }
-
-                    if (
-                        pageId ===
-                        "homePage"
-                    ) {
-
-                        displayLoginHistory();
-
-                        await updateStorage();
-                    }
-
-                    if (
-                        pageId ===
-                        "addPage"
-                    ) {
-
-                        await loadSecurityItems();
-
-                        await updateStorage();
-                    }
-
-                    if (
-                        pageId ===
-                        "profilePage"
-                    ) {
-
-                        await updateProfile();
-
-                        displayAccounts();
-                    }
-                };
-
-        })(navItems[i]);
-
-        i++;
-    }
-}
-
-/* =====================================================
-SECURITY CENTER
-===================================================== */
-
-function setupSecurityCenter() {
-
-    if (
-        securityCenterInitialized ||
-        !dashboard
-    ) {
-        return;
-    }
-
-    securityCenterInitialized =
-        true;
-
-    securityMenuButton =
-        document.createElement(
-            "button"
-        );
-
-    securityMenuButton.id =
-        "securityMenuButton";
-
-    securityMenuButton.type =
-        "button";
-
-    securityMenuButton.setAttribute(
-        "aria-label",
-        "Open Security Center"
-    );
-
-    securityMenuButton.setAttribute(
-        "aria-expanded",
-        "false"
-    );
-
-    securityMenuButton.innerHTML =
-        "☰";
-
-    securityCenterOverlay =
-        document.createElement(
-            "div"
-        );
-
-    securityCenterOverlay.id =
-        "securityCenterOverlay";
-
-    securityCenterPanel =
-        document.createElement(
-            "aside"
-        );
-
-    securityCenterPanel.id =
-        "securityCenterPanel";
-
-    securityCenterPanel.setAttribute(
-        "aria-label",
-        "Security Center"
-    );
-
-    securityCenterPanel.innerHTML =
-
-        '<div id="securityCenterHeader">' +
-
-        '<div>' +
-        '<div id="securityCenterTitle">' +
-        'SECURITY CENTER' +
-        '</div>' +
-        '<div id="securityCenterSubtitle">' +
-        'CYBER CORE PROTECTION' +
-        '</div>' +
-        '</div>' +
-
-        '<button id="securityCenterClose" type="button">' +
-        '×' +
-        '</button>' +
-
-        '</div>' +
-
-        '<div id="securityCenterContent">' +
-
-        '<div class="security-center-card">' +
-        '<div class="security-center-card-title">' +
-        '🛡 SECURITY STATUS' +
-        '</div>' +
-        '<div id="securityStatusContent">' +
-        'Checking security status...' +
-        '</div>' +
-        '</div>' +
-
-        '<div class="security-center-card">' +
-        '<div class="security-center-card-title">' +
-        '📱 CURRENT SESSION' +
-        '</div>' +
-        '<div id="securitySessionContent">' +
-        'Checking current session...' +
-        '</div>' +
-        '</div>' +
-
-        '<div class="security-center-card">' +
-        '<div class="security-center-card-title">' +
-        '📋 SECURITY ACTIVITY' +
-        '</div>' +
-        '<div id="securityActivityContent">' +
-        'Loading security activity...' +
-        '</div>' +
-        '</div>' +
-
-        '<div class="security-center-card">' +
-        '<div class="security-center-card-title">' +
-        '⚠ SECURITY ALERTS' +
-        '</div>' +
-        '<div id="securityAlertsContent">' +
-        'Checking alerts...' +
-        '</div>' +
-        '</div>' +
-
-        '<div class="security-center-card">' +
-        '<div class="security-center-card-title">' +
-        '🔐 ACCOUNT SECURITY' +
-        '</div>' +
-
-        '<button id="securityChangePasswordBtn" type="button" class="security-center-action">' +
-        'CHANGE PASSWORD' +
-        '</button>' +
-
-        '<button id="securitySignOutOthersBtn" type="button" class="security-center-action">' +
-        'SIGN OUT OTHER SESSIONS' +
-        '</button>' +
-
-        '<div id="securityActionMessage"></div>' +
-
-        '</div>' +
-
-        '</div>';
-
-    dashboard.appendChild(
-        securityMenuButton
-    );
-
-    dashboard.appendChild(
-        securityCenterOverlay
-    );
-
-    dashboard.appendChild(
-        securityCenterPanel
-    );
-
-    injectSecurityCenterStyles();
-
-    var closeButton =
-        document.getElementById(
-            "securityCenterClose"
-        );
-
-    var changeButton =
-        document.getElementById(
-            "securityChangePasswordBtn"
-        );
-
-    var signOutButton =
-        document.getElementById(
-            "securitySignOutOthersBtn"
-        );
-
-    securityMenuButton.onclick =
-        function () {
-
-            if (
-                securityCenterPanel.classList.contains(
-                    "show-security-panel"
-                )
-            ) {
-
-                closeSecurityCenter();
-
-            } else {
-
-                openSecurityCenter();
-            }
-        };
-
-    securityCenterOverlay.onclick =
-        function () {
-
-            closeSecurityCenter();
-        };
-
-    if (closeButton) {
-
-        closeButton.onclick =
-            function () {
-
-                closeSecurityCenter();
-            };
-    }
-
-    if (changeButton) {
-
-        changeButton.onclick =
-            function () {
-
-                closeSecurityCenter();
-
-                if (changePasswordBtn) {
-
-                    changePasswordBtn.click();
-                }
-            };
-    }
-
-    if (signOutButton) {
-
-        signOutButton.onclick =
-            async function () {
-
-                await signOutOtherSessions();
-            };
-    }
-
-    document.addEventListener(
-        "keydown",
-        function (event) {
-
-            if (
-                event.key ===
-                "Escape" &&
-                securityCenterPanel &&
-                securityCenterPanel.classList.contains(
-                    "show-security-panel"
-                )
-            ) {
-
-                closeSecurityCenter();
-            }
-        }
-    );
-}
-
-function injectSecurityCenterStyles() {
-
-    if (
-        document.getElementById(
-            "securityCenterDynamicStyles"
-        )
-    ) {
-        return;
-    }
-
-    var style =
-        document.createElement(
-            "style"
-        );
-
-    style.id =
-        "securityCenterDynamicStyles";
-
-    style.textContent =
-
-        "#securityMenuButton{" +
-        "position:fixed;" +
-        "top:18px;" +
-        "right:18px;" +
-        "width:48px;" +
-        "height:48px;" +
-        "border:1px solid rgba(0,255,100,.75);" +
-        "border-radius:16px;" +
-        "background:rgba(0,25,15,.55);" +
-        "backdrop-filter:blur(18px);" +
-        "-webkit-backdrop-filter:blur(18px);" +
-        "color:#00ff66;" +
-        "font-size:25px;" +
-        "line-height:1;" +
-        "cursor:pointer;" +
-        "z-index:1000015;" +
-        "display:flex;" +
-        "align-items:center;" +
-        "justify-content:center;" +
-        "box-shadow:none;" +
-        "text-shadow:none;" +
-        "}" +
-
-        "#securityCenterOverlay{" +
-        "position:fixed;" +
-        "inset:0;" +
-        "background:rgba(0,0,0,.48);" +
-        "backdrop-filter:blur(3px);" +
-        "-webkit-backdrop-filter:blur(3px);" +
-        "opacity:0;" +
-        "visibility:hidden;" +
-        "transition:opacity .25s ease,visibility .25s ease;" +
-        "z-index:1000010;" +
-        "}" +
-
-        "#securityCenterOverlay.show-security-overlay{" +
-        "opacity:1;" +
-        "visibility:visible;" +
-        "}" +
-
-        "#securityCenterPanel{" +
-        "position:fixed;" +
-        "top:0;" +
-        "right:0;" +
-        "width:min(390px,92vw);" +
-        "height:100vh;" +
-        "height:100dvh;" +
-        "background:rgba(0,20,12,.78);" +
-        "backdrop-filter:blur(25px);" +
-        "-webkit-backdrop-filter:blur(25px);" +
-        "border-left:1px solid rgba(0,255,100,.55);" +
-        "transform:translateX(105%);" +
-        "transition:transform .3s ease;" +
-        "z-index:1000012;" +
-        "overflow-y:auto;" +
-        "overflow-x:hidden;" +
-        "box-shadow:none;" +
-        "}" +
-
-        "#securityCenterPanel.show-security-panel{" +
-        "transform:translateX(0);" +
-        "}" +
-
-        "#securityCenterHeader{" +
-        "display:flex;" +
-        "align-items:center;" +
-        "justify-content:space-between;" +
-        "gap:12px;" +
-        "padding:22px 18px 16px;" +
-        "border-bottom:1px solid rgba(0,255,100,.25);" +
-        "position:sticky;" +
-        "top:0;" +
-        "background:rgba(0,20,12,.78);" +
-        "backdrop-filter:blur(20px);" +
-        "-webkit-backdrop-filter:blur(20px);" +
-        "z-index:2;" +
-        "}" +
-
-        "#securityCenterTitle{" +
-        "font-size:18px;" +
-        "font-weight:800;" +
-        "letter-spacing:1.4px;" +
-        "color:#fff;" +
-        "}" +
-
-        "#securityCenterSubtitle{" +
-        "font-size:10px;" +
-        "letter-spacing:2px;" +
-        "color:#00ff66;" +
-        "margin-top:5px;" +
-        "}" +
-
-        "#securityCenterClose{" +
-        "width:40px;" +
-        "height:40px;" +
-        "border:1px solid rgba(0,255,100,.55);" +
-        "border-radius:13px;" +
-        "background:rgba(0,255,100,.06);" +
-        "color:#00ff66;" +
-        "font-size:28px;" +
-        "cursor:pointer;" +
-        "box-shadow:none;" +
-        "text-shadow:none;" +
-        "}" +
-
-        "#securityCenterContent{" +
-        "padding:16px;" +
-        "padding-bottom:35px;" +
-        "}" +
-
-        ".security-center-card{" +
-        "border:1px solid rgba(0,255,100,.27);" +
-        "border-radius:18px;" +
-        "background:rgba(0,0,0,.25);" +
-        "padding:15px;" +
-        "margin-bottom:13px;" +
-        "box-shadow:none;" +
-        "}" +
-
-        ".security-center-card-title{" +
-        "font-size:12px;" +
-        "font-weight:800;" +
-        "letter-spacing:1px;" +
-        "color:#00ff66;" +
-        "margin-bottom:11px;" +
-        "}" +
-
-        ".security-center-line{" +
-        "font-size:12px;" +
-        "line-height:1.7;" +
-        "color:#eee;" +
-        "padding:3px 0;" +
-        "word-break:break-word;" +
-        "}" +
-
-        ".security-center-success{" +
-        "color:#00ff66;" +
-        "font-weight:700;" +
-        "}" +
-
-        ".security-center-warning{" +
-        "color:#ffd24a;" +
-        "font-weight:700;" +
-        "}" +
-
-        ".security-center-muted{" +
-        "color:#aaa;" +
-        "}" +
-
-        ".security-center-activity{" +
-        "border-bottom:1px solid rgba(255,255,255,.08);" +
-        "padding:8px 0;" +
-        "font-size:11px;" +
-        "line-height:1.55;" +
-        "color:#eee;" +
-        "}" +
-
-        ".security-center-activity:last-child{" +
-        "border-bottom:none;" +
-        "}" +
-
-        ".security-center-action{" +
-        "width:100%;" +
-        "min-height:44px;" +
-        "margin-top:9px;" +
-        "padding:10px 13px;" +
-        "border:1px solid rgba(0,255,100,.5);" +
-        "border-radius:13px;" +
-        "background:rgba(0,255,100,.07);" +
-        "color:#fff;" +
-        "font-size:11px;" +
-        "font-weight:800;" +
-        "letter-spacing:.7px;" +
-        "cursor:pointer;" +
-        "box-shadow:none;" +
-        "text-shadow:none;" +
-        "}" +
-
-        "#securityActionMessage{" +
-        "font-size:11px;" +
-        "line-height:1.5;" +
-        "margin-top:10px;" +
-        "color:#00ff66;" +
-        "}" +
-
-        "@media(max-width:600px){" +
-
-        "#securityMenuButton{" +
-        "top:12px;" +
-        "right:12px;" +
-        "width:44px;" +
-        "height:44px;" +
-        "border-radius:14px;" +
-        "font-size:23px;" +
-        "}" +
-
-        "#securityCenterPanel{" +
-        "width:92vw;" +
-        "}" +
-
-        "#securityCenterHeader{" +
-        "padding:18px 14px 14px;" +
-        "}" +
-
-        "#securityCenterContent{" +
-        "padding:13px;" +
-        "}" +
-
-        "}";
-
-    document.head.appendChild(
-        style
-    );
-}
-
-function openSecurityCenter() {
-
-    if (
-        !securityCenterPanel ||
-        !securityCenterOverlay
-    ) {
-        return;
-    }
-
-    securityCenterPanel.classList.add(
-        "show-security-panel"
-    );
-
-    securityCenterOverlay.classList.add(
-        "show-security-overlay"
-    );
-
-    if (securityMenuButton) {
-
-        securityMenuButton.style.display =
-            "none";
-
-        securityMenuButton.setAttribute(
-            "aria-expanded",
-            "true"
-        );
-
-        securityMenuButton.setAttribute(
-            "aria-label",
-            "Close Security Center"
-        );
-    }
-
-    updateSecurityCenter();
-}
-
-function closeSecurityCenter() {
-
-    if (
-        securityCenterPanel
-    ) {
-
-        securityCenterPanel.classList.remove(
-            "show-security-panel"
-        );
-    }
-
-    if (
-        securityCenterOverlay
-    ) {
-
-        securityCenterOverlay.classList.remove(
-            "show-security-overlay"
-        );
-    }
-
-    if (securityMenuButton) {
-
-        securityMenuButton.style.display =
-            "";
-
-        securityMenuButton.innerHTML =
-            "☰";
-
-        securityMenuButton.setAttribute(
-            "aria-expanded",
-            "false"
-        );
-
-        securityMenuButton.setAttribute(
-            "aria-label",
-            "Open Security Center"
-        );
-    }
-}
-
-function updateSecurityCenter() {
-
-    if (!securityCenterInitialized) {
-        return;
-    }
-
-    var statusContent =
-        document.getElementById(
-            "securityStatusContent"
-        );
-
-    var sessionContent =
-        document.getElementById(
-            "securitySessionContent"
-        );
-
-    var activityContent =
-        document.getElementById(
-            "securityActivityContent"
-        );
-
-    var alertsContent =
-        document.getElementById(
-            "securityAlertsContent"
-        );
-
-    if (
-        !currentUser
-    ) {
-
-        if (statusContent) {
-            statusContent.innerHTML =
-                '<div class="security-center-warning">NOT LOGGED IN</div>';
-        }
-
-        if (sessionContent) {
-            sessionContent.innerHTML =
-                '<div class="security-center-muted">No active session.</div>';
-        }
-
-        return;
-    }
-
-    var provider =
-        getOAuthProvider(
-            currentUser
-        );
-
-    var loginMethod =
-        "PASSWORD";
-
-    if (
-        provider ===
-        "google"
-    ) {
-
-        loginMethod =
-            "GOOGLE";
-
-    } else if (
-        provider ===
-        "github"
-    ) {
-
-        loginMethod =
-            "GITHUB";
-    }
-
-    if (statusContent) {
-
-        statusContent.innerHTML =
-            '<div class="security-center-line">' +
-            '<span class="security-center-success">● SECURE</span>' +
-            '</div>' +
-
-            '<div class="security-center-line">' +
-            'Account: ACTIVE' +
-            '</div>' +
-
-            '<div class="security-center-line">' +
-            'Login method: ' +
-            escapeHTML(
-                loginMethod
-            ) +
-            '</div>';
-    }
-
-    if (sessionContent) {
-
-        var sessionEmail =
-            currentUser.email ||
-            currentAccountEmail ||
-            "-";
-
-        sessionContent.innerHTML =
-            '<div class="security-center-line">' +
-            'Device: CURRENT DEVICE' +
-            '</div>' +
-
-            '<div class="security-center-line">' +
-            'Account: ' +
-            escapeHTML(
-                sessionEmail
-            ) +
-            '</div>' +
-
-            '<div class="security-center-line">' +
-            'Session: ' +
-            '<span class="security-center-success">ACTIVE</span>' +
-            '</div>';
-    }
-
-    if (activityContent) {
-
-        var history =
-            getLoginHistory();
-
-        if (
-            history.length ===
-            0
-        ) {
-
-            activityContent.innerHTML =
-                '<div class="security-center-muted">' +
-                'No security activity yet.' +
-                '</div>';
-
-        } else {
-
-            activityContent.innerHTML =
-                "";
-
-            var max =
-                Math.min(
-                    history.length,
-                    5
-                );
-
-            var i =
-                0;
-
-            while (
-                i < max
-            ) {
-
-                var item =
-                    history[i] ||
-                    {};
-
-                var activity =
-                    document.createElement(
-                        "div"
-                    );
-
-                activity.className =
-                    "security-center-activity";
-
-                activity.innerHTML =
-                    '<span class="security-center-success">LOGIN SUCCESSFUL</span><br>' +
-                    escapeHTML(
-                        item.date ||
-                        ""
-                    ) +
-                    " • " +
-                    escapeHTML(
-                        item.time ||
-                        ""
-                    ) +
-                    "<br>" +
-                    escapeHTML(
-                        item.email ||
-                        ""
-                    );
-
-                activityContent.appendChild(
-                    activity
-                );
-
-                i++;
-            }
-        }
-    }
-
-    if (alertsContent) {
-
-        var alerts = [];
-
-        if (
-            loginMethod ===
-            "PASSWORD"
-        ) {
-
-            alerts.push(
-                "Password authentication is active."
-            );
-
-        } else {
-
-            alerts.push(
-                loginMethod +
-                " authentication is active."
-            );
-        }
-
-        alerts.push(
-            "Keep your account credentials private."
-        );
-
-        if (
-            historyKey() !==
-            ""
-        ) {
-
-            alerts.push(
-                "Login history tracking is active."
-            );
-        }
-
-        alertsContent.innerHTML =
-            "";
-
-        var a =
-            0;
-
-        while (
-            a < alerts.length
-        ) {
-
-            var alertLine =
-                document.createElement(
-                    "div"
-                );
-
-            alertLine.className =
-                "security-center-line";
-
-            alertLine.innerHTML =
-                "• " +
-                escapeHTML(
-                    alerts[a]
-                );
-
-            alertsContent.appendChild(
-                alertLine
-            );
-
-            a++;
-        }
-    }
-}
-
-/* =====================================================
-SIGN OUT OTHER SESSIONS
-===================================================== */
-
-async function signOutOtherSessions() {
-
-    var actionMessage =
-        document.getElementById(
-            "securityActionMessage"
-        );
-
-    if (
-        !supabaseClient ||
-        !currentUser
-    ) {
-
-        if (actionMessage) {
-
-            actionMessage.textContent =
-                "❌ No active account.";
-        }
-
-        return;
-    }
-
-    var confirmed =
-        window.confirm(
-            "Sign out other active sessions?\n\n" +
-            "Your current device will remain signed in."
-        );
-
-    if (!confirmed) {
-        return;
-    }
-
-    var button =
-        document.getElementById(
-            "securitySignOutOthersBtn"
-        );
-
-    if (button) {
-
-        button.disabled =
-            true;
-
-        button.textContent =
-            "SIGNING OUT...";
-    }
-
-    if (actionMessage) {
-
-        actionMessage.textContent =
-            "Updating sessions...";
-    }
-
-    try {
-
-        var result =
-            await supabaseClient.auth
-                .signOut({
-                    scope:
-                        "others"
-                });
-
-        if (result.error) {
-
-            if (actionMessage) {
-
-                actionMessage.textContent =
-                    "❌ " +
-                    result.error.message;
-            }
-
-            return;
-        }
-
-        if (actionMessage) {
-
-            actionMessage.textContent =
-                "✔️ Other sessions signed out.";
-        }
-
-    } catch (error) {
-
-        console.log(
-            "Other session sign-out error:",
-            error
-        );
-
-        if (actionMessage) {
-
-            actionMessage.textContent =
-                "❌ Could not sign out other sessions.";
-        }
-
-    } finally {
-
-        if (button) {
-
-            button.disabled =
-                false;
-
-            button.textContent =
-                "SIGN OUT OTHER SESSIONS";
-        }
-    }
-}
-
-/* =====================================================
-CLOSE BOXES
-===================================================== */
-
-function closeAllProfileBoxes() {
-
-    if (accountChangeBox) {
-
-        accountChangeBox.classList.remove(
-            "show-box"
-        );
-    }
-
-    if (loginHistoryBox) {
-
-        loginHistoryBox.classList.remove(
-            "show-box"
-        );
-    }
-
-    if (changePasswordBox) {
-
-        changePasswordBox.classList.remove(
-            "show-box"
-        );
-    }
-
-    if (storageBox) {
-
-        storageBox.classList.remove(
-            "show-box"
-        );
-    }
-
-    closeSecurityCenter();
-}
-
-/* =====================================================
-LOGIN HISTORY BUTTON
-===================================================== */
-
-if (loginHistoryBtn) {
-
-    loginHistoryBtn.onclick =
-        function () {
-
-            if (!loginHistoryBox) {
-                return;
-            }
-
-            loginHistoryBox.classList.toggle(
-                "show-box"
-            );
-
-            displayLoginHistory();
-        };
-}
-
-if (clearHistoryBtn) {
-
-    clearHistoryBtn.onclick =
-        function () {
-
-            var confirmed =
-                window.confirm(
-                    "Clear all login history?"
-                );
-
-            if (!confirmed) {
-                return;
-            }
-
-            var key =
-                historyKey();
-
-            if (key !== "") {
-
-                localStorage.removeItem(
-                    key
-                );
-            }
-
-            displayLoginHistory();
-
-            updateSecurityCenter();
-        };
-}
-
-/* =====================================================
-CHANGE PASSWORD BOX
-===================================================== */
-
-if (changePasswordBtn) {
-
-    changePasswordBtn.onclick =
-        function () {
-
-            if (!changePasswordBox) {
-                return;
-            }
-
-            changePasswordBox.classList.toggle(
-                "show-box"
-            );
-
-            if (
-                changePasswordBox.classList.contains(
-                    "show-box"
-                )
-            ) {
-
-                if (oldPassword) {
-                    oldPassword.value =
-                        "";
-                }
-
-                if (changeNewPassword) {
-                    changeNewPassword.value =
-                        "";
-                }
-
-                if (changeConfirmPassword) {
-                    changeConfirmPassword.value =
-                        "";
-                }
-
-                if (changePasswordMessage) {
-                    changePasswordMessage.textContent =
-                        "";
-                }
-            }
-        };
-}
-
-/* =====================================================
-CHANGE PASSWORD
-===================================================== */
-
-if (saveChangedPasswordBtn) {
-
-    saveChangedPasswordBtn.onclick =
-        async function () {
-
-            if (
-                !supabaseClient ||
-                !currentUser
-            ) {
-                return;
-            }
-
-            if (
-                isGoogleUser(
-                    currentUser
-                )
-            ) {
-
-                changePasswordMessage.textContent =
-                    "Google accounts should manage their password through Google.";
-
-                return;
-            }
-
-            if (
-                isGithubUser(
-                    currentUser
-                )
-            ) {
-
-                changePasswordMessage.textContent =
-                    "GitHub accounts should manage their password through GitHub.";
-
-                return;
-            }
-
-            var currentPass =
-                oldPassword
-                    ? oldPassword.value
-                    : "";
-
-            var newPass =
-                changeNewPassword
-                    ? changeNewPassword.value
-                    : "";
-
-            var confirmPass =
-                changeConfirmPassword
-                    ? changeConfirmPassword.value
-                    : "";
-
-            if (
-                currentPass ===
-                ""
-            ) {
-
-                changePasswordMessage.textContent =
-                    "Please enter your current password.";
-
-                return;
-            }
-
-            if (
-                newPass ===
-                ""
-            ) {
-
-                changePasswordMessage.textContent =
-                    "Please enter a new password.";
-
-                return;
-            }
-
-            if (
-                newPass.length <
-                6
-            ) {
-
-                changePasswordMessage.textContent =
-                    "Password must be at least 6 characters.";
-
-                return;
-            }
-
-            if (
-                newPass !==
-                confirmPass
-            ) {
-
-                changePasswordMessage.textContent =
-                    "❌ New passwords do not match.";
-
-                return;
-            }
-
-            if (
-                newPass ===
-                currentPass
-            ) {
-
-                changePasswordMessage.textContent =
-                    "❌ New password must be different.";
-
-                return;
-            }
-
-            saveChangedPasswordBtn.disabled =
-                true;
-
-            changePasswordMessage.textContent =
-                "Checking current password...";
-
-            var authCheck =
-                await supabaseClient.auth
-                    .signInWithPassword({
-                        email:
-                            currentUser.email,
-                        password:
-                            currentPass
-                    });
-
-            if (
-                authCheck.error
-            ) {
-
-                saveChangedPasswordBtn.disabled =
-                    false;
-
-                changePasswordMessage.textContent =
-                    "❌ Current password is incorrect.";
-
-                return;
-            }
-
-            var updateResult =
-                await supabaseClient.auth
-                    .updateUser({
-                        password:
-                            newPass
-                    });
-
-            saveChangedPasswordBtn.disabled =
-                false;
-
-            if (
-                updateResult.error
-            ) {
-
-                changePasswordMessage.textContent =
-                    "❌ " +
-                    updateResult.error.message;
-
-                return;
-            }
-
-            if (oldPassword) {
-                oldPassword.value =
-                    "";
-            }
-
-            if (changeNewPassword) {
-                changeNewPassword.value =
-                    "";
-            }
-
-            if (changeConfirmPassword) {
-                changeConfirmPassword.value =
-                    "";
-            }
-
-            changePasswordMessage.textContent =
-                "✔️ Password changed successfully.";
-
-            updateSecurityCenter();
-        };
-}
-
-/* =====================================================
-STORAGE
-===================================================== */
-
-async function updateStorage() {
-
-    if (
-        !storageUsed ||
-        !storageProgress ||
-        !storageDetails
-    ) {
-        return;
-    }
-
-    if (
-        !supabaseClient ||
-        !currentUser
-    ) {
-
-        storageUsed.textContent =
-            "0 KB";
-
-        storageDetails.textContent =
-            "Please login to check cloud storage.";
-
-        storageProgress.style.width =
-            "0%";
-
-        return;
-    }
-
-    storageUsed.textContent =
-        "Checking...";
-
-    storageDetails.textContent =
-        "Checking cloud storage...";
-
-    await reconcileStorageUsage();
-
-    var trackedBytes =
-        getTrackedStorageUsage();
-
-    var remainingBytes =
-        USER_STORAGE_LIMIT_BYTES -
-        trackedBytes;
-
-    if (
-        remainingBytes <
-        0
-    ) {
-
-        remainingBytes =
-            0;
-    }
-
-    var percent =
-        (
-            trackedBytes /
-            USER_STORAGE_LIMIT_BYTES
-        ) *
-        100;
-
-    if (
-        percent >
-        100
-    ) {
-
-        percent =
-            100;
-    }
-
-    if (
-        percent <
-        0
-    ) {
-
-        percent =
-            0;
-    }
-
-    storageUsed.textContent =
-        formatFileSize(
-            trackedBytes
-        );
-
-    storageProgress.style.width =
-        percent +
-        "%";
-
-    storageDetails.textContent =
-        "Used: " +
-        formatFileSize(
-            trackedBytes
-        ) +
-        " • Free: " +
-        formatFileSize(
-            remainingBytes
-        ) +
-        " • Limit: " +
-        USER_STORAGE_LIMIT_GB +
-        " GB";
-}
-
-/* =====================================================
-STORAGE BUTTON
-===================================================== */
-
-if (storageBtn) {
-
-    storageBtn.onclick =
-        async function () {
-
-            if (!storageBox) {
-                return;
-            }
-
-            storageBox.classList.toggle(
-                "show-box"
-            );
-
-            if (
-                storageBox.classList.contains(
-                    "show-box"
-                )
-            ) {
-
-                await updateStorage();
-            }
-        };
-}
-
-/* =====================================================
-ADD PAGE - FILE NAME DISPLAY
-===================================================== */
-
-if (addFileInput) {
-
-    addFileInput.onchange =
-        function () {
-
-            if (!addFileName) {
-                return;
-            }
-
-            var file =
-                addFileInput.files[0];
-
-            if (!file) {
-
-                addFileName.textContent =
-                    "No file selected";
-
-                return;
-            }
-
-            addFileName.textContent =
-                file.name;
-        };
-}
-
-/* =====================================================
-ADD PAGE - MESSAGE
-===================================================== */
-
-function setAddFileMessage(
-    text,
-    success
-) {
-
-    if (!addFileMessage) {
-        return;
-    }
-
-    addFileMessage.textContent =
-        text;
-
-    if (success) {
-
-        addFileMessage.classList.add(
-            "success-message"
-        );
-
-        addFileMessage.classList.remove(
-            "error-message"
-        );
-
-    } else {
-
-        addFileMessage.classList.add(
-            "error-message"
-        );
-
-        addFileMessage.classList.remove(
-            "success-message"
-        );
-    }
-}
-
-/* =====================================================
-ADD PAGE - SAFE FILE NAME
-===================================================== */
-
-function createSafeFileName(
-    fileName
-) {
-
-    var original =
-        String(
-            fileName ||
-            ""
-        );
-
-    var safeName =
-        original
-            .replace(
-                /[^\w.\-]/g,
-                "_"
-            );
-
-    safeName =
-        safeName.replace(
-            /\.\./g,
-            "_"
-        );
-
-    safeName =
-        safeName.replace(
-            /^[/\\]+/g,
-            ""
-        );
-
-    safeName =
-        safeName.replace(
-            /[/\\]+/g,
-            "_"
-        );
-
-    safeName =
-        safeName.trim();
-
-    if (
-        safeName === "" ||
-        safeName === "." ||
-        safeName === ".."
-    ) {
-
-        safeName =
-            "file";
-    }
-
-    if (
-        safeName.length >
-        180
-    ) {
-
-        var lastDot =
-            safeName.lastIndexOf(
-                "."
-            );
-
-        if (
-            lastDot > 0 &&
-            lastDot <
-            safeName.length - 1
-        ) {
-
-            var extension =
-                safeName.slice(
-                    lastDot
-                );
-
-            var base =
-                safeName.slice(
-                    0,
-                    lastDot
-                );
-
-            safeName =
-                base.slice(
-                    0,
-                    180 -
-                    extension.length
-                ) +
-                extension;
-
-        } else {
-
-            safeName =
-                safeName.slice(
-                    0,
-                    180
-                );
-        }
-    }
-
-    return safeName;
-}
-
-/* =====================================================
-CREATE SAFE UPLOAD FILE
-===================================================== */
-
-function createSafeUploadFile(
-    file
-) {
-
-    if (!file) {
-        return file;
-    }
-
-    var safeName =
-        createSafeFileName(
-            file.name
-        );
-
-    try {
-
-        if (
-            typeof File ===
-            "function"
-        ) {
-
-            return new File(
-                [file],
-                safeName,
-                {
-                    type:
-                        file.type ||
-                        "",
-                    lastModified:
-                        file.lastModified ||
-                        Date.now()
-                }
-            );
-        }
-
-    } catch (error) {
-
-        console.log(
-            "Safe File creation skipped:",
-            error
-        );
-    }
-
-    return file;
-}
-
-/* =====================================================
-ADD PAGE - FORMAT FILE SIZE
-===================================================== */
-
-function formatFileSize(
-    bytes
-) {
-
-    var size =
-        Number(bytes) || 0;
-
-    if (
-        size <
-        1024
-    ) {
-
-        return (
-            size.toFixed(0) +
-            " B"
-        );
-    }
-
-    if (
-        size <
-        1024 *
-        1024
-    ) {
-
-        return (
-            (
-                size /
-                1024
-            ).toFixed(2) +
-            " KB"
-        );
-    }
-
-    if (
-        size <
-        1024 *
-        1024 *
-        1024
-    ) {
-
-        return (
-            (
-                size /
-                (
-                    1024 *
-                    1024
-                )
-            ).toFixed(2) +
-            " MB"
-        );
-    }
-
-    return (
-        (
-            size /
-            (
-                1024 *
-                1024 *
-                1024
-            )
-        ).toFixed(2) +
-        " GB"
-    );
-}
-
-/* =====================================================
-BACKBLAZE B2 URL HELPERS
-===================================================== */
-
-function isBackblazeB2FilePath(
-    filePath
-) {
-
-    var value =
-        String(
-            filePath ||
-            ""
-        );
-
-    var prefix =
-        "https://" +
-        B2_ENDPOINT +
-        "/" +
-        B2_BUCKET_NAME +
-        "/";
-
-    return (
-        value.indexOf(
-            prefix
-        ) ===
-        0
-    );
-}
-
-function isCloudinaryFilePath(
-    filePath
-) {
-
-    var value =
-        String(
-            filePath ||
-            ""
-        );
-
-    return (
-        value.indexOf(
-            "https://res.cloudinary.com/" +
-            CLOUDINARY_CLOUD_NAME +
-            "/"
-        ) ===
-        0
-    );
-}
-
-function getB2ObjectKeyFromUrl(
-    fileUrl
-) {
-
-    if (
-        !isBackblazeB2FilePath(
-            fileUrl
-        )
-    ) {
-
-        return "";
-    }
-
-    var prefix =
-        "https://" +
-        B2_ENDPOINT +
-        "/" +
-        B2_BUCKET_NAME +
-        "/";
-
-    var objectKey =
-        String(
-            fileUrl
-        ).slice(
-            prefix.length
-        );
-
-    try {
-
-        return decodeURIComponent(
-            objectKey
-        );
-
-    } catch (error) {
-
-        return objectKey;
-    }
-}
-
-/* =====================================================
-VIDEO DETECTION
-===================================================== */
-
-function isVideoFile(
-    file
-) {
-
-    if (!file) {
-        return false;
-    }
-
-    var mimeType =
-        String(
-            file.type ||
-            ""
-        ).toLowerCase();
-
-    if (
-        mimeType.indexOf(
-            "video/"
-        ) ===
-        0
-    ) {
-
-        return true;
-    }
-
-    var fileName =
-        String(
-            file.name ||
-            ""
-        ).toLowerCase();
-
-    var lastDot =
-        fileName.lastIndexOf(
-            "."
-        );
-
-    if (
-        lastDot ===
-        -1
-    ) {
-
-        return false;
-    }
-
-    var extension =
-        fileName.slice(
-            lastDot + 1
-        );
-
-    var videoExtensions = [
-        "mp4",
-        "m4v",
-        "mov",
-        "avi",
-        "mkv",
-        "webm",
-        "wmv",
-        "flv",
-        "mpeg",
-        "mpg",
-        "3gp",
-        "3g2",
-        "ts",
-        "mts",
-        "m2ts",
-        "ogv"
-    ];
-
-    return (
-        videoExtensions.indexOf(
-            extension
-        ) !==
-        -1
-    );
-}
-
-/* =====================================================
-LOAD SAVED SECURITY ITEMS
-===================================================== */
-
-async function loadSecurityItems() {
-
-    if (!securityItemsList) {
-        return;
-    }
-
-    if (
-        !supabaseClient ||
-        !currentUser
-    ) {
-
-        securityItemsList.textContent =
-            "Please login to view saved files.";
-
-        return;
-    }
-
-    securityItemsList.textContent =
-        "Loading saved files...";
-
-    var result =
-        await supabaseClient
-            .from("security_items")
-            .select("*")
-            .eq(
-                "user_id",
-                currentUser.id
-            )
-            .order(
-                "created_at",
-                {
-                    ascending:
-                        false
-                }
-            );
-
-    if (result.error) {
-
-        securityItemsList.textContent =
-            "❌ Could not load saved files.";
-
-        console.log(
-            "Security items load error:",
-            result.error.message
-        );
-
-        return;
-    }
-
-    var items =
-        result.data ||
-        [];
-
-    securityItemsList.innerHTML =
-        "";
-
-    if (
-        items.length ===
-        0
-    ) {
-
-        securityItemsList.textContent =
-            "No files saved yet.";
-
-        return;
-    }
-
-    var i =
-        0;
-
-    while (
-        i < items.length
-    ) {
-
-        createSecurityItemElement(
-            items[i]
-        );
-
-        i++;
-    }
-}
-
-/* =====================================================
-IMAGE FILE CHECK
-===================================================== */
-
-function isImageFilePath(
-    filePath
-) {
-
-    var pathValue =
-        String(
-            filePath ||
-            ""
-        );
-
-    var cleanPath =
-        pathValue
-            .split("?")[0]
-            .split("#")[0]
-            .toLowerCase();
-
-    var parts =
-        cleanPath.split(".");
-
-    var extension =
-        parts.length > 1
-            ? parts[
-                parts.length - 1
-            ]
-            : "";
-
-    var imageExtensions = [
-        "jpg",
-        "jpeg",
-        "png",
-        "gif",
-        "webp",
-        "bmp",
-        "svg"
-    ];
-
-    return (
-        imageExtensions.indexOf(
-            extension
-        ) !==
-        -1
-    );
-}
-
-/* =====================================================
-VIEW FILE
-===================================================== */
-
-async function viewSecurityItem(
-    item,
-    button
-) {
-
-    if (
-        !supabaseClient ||
-        !currentUser ||
-        !item ||
-        !item.file_path
-    ) {
-        return;
-    }
-
-    var isImage =
-        isImageFilePath(
-            item.file_path
-        );
-
-    var isB2File =
-        isBackblazeB2FilePath(
-            item.file_path
-        );
-
-    var isCloudinaryFile =
-        isCloudinaryFilePath(
-            item.file_path
-        );
-
-    var viewWindow =
-        null;
-
-    if (isImage) {
-
-        viewWindow =
-            window.open(
-                "",
-                "_blank"
-            );
-
-        if (viewWindow) {
-
-            viewWindow.document.write(
-                "<!DOCTYPE html><html><head>" +
-                "<title>Loading...</title>" +
-                "<style>" +
-                "body{margin:0;background:#000;" +
-                "display:flex;align-items:center;" +
-                "justify-content:center;" +
-                "min-height:100vh;color:#00ff00;" +
-                "font-family:sans-serif;}" +
-                "</style></head>" +
-                "<body>Loading...</body></html>"
-            );
-        }
-    }
-
-    var originalText =
-        button
-            ? button.textContent
-            : "VIEW";
-
-    if (button) {
-
-        button.disabled =
-            true;
-
-        button.textContent =
-            "OPENING...";
-    }
-
-    var signedUrl =
-        "";
-
-    if (
-        isB2File ||
-        isCloudinaryFile
-    ) {
-
-        signedUrl =
-            item.file_path;
-
-    } else {
-
-        var result =
-            await supabaseClient
-                .storage
-                .from(
-                    STORAGE_BUCKET
-                )
-                .createSignedUrl(
-                    item.file_path,
-                    3600
-                );
-
-        if (result.error) {
-
-            if (button) {
-
-                button.disabled =
-                    false;
-
-                button.textContent =
-                    originalText;
-            }
-
-            if (viewWindow) {
-
-                viewWindow.close();
-            }
-
-            alert(
-                "❌ File could not be opened: " +
-                result.error.message
-            );
-
-            return;
-        }
-
-        signedUrl =
-            result.data &&
-            result.data.signedUrl
-                ? result.data.signedUrl
-                : "";
-    }
-
-    if (button) {
-
-        button.disabled =
-            false;
-
-        button.textContent =
-            originalText;
-    }
-
-    if (!signedUrl) {
-
-        if (viewWindow) {
-            viewWindow.close();
-        }
-
-        alert(
-            "❌ File URL could not be created."
-        );
-
-        return;
-    }
-
-    if (isImage) {
-
-        if (viewWindow) {
-
-            var safeTitle =
-                escapeHTML(
-                    item.title ||
-                    "File"
-                );
-
-            viewWindow.document.open();
-
-            viewWindow.document.write(
-                "<!DOCTYPE html><html><head>" +
-                "<title>" +
-                safeTitle +
-                "</title>" +
-                "<style>" +
-                "body{margin:0;background:#000;" +
-                "display:flex;align-items:center;" +
-                "justify-content:center;" +
-                "min-height:100vh;}" +
-                "img{max-width:100%;" +
-                "max-height:100vh;" +
-                "object-fit:contain;}" +
-                "</style></head><body>" +
-                "<img src=\"" +
-                escapeHTML(
-                    signedUrl
-                ) +
-                "\" alt=\"" +
-                safeTitle +
-                "\"></body></html>"
-            );
-
-            viewWindow.document.close();
-
-            return;
-        }
-
-        window.open(
-            signedUrl,
-            "_blank"
-        );
-
-        return;
-    }
-
-    window.open(
-        signedUrl,
-        "_blank"
-    );
-}
-
-/* =====================================================
-CREATE SAVED ITEM UI
-===================================================== */
-
-function createSecurityItemElement(
-    item
-) {
-
-    if (!securityItemsList) {
-        return;
-    }
-
-    var itemBox =
-        document.createElement(
-            "div"
-        );
-
-    itemBox.className =
-        "security-item";
-
-    var titleElement =
-        document.createElement(
-            "div"
-        );
-
-    titleElement.className =
-        "security-item-title";
-
-    titleElement.textContent =
-        item.title ||
-        "Untitled File";
-
-    var categoryElement =
-        document.createElement(
-            "div"
-        );
-
-    categoryElement.className =
-        "security-item-category";
-
-    categoryElement.textContent =
-        "CATEGORY: " +
-        (
-            item.category ||
-            "Other"
-        );
-
-    var fileName =
-        "";
-
-    if (item.file_path) {
-
-        var pathParts =
-            item.file_path.split("/");
-
-        fileName =
-            pathParts[
-                pathParts.length - 1
-            ];
-    }
-
-    if (fileName) {
-
-        var fileElement =
-            document.createElement(
-                "div"
-            );
-
-        fileElement.className =
-            "security-item-file";
-
-        fileElement.textContent =
-            "FILE: " +
-            fileName;
-
-        itemBox.appendChild(
-            fileElement
-        );
-    }
-
-    var knownFileSize =
-        getStorageFileSize(
-            item.file_path
-        );
-
-    if (
-        knownFileSize >
-        0
-    ) {
-
-        var sizeElement =
-            document.createElement(
-                "div"
-            );
-
-        sizeElement.className =
-            "security-item-file";
-
-        sizeElement.textContent =
-            "SIZE: " +
-            formatFileSize(
-                knownFileSize
-            );
-
-        itemBox.appendChild(
-            sizeElement
-        );
-    }
-
-    var infoBox =
-        document.createElement(
-            "div"
-        );
-
-    infoBox.className =
-        "security-item-info";
-
-    infoBox.appendChild(
-        titleElement
-    );
-
-    infoBox.appendChild(
-        categoryElement
-    );
-
-    var buttonBox =
-        document.createElement(
-            "div"
-        );
-
-    buttonBox.className =
-        "security-item-actions";
-
-    var viewButton =
-        document.createElement(
-            "button"
-        );
-
-    viewButton.type =
-        "button";
-
-    viewButton.className =
-        "security-view-button";
-
-    viewButton.textContent =
-        "VIEW";
-
-    viewButton.onclick =
-        function () {
-
-            viewSecurityItem(
-                item,
-                viewButton
-            );
-        };
-
-    buttonBox.appendChild(
-        viewButton
-    );
-
-    var editButton =
-        document.createElement(
-            "button"
-        );
-
-    editButton.type =
-        "button";
-
-    editButton.className =
-        "security-edit-button";
-
-    editButton.textContent =
-        "EDIT";
-
-    editButton.onclick =
-        function () {
-
-            editSecurityItem(
-                item
-            );
-        };
-
-    var deleteButton =
-        document.createElement(
-            "button"
-        );
-
-    deleteButton.type =
-        "button";
-
-    deleteButton.className =
-        "security-delete-button";
-
-    deleteButton.textContent =
-        "DELETE";
-
-    deleteButton.onclick =
-        function () {
-
-            deleteSecurityItem(
-                item
-            );
-        };
-
-    buttonBox.appendChild(
-        editButton
-    );
-
-    buttonBox.appendChild(
-        deleteButton
-    );
-
-    itemBox.appendChild(
-        infoBox
-    );
-
-    itemBox.appendChild(
-        buttonBox
-    );
-
-    securityItemsList.appendChild(
-        itemBox
-    );
-}
-
-/* =====================================================
-REMOTE FILE CLEANUP
-===================================================== */
-
-async function cleanupRemoteFile(
-    filePath
-) {
-
-    if (
-        !supabaseClient ||
-        !currentUser ||
-        !filePath
-    ) {
-        return;
-    }
-
-    if (
-        isBackblazeB2FilePath(
-            filePath
-        )
-    ) {
-
-        var objectKey =
-            getB2ObjectKeyFromUrl(
-                filePath
-            );
-
-        if (!objectKey) {
-            return;
-        }
-
-        try {
-
-            await supabaseClient
-                .functions
-                .invoke(
-                    B2_FUNCTION_DELETE,
-                    {
-                        body: {
-                            objectKey:
-                                objectKey,
-                            userId:
-                                currentUser.id
-                        }
-                    }
-                );
-
-        } catch (error) {
-
-            console.log(
-                "B2 cleanup error:",
-                error
-            );
-        }
-
-        return;
-    }
-
-    if (
-        isCloudinaryFilePath(
-            filePath
-        )
-    ) {
-
-        try {
-
-            await supabaseClient
-                .functions
-                .invoke(
-                    "cloudinary-delete",
-                    {
-                        body: {
-                            fileUrl:
-                                filePath
-                        }
-                    }
-                );
-
-        } catch (error) {
-
-            console.log(
-                "Cloudinary cleanup error:",
-                error
-            );
-        }
-
-        return;
-    }
-}
-
-/* =====================================================
-ADD PAGE - SAVE FILE
-===================================================== */
-
-if (saveFileBtn) {
-
-    saveFileBtn.onclick =
-        async function () {
-
-            if (
-                !supabaseClient ||
-                !currentUser
-            ) {
-
-                setAddFileMessage(
-                    "❌ Please login first.",
-                    false
-                );
-
-                return;
-            }
-
-            if (!addFileInput) {
-
-                setAddFileMessage(
-                    "❌ File input is unavailable.",
-                    false
-                );
-
-                return;
-            }
-
-            var file =
-                addFileInput.files[0];
-
-            var title =
-                addTitle
-                    ? addTitle.value.trim()
-                    : "";
-
-            var category =
-                addCategory
-                    ? addCategory.value
-                    : "";
-
-            if (!file) {
-
-                setAddFileMessage(
-                    "❌ Please select a file.",
-                    false
-                );
-
-                return;
-            }
-
-            if (
-                title ===
-                ""
-            ) {
-
-                setAddFileMessage(
-                    "❌ Please enter a file title.",
-                    false
-                );
-
-                if (addTitle) {
-                    addTitle.focus();
-                }
-
-                return;
-            }
-
-            if (
-                category ===
-                ""
-            ) {
-
-                setAddFileMessage(
-                    "❌ Please select a category.",
-                    false
-                );
-
-                if (addCategory) {
-                    addCategory.focus();
-                }
-
-                return;
-            }
-
-            var fileSize =
-                Number(
-                    file.size
-                ) || 0;
-
-            if (
-                fileSize <=
-                0
-            ) {
-
-                setAddFileMessage(
-                    "❌ The selected file is empty or invalid.",
-                    false
-                );
-
-                return;
-            }
-
-            var remainingBytes =
-                getRemainingStorageBytes();
-
-            if (
-                fileSize >
-                remainingBytes
-            ) {
-
-                setAddFileMessage(
-                    "❌ Storage quota exceeded. " +
-                    "Free space: " +
-                    formatFileSize(
-                        remainingBytes
-                    ) +
-                    " • File size: " +
-                    formatFileSize(
-                        fileSize
-                    ) +
-                    " • Limit: " +
-                    USER_STORAGE_LIMIT_GB +
-                    " GB",
-                    false
-                );
-
-                await updateStorage();
-
-                return;
-            }
-
-            var safeFile =
-                createSafeUploadFile(
-                    file
-                );
-
-            var safeFileName =
-                createSafeFileName(
-                    file.name
-                );
-
-            saveFileBtn.disabled =
-                true;
-
-            var filePath =
-                "";
-
-            var uploadedToB2 =
-                false;
-
-            var uploadedToCloudinary =
-                false;
-
-            var usageWasAdded =
-                false;
-
-            try {
-
-                var videoFile =
-                    isVideoFile(
-                        file
-                    );
-
-                if (videoFile) {
-
-                    setAddFileMessage(
-                        "Uploading video to Backblaze B2...",
-                        true
-                    );
-
-                    var b2FormData =
-                        new FormData();
-
-                    b2FormData.append(
-                        "file",
-                        safeFile,
-                        safeFileName
-                    );
-
-                    b2FormData.append(
-                        "userId",
-                        currentUser.id
-                    );
-
-                    var b2Result =
-                        await supabaseClient
-                            .functions
-                            .invoke(
-                                B2_FUNCTION_UPLOAD,
-                                {
-                                    body:
-                                        b2FormData
-                                }
-                            );
-
-                    if (
-                        b2Result.error
-                    ) {
-
-                        saveFileBtn.disabled =
-                            false;
-
-                        setAddFileMessage(
-                            "❌ B2 upload failed: " +
-                            b2Result.error.message,
-                            false
-                        );
-
-                        return;
-                    }
-
-                    var b2Data =
-                        b2Result.data ||
-                        {};
-
-                    if (
-                        !b2Data.success ||
-                        !b2Data.url
-                    ) {
-
-                        saveFileBtn.disabled =
-                            false;
-
-                        setAddFileMessage(
-                            "❌ B2 video upload failed: " +
-                            (
-                                b2Data.error ||
-                                "Unknown error"
-                            ),
-                            false
-                        );
-
-                        return;
-                    }
-
-                    filePath =
-                        b2Data.url;
-
-                    uploadedToB2 =
-                        true;
-
-                } else {
-
-                    setAddFileMessage(
-                        "Uploading file to Cloudinary...",
-                        true
-                    );
-
-                    var cloudinaryFormData =
-                        new FormData();
-
-                    cloudinaryFormData.append(
-                        "file",
-                        safeFile,
-                        safeFileName
-                    );
-
-                    cloudinaryFormData.append(
-                        "upload_preset",
-                        CLOUDINARY_UPLOAD_PRESET
-                    );
-
-                    cloudinaryFormData.append(
-                        "folder",
-                        CLOUDINARY_FOLDER
-                    );
-
-                    var cloudinaryResponse =
-                        await fetch(
-                            "https://api.cloudinary.com/v1_1/" +
-                            CLOUDINARY_CLOUD_NAME +
-                            "/auto/upload",
-                            {
-                                method:
-                                    "POST",
-                                body:
-                                    cloudinaryFormData
-                            }
-                        );
-
-                    var cloudinaryData =
-                        await cloudinaryResponse.json();
-
-                    if (
-                        !cloudinaryResponse.ok ||
-                        !cloudinaryData.secure_url
-                    ) {
-
-                        saveFileBtn.disabled =
-                            false;
-
-                        setAddFileMessage(
-                            "❌ Cloudinary upload failed: " +
-                            (
-                                cloudinaryData.error &&
-                                cloudinaryData.error.message
-                                    ? cloudinaryData.error.message
-                                    : "Unknown error"
-                            ),
-                            false
-                        );
-
-                        return;
-                    }
-
-                    filePath =
-                        cloudinaryData.secure_url;
-
-                    uploadedToCloudinary =
-                        true;
-                }
-
-                setAddFileMessage(
-                    "Saving file information...",
-                    true
-                );
-
-                var insertResult =
-                    await supabaseClient
-                        .from(
-                            "security_items"
-                        )
-                        .insert({
-                            user_id:
-                                currentUser.id,
-                            title:
-                                title,
-                            category:
-                                category,
-                            file_path:
-                                filePath
-                        });
-
-                if (
-                    insertResult.error
-                ) {
-
-                    await cleanupRemoteFile(
-                        filePath
-                    );
-
-                    saveFileBtn.disabled =
-                        false;
-
-                    setAddFileMessage(
-                        "❌ File information could not be saved: " +
-                        insertResult.error.message,
-                        false
-                    );
-
-                    return;
-                }
-
-                saveStorageFileSize(
-                    filePath,
-                    fileSize
-                );
-
-                increaseTrackedStorageUsage(
-                    fileSize
-                );
-
-                usageWasAdded =
-                    true;
-
-                if (addFileInput) {
-
-                    addFileInput.value =
-                        "";
-                }
-
-                if (addFileName) {
-
-                    addFileName.textContent =
-                        "No file selected";
-                }
-
-                if (addTitle) {
-
-                    addTitle.value =
-                        "";
-                }
-
-                if (addCategory) {
-
-                    addCategory.value =
-                        "";
-                }
-
-                saveFileBtn.disabled =
-                    false;
-
-                if (uploadedToB2) {
-
-                    setAddFileMessage(
-                        "✔️ Video saved successfully to Backblaze B2.",
-                        true
-                    );
-
-                } else if (
-                    uploadedToCloudinary
-                ) {
-
-                    setAddFileMessage(
-                        "✔️ File saved successfully to Cloudinary.",
-                        true
-                    );
-
-                } else {
-
-                    setAddFileMessage(
-                        "✔️ File saved successfully.",
-                        true
-                    );
-                }
-
-                await loadSecurityItems();
-
-                await updateStorage();
-
-            } catch (error) {
-
-                console.log(
-                    "Save security item error:",
-                    error
-                );
-
-                if (
-                    filePath &&
-                    !usageWasAdded
-                ) {
-
-                    await cleanupRemoteFile(
-                        filePath
-                    );
-                }
-
-                saveFileBtn.disabled =
-                    false;
-
-                setAddFileMessage(
-                    "❌ File save failed: " +
-                    (
-                        error &&
-                        error.message
-                            ? error.message
-                            : "Unknown error"
-                    ),
-                    false
-                );
-            }
-        };
-}
-
-/* =====================================================
-ADD PAGE - EDIT FILE
-===================================================== */
-
-async function editSecurityItem(
-    item
-) {
-
-    if (
-        !supabaseClient ||
-        !currentUser ||
-        !item
-    ) {
-        return;
-    }
-
-    var currentTitle =
-        item.title ||
-        "";
-
-    var currentCategory =
-        item.category ||
-        "";
-
-    var newTitle =
-        window.prompt(
-            "Enter new file title:",
-            currentTitle
-        );
-
-    if (
-        newTitle ===
-        null
-    ) {
-        return;
-    }
-
-    newTitle =
-        newTitle.trim();
-
-    if (
-        newTitle ===
-        ""
-    ) {
-
-        alert(
-            "File title cannot be empty."
-        );
-
-        return;
-    }
-
-    var categoryText =
-        "Documents, Photos, Videos, Accounts, Security, Personal, Other";
-
-    var newCategory =
-        window.prompt(
-            "Enter category:\n\n" +
-            categoryText,
-            currentCategory
-        );
-
-    if (
-        newCategory ===
-        null
-    ) {
-        return;
-    }
-
-    newCategory =
-        newCategory.trim();
-
-    var allowedCategories = [
-        "Documents",
-        "Photos",
-        "Videos",
-        "Accounts",
-        "Security",
-        "Personal",
-        "Other"
-    ];
-
-    if (
-        allowedCategories.indexOf(
-            newCategory
-        ) ===
-        -1
-    ) {
-
-        alert(
-            "Please use one of the available categories."
-        );
-
-        return;
-    }
-
-    var confirmed =
-        window.confirm(
-            "Update this file information?"
-        );
-
-    if (!confirmed) {
-        return;
-    }
-
-    var result =
-        await supabaseClient
-            .from(
-                "security_items"
-            )
-            .update({
-                title:
-                    newTitle,
-                category:
-                    newCategory
-            })
-            .eq(
-                "id",
-                item.id
-            )
-            .eq(
-                "user_id",
-                currentUser.id
-            );
-
-    if (result.error) {
-
-        alert(
-            "❌ Update failed: " +
-            result.error.message
-        );
-
-        return;
-    }
-
-    if (addFileMessage) {
-
-        setAddFileMessage(
-            "✔️ File information updated.",
-            true
-        );
-    }
-
-    await loadSecurityItems();
-}
-
-/* =====================================================
-ADD PAGE - DELETE FILE
-===================================================== */
-
-async function deleteSecurityItem(
-    item
-) {
-
-    if (
-        !supabaseClient ||
-        !currentUser ||
-        !item
-    ) {
-        return;
-    }
-
-    var confirmed =
-        window.confirm(
-            "Delete this saved file?\n\n" +
-            "The file and its saved information will be removed."
-        );
-
-    if (!confirmed) {
-        return;
-    }
-
-    var remoteDeleteFailed =
-        false;
-
-    var ledgerSize =
-        getStorageFileSize(
-            item.file_path
-        );
-
-    var databaseFileSize =
-        Number(
-            item.file_size
-        ) || 0;
-
-    var trackedFileSize =
-        ledgerSize >
-        0
-            ? ledgerSize
-            : databaseFileSize;
-
-    if (
-        item.file_path &&
-        isBackblazeB2FilePath(
-            item.file_path
-        )
-    ) {
-
-        var objectKey =
-            getB2ObjectKeyFromUrl(
-                item.file_path
-            );
-
-        if (!objectKey) {
-
-            alert(
-                "❌ B2 object key could not be detected."
-            );
-
-            return;
-        }
-
-        var b2DeleteResult =
-            await supabaseClient
-                .functions
-                .invoke(
-                    B2_FUNCTION_DELETE,
-                    {
-                        body: {
-                            objectKey:
-                                objectKey,
-                            userId:
-                                currentUser.id
-                        }
-                    }
-                );
-
-        if (
-            b2DeleteResult.error
-        ) {
-
-            remoteDeleteFailed =
-                true;
-
-            console.log(
-                "B2 delete error:",
-                b2DeleteResult.error.message
-            );
-
-            var continueB2Delete =
-                window.confirm(
-                    "The B2 video could not be removed.\n\n" +
-                    "Do you still want to remove its saved information?"
-                );
-
-            if (
-                !continueB2Delete
-            ) {
-                return;
-            }
-
-        } else {
-
-            var b2DeleteData =
-                b2DeleteResult.data ||
-                {};
-
-            if (
-                b2DeleteData.success ===
-                false
-            ) {
-
-                remoteDeleteFailed =
-                    true;
-
-                var continueB2Delete2 =
-                    window.confirm(
-                        "The B2 video could not be removed.\n\n" +
-                        "Do you still want to remove its saved information?"
-                    );
-
-                if (
-                    !continueB2Delete2
-                ) {
-                    return;
-                }
-            }
-        }
-
-    } else if (
-        item.file_path &&
-        isCloudinaryFilePath(
-            item.file_path
-        )
-    ) {
-
-        var cloudinaryDeleteResult =
-            await supabaseClient
-                .functions
-                .invoke(
-                    "cloudinary-delete",
-                    {
-                        body: {
-                            fileUrl:
-                                item.file_path
-                        }
-                    }
-                );
-
-        if (
-            cloudinaryDeleteResult.error
-        ) {
-
-            remoteDeleteFailed =
-                true;
-
-            console.log(
-                "Cloudinary delete error:",
-                cloudinaryDeleteResult.error.message
-            );
-
-            var continueCloudinaryDelete =
-                window.confirm(
-                    "The cloud file could not be removed.\n\n" +
-                    "Do you still want to remove its saved information?"
-                );
-
-            if (
-                !continueCloudinaryDelete
-            ) {
-                return;
-            }
-
-        } else {
-
-            var cloudinaryDeleteData =
-                cloudinaryDeleteResult.data ||
-                {};
-
-            if (
-                cloudinaryDeleteData.success ===
-                false
-            ) {
-
-                remoteDeleteFailed =
-                    true;
-
-                var continueCloudinaryDelete2 =
-                    window.confirm(
-                        "The cloud file could not be removed.\n\n" +
-                        "Do you still want to remove its saved information?"
-                    );
-
-                if (
-                    !continueCloudinaryDelete2
-                ) {
-                    return;
-                }
-            }
-        }
-
-    } else if (
-        item.file_path
-    ) {
-
-        var storageResult =
-            await supabaseClient
-                .storage
-                .from(
-                    STORAGE_BUCKET
-                )
-                .remove([
-                    item.file_path
-                ]);
-
-        if (
-            storageResult.error
-        ) {
-
-            remoteDeleteFailed =
-                true;
-
-            console.log(
-                "Storage file delete error:",
-                storageResult.error.message
-            );
-
-            var continueStorageDelete =
-                window.confirm(
-                    "The cloud file could not be removed.\n\n" +
-                    "Do you still want to remove its saved information?"
-                );
-
-            if (
-                !continueStorageDelete
-            ) {
-                return;
-            }
-        }
-    }
-
-    var databaseResult =
-        await supabaseClient
-            .from(
-                "security_items"
-            )
-            .delete()
-            .eq(
-                "id",
-                item.id
-            )
-            .eq(
-                "user_id",
-                currentUser.id
-            );
-
-    if (
-        databaseResult.error
-    ) {
-
-        alert(
-            "❌ Saved file information could not be deleted: " +
-            databaseResult.error.message
-        );
-
-        return;
-    }
-
-    var removedLedgerSize =
-        removeStorageFileSize(
-            item.file_path
-        );
-
-    if (
-        trackedFileSize <=
-        0 &&
-        removedLedgerSize >
-        0
-    ) {
-
-        trackedFileSize =
-            removedLedgerSize;
-    }
-
-    if (
-        trackedFileSize >
-        0
-    ) {
-
-        decreaseTrackedStorageUsage(
-            trackedFileSize
-        );
-    }
-
-    await reconcileStorageUsage();
-
-    if (addFileMessage) {
-
-        if (
-            remoteDeleteFailed
-        ) {
-
-            setAddFileMessage(
-                "⚠️ Saved information deleted, but the cloud file may still exist.",
-                false
-            );
-
-        } else {
-
-            setAddFileMessage(
-                "✔️ File deleted successfully.",
-                true
-            );
-        }
-    }
-
-    await loadSecurityItems();
-
-    await updateStorage();
-}
-
-/* =====================================================
-ACCOUNT CHANGE
-===================================================== */
-
-if (accountChangeBtn) {
-
-    accountChangeBtn.onclick =
-        function () {
-
-            if (!accountChangeBox) {
-                return;
-            }
-
-            var isOpen =
-                accountChangeBox.classList.toggle(
-                    "show-box"
-                );
-
-            if (isOpen) {
-
-                displayAccounts();
-
-                updateProfile();
-            }
-        };
-}
-
-/* =====================================================
-DISPLAY ACCOUNTS
-===================================================== */
-
-async function displayAccounts() {
-
-    if (!accountList) {
-        return;
-    }
-
-    var accounts =
-        getRememberedAccounts();
-
-    accountList.innerHTML =
-        "";
-
-    if (
-        accounts.length ===
-        0
-    ) {
-
-        accountList.textContent =
-            "No saved accounts.";
-
-        return;
-    }
-
-    var i =
-        0;
-
-    while (
-        i < accounts.length
-    ) {
-
-        var account =
-            accounts[i];
-
-        var item =
-            document.createElement(
-                "div"
-            );
-
-        item.className =
-            "account-item";
-
-        var info =
-            document.createElement(
-                "div"
-            );
-
-        info.className =
-            "account-item-info";
-
-        var name =
-            document.createElement(
-                "div"
-            );
-
-        name.className =
-            "account-item-name";
-
-        name.textContent =
-            account.email ||
-            "ACCOUNT";
-
-        var mail =
-            document.createElement(
-                "div"
-            );
-
-        mail.className =
-            "account-item-email";
-
-        mail.textContent =
-            account.email ||
-            "";
-
-        info.appendChild(
-            name
-        );
-
-        info.appendChild(
-            mail
-        );
-
-        item.appendChild(
-            info
-        );
-
-        if (
-            currentUser &&
-            account.email &&
-            currentUser.email &&
-            account.email.toLowerCase() ===
-            currentUser.email.toLowerCase()
-        ) {
-
-            var current =
-                document.createElement(
-                    "div"
-                );
-
-            current.className =
-                "current-account-label";
-
-            current.textContent =
-                "CURRENT";
-
-            item.appendChild(
-                current
-            );
-
-        } else {
-
-            var switchButton =
-                document.createElement(
-                    "button"
-                );
-
-            switchButton.type =
-                "button";
-
-            switchButton.className =
-                "account-switch-button";
-
-            switchButton.textContent =
-                "SWITCH";
-
-            switchButton.onclick =
-                createSwitchHandler(
-                    account
-                );
-
-            item.appendChild(
-                switchButton
-            );
-        }
-
-        accountList.appendChild(
-            item
-        );
-
-        i++;
-    }
-}
-
-/* =====================================================
-SWITCH ACCOUNT
-===================================================== */
-
-function createSwitchHandler(
-    account
-) {
-
-    return function () {
-
-        if (!account.email) {
-            return;
-        }
-
-        if (loginEmail) {
-
-            loginEmail.value =
-                account.email;
-        }
-
-        if (loginPhone) {
-
-            loginPhone.value =
-                account.phone ||
-                "";
-        }
-
-        if (loginPassword) {
-
-            loginPassword.value =
-                "";
-        }
-
-        showLogin();
-
-        message.textContent =
-            "Enter password for " +
-            account.email +
-            " to switch account.";
+    createAccountBtn.onclick = function () {
+        var accounts = getRememberedAccounts();
+        if (accounts.length >= MAX_ACCOUNTS) { message.textContent = "❌ Maximum 5 accounts allowed."; return; }
+
+        resetRegistrationForm();
+        if (loginEmail) loginEmail.value = "";
+        if (loginPhone) loginPhone.value = "";
+        if (loginPassword) loginPassword.value = "";
+
+        message.textContent = "Create your new account❗";
+        showRegister();
     };
 }
 
 /* =====================================================
-HELP CENTER
+   OAUTH PROVIDER DETECTION
 ===================================================== */
 
-if (helpCenterBtn) {
+function getOAuthProvider(user) {
+    if (!user) return "";
+    var metadata = user.app_metadata || {};
+    var provider = metadata.provider || "";
+    var providers = metadata.providers || [];
 
-    helpCenterBtn.onclick =
-        function () {
-
-            var confirmed =
-                window.confirm(
-                    "Open Help Center on WhatsApp?\n\n" +
-                    "A message will be prepared for the Cyber Core Help Center."
-                );
-
-            if (!confirmed) {
-                return;
-            }
-
-            var username =
-                "User";
-
-            if (
-                currentProfile &&
-                currentProfile.username
-            ) {
-
-                username =
-                    currentProfile.username;
-            }
-
-            var accountEmail =
-                currentUser &&
-                currentUser.email
-                    ? currentUser.email
-                    : verifiedEmail;
-
-            var text =
-                "Hello Cyber Core Help Center,\n\n" +
-                "I need help with my account.\n" +
-                "Username: " +
-                username +
-                "\n" +
-                "Email: " +
-                accountEmail;
-
-            var url =
-                "https://wa.me/" +
-                HELP_WHATSAPP_NUMBER +
-                "?text=" +
-                encodeURIComponent(
-                    text
-                );
-
-            window.open(
-                url,
-                "_blank"
-            );
-        };
+    if (provider === "google") return "google";
+    if (provider === "github") return "github";
+    if (Array.isArray(providers)) {
+        if (providers.indexOf("google") !== -1) return "google";
+        if (providers.indexOf("github") !== -1) return "github";
+    }
+    return "";
 }
 
-/* =====================================================
-REMOVE ACCOUNT
-===================================================== */
+function isOAuthUser(user) { return getOAuthProvider(user) !== ""; }
 
-if (removeAccountBtn) {
-
-    removeAccountBtn.onclick =
-        async function () {
-
-            if (!currentUser) {
-                return;
-            }
-
-            var confirmed =
-                window.confirm(
-                    "Remove this account from this device?\n\n" +
-                    "You will be signed out."
-                );
-
-            if (!confirmed) {
-                return;
-            }
-
-            var userEmail =
-                currentUser.email ||
-                "";
-
-            removeRememberedAccount(
-                userEmail
-            );
-
-            closeSecurityCenter();
-
-            await supabaseClient.auth
-                .signOut();
-
-            currentUser =
-                null;
-
-            currentProfile =
-                null;
-
-            currentAccountEmail =
-                "";
-
-            currentAccountPhone =
-                "";
-
-            googleOAuthLogin =
-                false;
-
-            githubOAuthLogin =
-                false;
-
-            if (loginEmail) {
-
-                loginEmail.value =
-                    "";
-            }
-
-            if (loginPhone) {
-
-                loginPhone.value =
-                    "";
-            }
-
-            if (loginPassword) {
-
-                loginPassword.value =
-                    "";
-            }
-
-            showLogin();
-
-            message.textContent =
-                "✔️ Account removed from this device.";
-        };
+function isOAuthCallback() {
+    var hash = window.location.hash || "";
+    var search = window.location.search || "";
+    return hash.indexOf("access_token=") !== -1 || hash.indexOf("refresh_token=") !== -1 || search.indexOf("code=") !== -1;
 }
 
-/* =====================================================
-OAUTH CALLBACK SESSION HANDLER
-===================================================== */
+function getOAuthOptions() {
+    return { queryParams: { prompt: "select_account" }, redirectTo: OAUTH_REDIRECT_URL };
+}
+
+async function handleOAuthUser(user, provider) {
+    if (!user || oauthHandling) return;
+    oauthHandling = true;
+
+    currentUser = user;
+    currentAccountEmail = user.email || "";
+    currentAccountPhone = "";
+    verifiedEmail = currentAccountEmail;
+    verifiedPhone = "";
+    googleOAuthLogin = provider === "google";
+    githubOAuthLogin = provider === "github";
+
+    if (currentAccountEmail) rememberAccount(currentAccountEmail, "");
+
+    await createOrUpdateProfile(currentUser, "");
+    addLoginHistory(currentAccountEmail || provider.toUpperCase() + " ACCOUNT");
+
+    if (loginEmail) loginEmail.value = currentAccountEmail;
+    if (loginPhone) loginPhone.value = "";
+    if (loginPassword) loginPassword.value = "";
+
+    if (message) {
+        message.textContent = provider === "google" ? "✔️ GOOGLE LOGIN SUCCESSFUL❗" : "✔️ GITHUB LOGIN SUCCESSFUL❗";
+    }
+
+    await showDashboard();
+    oauthHandling = false;
+}
+
+if (googleLoginBtn) {
+    googleLoginBtn.onclick = async function () {
+        if (!supabaseClient) { message.textContent = "❌ Supabase could not be loaded."; return; }
+        googleLoginBtn.disabled = true;
+        if (githubLoginBtn) githubLoginBtn.disabled = true;
+        message.textContent = "Verifying security check...";
+
+        var token = await runHCaptcha(hcaptchaLoginWidgetId);
+        if (!token) { googleLoginBtn.disabled = false; if (githubLoginBtn) githubLoginBtn.disabled = false; message.textContent = "❌ Security verification failed. Please try again."; return; }
+
+        var verified = await verifyHCaptchaToken(token);
+        if (!verified) { googleLoginBtn.disabled = false; if (githubLoginBtn) githubLoginBtn.disabled = false; message.textContent = "❌ Security verification failed. Please try again."; return; }
+
+        message.textContent = "Opening Google...";
+
+        try {
+            var result = await supabaseClient.auth.signInWithOAuth({ provider: "google", options: getOAuthOptions() });
+            if (result.error) {
+                googleLoginBtn.disabled = false;
+                if (githubLoginBtn) githubLoginBtn.disabled = false;
+                message.textContent = "❌ " + result.error.message;
+            }
+        } catch (error) {
+            googleLoginBtn.disabled = false;
+            if (githubLoginBtn) githubLoginBtn.disabled = false;
+            message.textContent = "❌ Google login failed.";
+            console.log("Google OAuth error:", error);
+        }
+    };
+}
+
+if (githubLoginBtn) {
+    githubLoginBtn.onclick = async function () {
+        if (!supabaseClient) { message.textContent = "❌ Supabase could not be loaded."; return; }
+        githubLoginBtn.disabled = true;
+        if (googleLoginBtn) googleLoginBtn.disabled = true;
+        message.textContent = "Verifying security check...";
+
+        var token = await runHCaptcha(hcaptchaLoginWidgetId);
+        if (!token) { githubLoginBtn.disabled = false; if (googleLoginBtn) googleLoginBtn.disabled = false; message.textContent = "❌ Security verification failed. Please try again."; return; }
+
+        var verified = await verifyHCaptchaToken(token);
+        if (!verified) { githubLoginBtn.disabled = false; if (googleLoginBtn) googleLoginBtn.disabled = false; message.textContent = "❌ Security verification failed. Please try again."; return; }
+
+        message.textContent = "Opening GitHub...";
+
+        try {
+            var result = await supabaseClient.auth.signInWithOAuth({ provider: "github", options: getOAuthOptions() });
+            if (result.error) {
+                githubLoginBtn.disabled = false;
+                if (googleLoginBtn) googleLoginBtn.disabled = false;
+                message.textContent = "❌ " + result.error.message;
+            }
+        } catch (error) {
+            githubLoginBtn.disabled = false;
+            if (googleLoginBtn) googleLoginBtn.disabled = false;
+            message.textContent = "❌ GitHub login failed.";
+            console.log("GitHub OAuth error:", error);
+        }
+    };
+}
 
 async function handleOAuthCallbackSession() {
+    if (!supabaseClient || !isOAuthCallback()) return false;
 
-    if (!supabaseClient) {
-        return false;
-    }
+    var waitCount = 0;
+    var session = null;
 
-    if (
-        !isOAuthCallback()
-    ) {
-        return false;
-    }
-
-    var waitCount =
-        0;
-
-    var session =
-        null;
-
-    while (
-        waitCount <
-        20
-    ) {
-
-        var result =
-            await supabaseClient.auth
-                .getSession();
-
-        if (
-            result.data &&
-            result.data.session
-        ) {
-
-            session =
-                result.data.session;
-
-            break;
-        }
-
-        await new Promise(
-            function (
-                resolve
-            ) {
-
-                setTimeout(
-                    resolve,
-                    250
-                );
-            }
-        );
-
+    while (waitCount < 20) {
+        var result = await supabaseClient.auth.getSession();
+        if (result.data && result.data.session) { session = result.data.session; break; }
+        await new Promise(function (resolve) { setTimeout(resolve, 250); });
         waitCount++;
     }
 
-    if (
-        !session ||
-        !session.user
-    ) {
+    if (!session || !session.user) return false;
 
-        return false;
-    }
+    var provider = getOAuthProvider(session.user);
+    if (provider !== "google" && provider !== "github") return false;
 
-    var provider =
-        getOAuthProvider(
-            session.user
-        );
+    if (provider === "google") { googleOAuthLogin = true; githubOAuthLogin = false; await handleOAuthUser(session.user, "google"); }
+    else { githubOAuthLogin = true; googleOAuthLogin = false; await handleOAuthUser(session.user, "github"); }
 
-    if (
-        provider !==
-        "google" &&
-        provider !==
-        "github"
-    ) {
-
-        return false;
-    }
-
-    if (
-        provider ===
-        "google"
-    ) {
-
-        googleOAuthLogin =
-            true;
-
-        githubOAuthLogin =
-            false;
-
-        await handleGoogleUser(
-            session.user
-        );
-
-    } else {
-
-        githubOAuthLogin =
-            true;
-
-        googleOAuthLogin =
-            false;
-
-        await handleGithubUser(
-            session.user
-        );
-    }
-
-    try {
-
-        window.history.replaceState(
-            {},
-            document.title,
-            OAUTH_REDIRECT_URL
-        );
-
-    } catch (error) {
-
-        console.log(
-            "OAuth URL cleanup skipped:",
-            error
-        );
-    }
+    try { window.history.replaceState({}, document.title, OAUTH_REDIRECT_URL); }
+    catch (error) { console.log("OAuth URL cleanup skipped:", error); }
 
     return true;
 }
 
 /* =====================================================
-SUPABASE SESSION
+   PROFILE
+===================================================== */
+
+async function createOrUpdateProfile(user, userPhone) {
+    if (!supabaseClient || !user) return null;
+
+    var defaultUsername = "USER";
+    if (user.user_metadata && user.user_metadata.full_name) defaultUsername = user.user_metadata.full_name;
+    else if (user.user_metadata && user.user_metadata.name) defaultUsername = user.user_metadata.name;
+
+    var result = await supabaseClient.from("profiles").select("id, username, birthday, phone, profile_picture").eq("id", user.id).maybeSingle();
+
+    if (result.error) { console.log("Profile select error:", result.error.message); return null; }
+
+    if (result.data) {
+        if (userPhone && result.data.phone !== userPhone) {
+            var updateResult = await supabaseClient.from("profiles").update({ phone: userPhone }).eq("id", user.id);
+            if (updateResult.error) console.log("Phone update error:", updateResult.error.message);
+        }
+        currentProfile = result.data;
+        return result.data;
+    }
+
+    var insertResult = await supabaseClient.from("profiles").insert({
+        id: user.id, username: defaultUsername, phone: userPhone || "", birthday: null, profile_picture: null
+    }).select("id, username, birthday, phone, profile_picture").single();
+
+    if (insertResult.error) { console.log("Profile insert error:", insertResult.error.message); return null; }
+
+    currentProfile = insertResult.data;
+    return insertResult.data;
+}
+
+async function loadProfile() {
+    if (!supabaseClient || !currentUser) return null;
+    var result = await supabaseClient.from("profiles").select("id, username, birthday, phone, profile_picture").eq("id", currentUser.id).maybeSingle();
+    if (result.error) { console.log("Profile load error:", result.error.message); return null; }
+    currentProfile = result.data;
+    return currentProfile;
+}
+
+/* Bio is optional and may not exist as a DB column — loaded/saved defensively so it never breaks the rest of the profile. */
+async function loadProfileBio() {
+    if (!supabaseClient || !currentUser) return "";
+    try {
+        var result = await supabaseClient.from("profiles").select("bio").eq("id", currentUser.id).maybeSingle();
+        if (result.error || !result.data) return "";
+        return result.data.bio || "";
+    } catch (error) {
+        return "";
+    }
+}
+
+async function saveProfileBio(bioValue) {
+    if (!supabaseClient || !currentUser) return;
+    try {
+        await supabaseClient.from("profiles").update({ bio: bioValue }).eq("id", currentUser.id);
+    } catch (error) {
+        console.log("Bio save skipped:", error);
+    }
+}
+
+async function getProfilePictureURL(path) {
+    if (!supabaseClient || !path) return "";
+    var result = await supabaseClient.storage.from(STORAGE_BUCKET).createSignedUrl(path, 3600);
+    if (result.error) { console.log("Signed URL error:", result.error.message); return ""; }
+    return result.data && result.data.signedUrl ? result.data.signedUrl : "";
+}
+
+async function updateProfile() {
+    if (!currentUser) return;
+
+    var profile = await loadProfile();
+    if (!profile) profile = await createOrUpdateProfile(currentUser, currentAccountPhone);
+
+    if (!profile) { if (profileMessage) profileMessage.textContent = "⚠️ Profile data could not be loaded."; return; }
+
+    currentProfile = profile;
+
+    if (profileDisplayName) profileDisplayName.textContent = profile.username || "USER";
+    if (profileDisplayEmail) profileDisplayEmail.textContent = currentUser.email || "-";
+    if (profileDisplayPhone) profileDisplayPhone.textContent = profile.phone || currentAccountPhone || "-";
+
+    if (profileNameInput) profileNameInput.value = profile.username || "";
+    if (profileBirthdayInput) profileBirthdayInput.value = profile.birthday || "";
+    if (profileBioInput) profileBioInput.value = await loadProfileBio();
+
+    if (profile.profile_picture) {
+        var pictureURL = await getProfilePictureURL(profile.profile_picture);
+        if (pictureURL && profilePicture) {
+            profilePicture.src = pictureURL;
+            profilePicture.style.display = "block";
+            if (profilePicturePlaceholder) profilePicturePlaceholder.style.display = "none";
+        }
+    } else {
+        if (profilePicture) { profilePicture.src = ""; profilePicture.style.display = "none"; }
+        if (profilePicturePlaceholder) profilePicturePlaceholder.style.display = "block";
+    }
+}
+
+if (saveProfileBtn) {
+    saveProfileBtn.onclick = async function () {
+        if (!supabaseClient || !currentUser) return;
+
+        var username = profileNameInput ? profileNameInput.value.trim() : "";
+        var birthday = profileBirthdayInput ? profileBirthdayInput.value : "";
+        var bio = profileBioInput ? profileBioInput.value.trim() : "";
+
+        if (username === "") { profileMessage.textContent = "Please enter a name."; return; }
+        if (username.length > 30) { profileMessage.textContent = "Name must be 30 characters or less."; return; }
+
+        saveProfileBtn.disabled = true;
+        profileMessage.textContent = "Saving...";
+
+        var result = await supabaseClient.from("profiles").upsert({
+            id: currentUser.id, username: username, birthday: birthday || null, phone: currentAccountPhone || ""
+        }).select("id, username, birthday, phone, profile_picture").single();
+
+        if (result.error) { saveProfileBtn.disabled = false; profileMessage.textContent = "❌ " + result.error.message; return; }
+
+        currentProfile = result.data;
+        await saveProfileBio(bio);
+        await updateProfile();
+
+        saveProfileBtn.disabled = false;
+        profileMessage.textContent = "✔️ Profile updated successfully.";
+    };
+}
+
+if (profilePictureInput) {
+    profilePictureInput.onchange = async function () {
+        var file = profilePictureInput.files[0];
+        if (!file) return;
+        if (!currentUser) { alert("Please login first."); return; }
+        if (!file.type.startsWith("image/")) { alert("Please select an image."); return; }
+        if (file.size > 5 * 1024 * 1024) { alert("Please select an image smaller than 5 MB."); return; }
+
+        var extension = "jpg";
+        if (file.type === "image/png") extension = "png";
+        else if (file.type === "image/webp") extension = "webp";
+        else if (file.type === "image/gif") extension = "gif";
+
+        var path = currentUser.id + "/profile-picture." + extension;
+        profileMessage.textContent = "Uploading profile picture...";
+
+        var uploadResult = await supabaseClient.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: true, contentType: file.type });
+        if (uploadResult.error) { profileMessage.textContent = "❌ Upload failed: " + uploadResult.error.message; profilePictureInput.value = ""; return; }
+
+        var updateResult = await supabaseClient.from("profiles").update({ profile_picture: path }).eq("id", currentUser.id);
+        if (updateResult.error) { profileMessage.textContent = "❌ Picture saved, but profile update failed: " + updateResult.error.message; return; }
+
+        profilePictureInput.value = "";
+        await updateProfile();
+        profileMessage.textContent = "✔️ Profile picture updated successfully.";
+        await updateStorage();
+    };
+}
+
+/* =====================================================
+   ACCOUNTS (profile page list)
+===================================================== */
+
+function displayAccounts() {
+    if (!accountList) return;
+    var accounts = getRememberedAccounts();
+    accountList.innerHTML = "";
+
+    if (accounts.length === 0) { accountList.textContent = "No saved accounts."; return; }
+
+    for (var i = 0; i < accounts.length; i++) {
+        var account = accounts[i] || {};
+        var item = document.createElement("div");
+        item.className = "account-item";
+
+        var info = document.createElement("div");
+        info.className = "account-item-info";
+        info.innerHTML =
+            '<div class="account-item-name">' + escapeHTML(account.email || "ACCOUNT") + "</div>" +
+            '<div class="account-item-email">' + escapeHTML(account.phone || "") + "</div>";
+        item.appendChild(info);
+
+        if (currentUser && currentUser.email && account.email && account.email.toLowerCase() === currentUser.email.toLowerCase()) {
+            var current = document.createElement("div");
+            current.className = "current-account-label";
+            current.textContent = "CURRENT";
+            item.appendChild(current);
+        } else {
+            var switchButton = document.createElement("button");
+            switchButton.type = "button";
+            switchButton.className = "account-switch-button";
+            switchButton.textContent = "SWITCH";
+            switchButton.onclick = createSwitchHandler(account);
+            item.appendChild(switchButton);
+        }
+
+        accountList.appendChild(item);
+    }
+}
+
+function createSwitchHandler(account) {
+    return function () {
+        if (!account.email) return;
+        if (loginEmail) loginEmail.value = account.email;
+        if (loginPhone) loginPhone.value = account.phone || "";
+        if (loginPassword) loginPassword.value = "";
+        showLogin();
+        message.textContent = "Enter password for " + account.email + " to switch account.";
+    };
+}
+
+if (addAccountProfileBtn) {
+    addAccountProfileBtn.onclick = function () {
+        var accounts = getRememberedAccounts();
+        if (accounts.length >= MAX_ACCOUNTS) { alert("❌ Maximum 5 accounts allowed."); return; }
+        resetRegistrationForm();
+        if (loginEmail) loginEmail.value = "";
+        if (loginPhone) loginPhone.value = "";
+        if (loginPassword) loginPassword.value = "";
+        showRegister();
+        message.textContent = "➕ Add a new account.";
+    };
+}
+
+/* =====================================================
+   FILE TYPE HELPERS
+===================================================== */
+
+function isImageFilePath(pathValue) {
+    if (!pathValue) return false;
+    var cleanPath = String(pathValue).split("?")[0].split("#")[0].toLowerCase();
+    var parts = cleanPath.split(".");
+    var extension = parts.length > 1 ? parts[parts.length - 1] : "";
+    var imageExtensions = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"];
+    return imageExtensions.indexOf(extension) !== -1;
+}
+
+function isVideoFile(file) {
+    return !!(file && file.type && file.type.indexOf("video/") === 0);
+}
+
+function isBackblazeB2FilePath(path) {
+    return typeof path === "string" && (path.indexOf(B2_ENDPOINT) !== -1 || path.indexOf(B2_BUCKET_NAME) !== -1);
+}
+
+function isCloudinaryFilePath(path) {
+    return typeof path === "string" && path.indexOf("cloudinary.com") !== -1;
+}
+
+function getB2ObjectKeyFromUrl(url) {
+    if (!url) return "";
+    var marker = B2_BUCKET_NAME + "/";
+    var idx = url.indexOf(marker);
+    if (idx === -1) return "";
+    return url.substring(idx + marker.length).split("?")[0];
+}
+
+function createSafeFileName(name) {
+    return String(name || "file").replace(/[^a-zA-Z0-9._-]/g, "_");
+}
+
+function createSafeUploadFile(file) {
+    return file;
+}
+
+function setAddFileMessage(text, success) {
+    if (!securityAddMessage) return;
+    securityAddMessage.textContent = text;
+    securityAddMessage.style.color = success ? "#00ff66" : "#ff5050";
+}
+
+/* =====================================================
+   VIEW FILE
+===================================================== */
+
+async function viewSecurityItem(item, button) {
+    if (!supabaseClient || !currentUser || !item || !item.file_path) return;
+
+    var isImage = isImageFilePath(item.file_path);
+    var isB2File = isBackblazeB2FilePath(item.file_path);
+    var isCloudinaryFile = isCloudinaryFilePath(item.file_path);
+    var viewWindow = null;
+
+    if (isImage) {
+        viewWindow = window.open("", "_blank");
+        if (viewWindow) {
+            viewWindow.document.write("<!DOCTYPE html><html><head><title>Loading...</title><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;color:#00ff00;font-family:sans-serif;}</style></head><body>Loading...</body></html>");
+        }
+    }
+
+    var originalText = button ? button.textContent : "VIEW";
+    if (button) { button.disabled = true; button.textContent = "OPENING..."; }
+
+    var signedUrl = "";
+
+    if (isB2File || isCloudinaryFile) {
+        signedUrl = item.file_path;
+    } else {
+        var result = await supabaseClient.storage.from(STORAGE_BUCKET).createSignedUrl(item.file_path, 3600);
+        if (result.error) {
+            if (button) { button.disabled = false; button.textContent = originalText; }
+            if (viewWindow) viewWindow.close();
+            alert("❌ File could not be opened: " + result.error.message);
+            return;
+        }
+        signedUrl = result.data && result.data.signedUrl ? result.data.signedUrl : "";
+    }
+
+    if (button) { button.disabled = false; button.textContent = originalText; }
+
+    if (!signedUrl) {
+        if (viewWindow) viewWindow.close();
+        alert("❌ File URL could not be created.");
+        return;
+    }
+
+    if (isImage && viewWindow) {
+        var safeTitle = escapeHTML(item.title || "File");
+        viewWindow.document.open();
+        viewWindow.document.write(
+            "<!DOCTYPE html><html><head><title>" + safeTitle + "</title><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;}img{max-width:100%;max-height:100vh;object-fit:contain;}</style></head><body><img src=\"" + escapeHTML(signedUrl) + "\" alt=\"" + safeTitle + "\"></body></html>"
+        );
+        viewWindow.document.close();
+        return;
+    }
+
+    window.open(signedUrl, "_blank");
+}
+
+/* =====================================================
+   SAVED ITEM UI
+===================================================== */
+
+function createSecurityItemElement(item) {
+    if (!securityItemsList) return;
+
+    var itemBox = document.createElement("div");
+    itemBox.className = "security-item";
+
+    var titleElement = document.createElement("div");
+    titleElement.className = "security-item-title";
+    titleElement.textContent = item.title || "Untitled File";
+
+    var categoryElement = document.createElement("div");
+    categoryElement.className = "security-item-category";
+    categoryElement.textContent = "CATEGORY: " + (item.category || "General");
+
+    var infoBox = document.createElement("div");
+    infoBox.appendChild(titleElement);
+    infoBox.appendChild(categoryElement);
+
+    var fileName = "";
+    if (item.file_path) {
+        var pathParts = item.file_path.split("/");
+        fileName = pathParts[pathParts.length - 1];
+    }
+    if (fileName) {
+        var fileElement = document.createElement("div");
+        fileElement.className = "security-item-file";
+        fileElement.textContent = "FILE: " + fileName;
+        infoBox.appendChild(fileElement);
+    }
+
+    var knownFileSize = getStorageFileSize(item.file_path);
+    if (knownFileSize > 0) {
+        var sizeElement = document.createElement("div");
+        sizeElement.className = "security-item-file";
+        sizeElement.textContent = "SIZE: " + formatFileSize(knownFileSize);
+        infoBox.appendChild(sizeElement);
+    }
+
+    var buttonBox = document.createElement("div");
+    buttonBox.className = "security-item-actions";
+
+    var viewButton = document.createElement("button");
+    viewButton.type = "button";
+    viewButton.className = "security-view-button";
+    viewButton.textContent = "VIEW";
+    viewButton.onclick = function () { viewSecurityItem(item, viewButton); };
+
+    var editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.className = "security-edit-button";
+    editButton.textContent = "EDIT";
+    editButton.onclick = function () { editSecurityItem(item); };
+
+    var deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "security-delete-button";
+    deleteButton.textContent = "DELETE";
+    deleteButton.onclick = function () { deleteSecurityItem(item); };
+
+    buttonBox.appendChild(viewButton);
+    buttonBox.appendChild(editButton);
+    buttonBox.appendChild(deleteButton);
+
+    itemBox.appendChild(infoBox);
+    itemBox.appendChild(buttonBox);
+    securityItemsList.appendChild(itemBox);
+}
+
+/* =====================================================
+   REMOTE FILE CLEANUP
+===================================================== */
+
+async function cleanupRemoteFile(filePath) {
+    if (!supabaseClient || !currentUser || !filePath) return;
+
+    if (isBackblazeB2FilePath(filePath)) {
+        var objectKey = getB2ObjectKeyFromUrl(filePath);
+        if (!objectKey) return;
+        try {
+            await supabaseClient.functions.invoke(B2_FUNCTION_DELETE, { body: { objectKey: objectKey, userId: currentUser.id } });
+        } catch (error) { console.log("B2 cleanup error:", error); }
+        return;
+    }
+
+    if (isCloudinaryFilePath(filePath)) {
+        try {
+            await supabaseClient.functions.invoke("cloudinary-delete", { body: { fileUrl: filePath } });
+        } catch (error) { console.log("Cloudinary cleanup error:", error); }
+        return;
+    }
+
+    try {
+        await supabaseClient.storage.from(STORAGE_BUCKET).remove([filePath]);
+    } catch (error) { console.log("Storage cleanup error:", error); }
+}
+
+/* =====================================================
+   ADD PAGE — SELECT FILE
+===================================================== */
+
+if (securityFileInput) {
+    securityFileInput.onchange = function () {
+        var file = securityFileInput.files[0];
+        if (selectedFileName) selectedFileName.textContent = file ? file.name : "No file selected.";
+    };
+}
+
+/* =====================================================
+   ADD PAGE — SAVE FILE
+===================================================== */
+
+if (securityAddFileBtn) {
+    securityAddFileBtn.onclick = async function () {
+        if (!supabaseClient || !currentUser) { setAddFileMessage("❌ Please login first.", false); return; }
+        if (!securityFileInput) { setAddFileMessage("❌ File input is unavailable.", false); return; }
+
+        var file = securityFileInput.files[0];
+        var title = securityFileTitle ? securityFileTitle.value.trim() : "";
+        var category = securityFileCategory ? securityFileCategory.value : "";
+
+        if (!file) { setAddFileMessage("❌ Please select a file.", false); return; }
+        if (title === "") { setAddFileMessage("❌ Please enter a file title.", false); if (securityFileTitle) securityFileTitle.focus(); return; }
+        if (category === "") { setAddFileMessage("❌ Please select a category.", false); if (securityFileCategory) securityFileCategory.focus(); return; }
+
+        var fileSize = Number(file.size) || 0;
+        if (fileSize <= 0) { setAddFileMessage("❌ The selected file is empty or invalid.", false); return; }
+
+        var remainingBytes = getRemainingStorageBytes();
+        if (fileSize > remainingBytes) {
+            setAddFileMessage("❌ Storage quota exceeded. Free space: " + formatFileSize(remainingBytes) + " • File size: " + formatFileSize(fileSize) + " • Limit: " + USER_STORAGE_LIMIT_GB + " GB", false);
+            await updateStorage();
+            return;
+        }
+
+        var safeFile = createSafeUploadFile(file);
+        var safeFileName = createSafeFileName(file.name);
+
+        securityAddFileBtn.disabled = true;
+        var filePath = "";
+        var uploadedToB2 = false;
+        var uploadedToCloudinary = false;
+        var usageWasAdded = false;
+
+        try {
+            if (isVideoFile(file)) {
+                setAddFileMessage("Uploading video to Backblaze B2...", true);
+
+                var b2FormData = new FormData();
+                b2FormData.append("file", safeFile, safeFileName);
+                b2FormData.append("userId", currentUser.id);
+
+                var b2Result = await supabaseClient.functions.invoke(B2_FUNCTION_UPLOAD, { body: b2FormData });
+                if (b2Result.error) { securityAddFileBtn.disabled = false; setAddFileMessage("❌ B2 upload failed: " + b2Result.error.message, false); return; }
+
+                var b2Data = b2Result.data || {};
+                if (!b2Data.success || !b2Data.url) { securityAddFileBtn.disabled = false; setAddFileMessage("❌ B2 video upload failed: " + (b2Data.error || "Unknown error"), false); return; }
+
+                filePath = b2Data.url;
+                uploadedToB2 = true;
+            } else {
+                setAddFileMessage("Uploading file to Cloudinary...", true);
+
+                var cloudinaryFormData = new FormData();
+                cloudinaryFormData.append("file", safeFile, safeFileName);
+                cloudinaryFormData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+                cloudinaryFormData.append("folder", CLOUDINARY_FOLDER);
+
+                var cloudinaryResponse = await fetch("https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload", { method: "POST", body: cloudinaryFormData });
+                var cloudinaryData = await cloudinaryResponse.json();
+
+                if (!cloudinaryResponse.ok || !cloudinaryData.secure_url) {
+                    securityAddFileBtn.disabled = false;
+                    setAddFileMessage("❌ Cloudinary upload failed: " + (cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : "Unknown error"), false);
+                    return;
+                }
+
+                filePath = cloudinaryData.secure_url;
+                uploadedToCloudinary = true;
+            }
+
+            setAddFileMessage("Saving file information...", true);
+
+            var insertResult = await supabaseClient.from("security_items").insert({ user_id: currentUser.id, title: title, category: category, file_path: filePath });
+
+            if (insertResult.error) {
+                await cleanupRemoteFile(filePath);
+                securityAddFileBtn.disabled = false;
+                setAddFileMessage("❌ File information could not be saved: " + insertResult.error.message, false);
+                return;
+            }
+
+            saveStorageFileSize(filePath, fileSize);
+            increaseTrackedStorageUsage(fileSize);
+            usageWasAdded = true;
+
+            if (securityFileInput) securityFileInput.value = "";
+            if (selectedFileName) selectedFileName.textContent = "No file selected.";
+            if (securityFileTitle) securityFileTitle.value = "";
+            if (securityFileCategory) securityFileCategory.value = "";
+
+            securityAddFileBtn.disabled = false;
+            setAddFileMessage(uploadedToB2 ? "✔️ Video saved successfully to Backblaze B2." : uploadedToCloudinary ? "✔️ File saved successfully to Cloudinary." : "✔️ File saved successfully.", true);
+
+            await loadSecurityItems();
+            await updateStorage();
+        } catch (error) {
+            console.log("Save security item error:", error);
+            if (filePath && !usageWasAdded) await cleanupRemoteFile(filePath);
+            securityAddFileBtn.disabled = false;
+            setAddFileMessage("❌ File save failed: " + (error && error.message ? error.message : "Unknown error"), false);
+        }
+    };
+}
+
+async function loadSecurityItems() {
+    if (!supabaseClient || !currentUser || !securityItemsList) return;
+
+    securityItemsList.innerHTML = "";
+
+    var result = await supabaseClient.from("security_items").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false });
+
+    if (result.error) {
+        console.log("Load security items error:", result.error.message);
+        securityItemsList.innerHTML = '<div class="add-file-name">Could not load saved data.</div>';
+        return;
+    }
+
+    var items = result.data || [];
+    if (items.length === 0) { securityItemsList.innerHTML = '<div class="add-file-name">No saved data yet.</div>'; return; }
+
+    items.forEach(function (item) { createSecurityItemElement(item); });
+}
+
+/* =====================================================
+   EDIT FILE
+===================================================== */
+
+async function editSecurityItem(item) {
+    if (!supabaseClient || !currentUser || !item) return;
+
+    var newTitle = window.prompt("Enter new file title:", item.title || "");
+    if (newTitle === null) return;
+    newTitle = newTitle.trim();
+    if (newTitle === "") { alert("File title cannot be empty."); return; }
+
+    var allowedCategories = ["General", "Security", "Documents", "Videos", "Images", "Other"];
+    var newCategory = window.prompt("Enter category:\n\n" + allowedCategories.join(", "), item.category || "");
+    if (newCategory === null) return;
+    newCategory = newCategory.trim();
+
+    if (allowedCategories.indexOf(newCategory) === -1) { alert("Please use one of the available categories."); return; }
+    if (!window.confirm("Update this file information?")) return;
+
+    var result = await supabaseClient.from("security_items").update({ title: newTitle, category: newCategory }).eq("id", item.id).eq("user_id", currentUser.id);
+
+    if (result.error) { alert("❌ Update failed: " + result.error.message); return; }
+
+    setAddFileMessage("✔️ File information updated.", true);
+    await loadSecurityItems();
+}
+
+/* =====================================================
+   DELETE FILE
+===================================================== */
+
+async function deleteSecurityItem(item) {
+    if (!supabaseClient || !currentUser || !item) return;
+    if (!window.confirm("Delete this saved file?\n\nThe file and its saved information will be removed.")) return;
+
+    var remoteDeleteFailed = false;
+    var ledgerSize = getStorageFileSize(item.file_path);
+    var databaseFileSize = Number(item.file_size) || 0;
+    var trackedFileSize = ledgerSize > 0 ? ledgerSize : databaseFileSize;
+
+    if (item.file_path && isBackblazeB2FilePath(item.file_path)) {
+        var objectKey = getB2ObjectKeyFromUrl(item.file_path);
+        if (!objectKey) { alert("❌ B2 object key could not be detected."); return; }
+
+        var b2DeleteResult = await supabaseClient.functions.invoke(B2_FUNCTION_DELETE, { body: { objectKey: objectKey, userId: currentUser.id } });
+        if (b2DeleteResult.error || (b2DeleteResult.data && b2DeleteResult.data.success === false)) {
+            remoteDeleteFailed = true;
+            if (!window.confirm("The B2 video could not be removed.\n\nDo you still want to remove its saved information?")) return;
+        }
+    } else if (item.file_path && isCloudinaryFilePath(item.file_path)) {
+        var cloudinaryDeleteResult = await supabaseClient.functions.invoke("cloudinary-delete", { body: { fileUrl: item.file_path } });
+        if (cloudinaryDeleteResult.error || (cloudinaryDeleteResult.data && cloudinaryDeleteResult.data.success === false)) {
+            remoteDeleteFailed = true;
+            if (!window.confirm("The cloud file could not be removed.\n\nDo you still want to remove its saved information?")) return;
+        }
+    } else if (item.file_path) {
+        var storageResult = await supabaseClient.storage.from(STORAGE_BUCKET).remove([item.file_path]);
+        if (storageResult.error) {
+            remoteDeleteFailed = true;
+            if (!window.confirm("The cloud file could not be removed.\n\nDo you still want to remove its saved information?")) return;
+        }
+    }
+
+    var databaseResult = await supabaseClient.from("security_items").delete().eq("id", item.id).eq("user_id", currentUser.id);
+    if (databaseResult.error) { alert("❌ Saved file information could not be deleted: " + databaseResult.error.message); return; }
+
+    var removedLedgerSize = removeStorageFileSize(item.file_path);
+    if (trackedFileSize <= 0 && removedLedgerSize > 0) trackedFileSize = removedLedgerSize;
+    if (trackedFileSize > 0) decreaseTrackedStorageUsage(trackedFileSize);
+
+    await reconcileStorageUsage();
+
+    setAddFileMessage(remoteDeleteFailed ? "⚠️ Saved information deleted, but the cloud file may still exist." : "✔️ File deleted successfully.", !remoteDeleteFailed);
+
+    await loadSecurityItems();
+    await updateStorage();
+}
+
+/* =====================================================
+   HOME TAB — LOGIN HISTORY TOGGLE + CLEAR
+===================================================== */
+
+if (loginHistoryToggleBtn) {
+    loginHistoryToggleBtn.onclick = function () {
+        var isOpen = loginHistoryPanel && loginHistoryPanel.classList.contains("open");
+
+        if (isOpen) {
+            loginHistoryPanel.classList.remove("open");
+            if (loginHistoryArrow) loginHistoryArrow.classList.remove("rotated");
+        } else {
+            displayLoginHistory();
+            if (loginHistoryPanel) loginHistoryPanel.classList.add("open");
+            if (loginHistoryArrow) loginHistoryArrow.classList.add("rotated");
+        }
+    };
+}
+
+if (clearHistoryBtn) {
+    clearHistoryBtn.onclick = function () {
+        if (!currentUser) return;
+        if (!window.confirm("Clear all login history?")) return;
+        saveLoginHistory([]);
+        displayLoginHistory();
+    };
+}
+
+/* =====================================================
+   HOME TAB — CHANGE PASSWORD (inline panel, real save)
+===================================================== */
+
+if (changePasswordToggleBtn) {
+    changePasswordToggleBtn.onclick = function () {
+        var isOpen = changePasswordPanel && changePasswordPanel.classList.contains("open");
+
+        if (isOpen) {
+            changePasswordPanel.classList.remove("open");
+            if (changePasswordArrow) changePasswordArrow.classList.remove("rotated");
+        } else {
+            if (currentPasswordField) currentPasswordField.value = "";
+            if (newPasswordField) newPasswordField.value = "";
+            if (confirmNewPasswordField) confirmNewPasswordField.value = "";
+            if (changePasswordHomeMessage) changePasswordHomeMessage.textContent = "";
+            if (changePasswordPanel) changePasswordPanel.classList.add("open");
+            if (changePasswordArrow) changePasswordArrow.classList.add("rotated");
+        }
+    };
+}
+
+if (savePasswordChangeBtn) {
+    savePasswordChangeBtn.onclick = async function () {
+        if (!supabaseClient || !currentUser) { if (changePasswordHomeMessage) changePasswordHomeMessage.textContent = "❌ Please login first."; return; }
+
+        var oldPass = currentPasswordField ? currentPasswordField.value : "";
+        var newPass = newPasswordField ? newPasswordField.value : "";
+        var confirmPass = confirmNewPasswordField ? confirmNewPasswordField.value : "";
+
+        if (oldPass === "") { changePasswordHomeMessage.textContent = "Please enter your current password."; return; }
+        if (newPass === "" || newPass.length < 6) { changePasswordHomeMessage.textContent = "New password must be at least 6 characters."; return; }
+        if (newPass !== confirmPass) { changePasswordHomeMessage.textContent = "❌ New passwords do not match."; return; }
+        if (oldPass === newPass) { changePasswordHomeMessage.textContent = "New password must be different from current password."; return; }
+
+        savePasswordChangeBtn.disabled = true;
+        changePasswordHomeMessage.textContent = "Verifying current password...";
+
+        try {
+            var verify = await supabaseClient.auth.signInWithPassword({ email: currentUser.email, password: oldPass });
+            if (verify.error) { savePasswordChangeBtn.disabled = false; changePasswordHomeMessage.textContent = "❌ Current password is incorrect."; return; }
+
+            changePasswordHomeMessage.textContent = "Updating password...";
+            var update = await supabaseClient.auth.updateUser({ password: newPass });
+            if (update.error) { savePasswordChangeBtn.disabled = false; changePasswordHomeMessage.textContent = "❌ " + update.error.message; return; }
+
+            savePasswordChangeBtn.disabled = false;
+            if (currentPasswordField) currentPasswordField.value = "";
+            if (newPasswordField) newPasswordField.value = "";
+            if (confirmNewPasswordField) confirmNewPasswordField.value = "";
+            changePasswordHomeMessage.textContent = "✔️ Password changed successfully.";
+        } catch (error) {
+            savePasswordChangeBtn.disabled = false;
+            console.log("Password change error:", error);
+            changePasswordHomeMessage.textContent = "❌ Password change failed.";
+        }
+    };
+}
+
+/* =====================================================
+   CHANGE PASSWORD (settings page — uses prompts, since
+   that panel has no dedicated input fields)
+===================================================== */
+
+async function doPasswordChangeFlow() {
+    if (!supabaseClient || !currentUser) { alert("Please login first."); return; }
+
+    var oldPass = window.prompt("Enter your current password:");
+    if (oldPass === null) return;
+    if (oldPass === "") { alert("Current password is required."); return; }
+
+    var newPass = window.prompt("Enter your new password (min 6 characters):");
+    if (newPass === null) return;
+    if (!newPass || newPass.length < 6) { alert("New password must be at least 6 characters."); return; }
+
+    var confirmPass = window.prompt("Confirm your new password:");
+    if (confirmPass === null) return;
+    if (newPass !== confirmPass) { alert("New passwords do not match."); return; }
+    if (oldPass === newPass) { alert("New password must be different from your current password."); return; }
+
+    var verify = await supabaseClient.auth.signInWithPassword({ email: currentUser.email, password: oldPass });
+    if (verify.error) { alert("❌ Current password is incorrect."); return; }
+
+    var update = await supabaseClient.auth.updateUser({ password: newPass });
+    if (update.error) { alert("❌ Password change failed: " + update.error.message); return; }
+
+    alert("✔️ Password changed successfully.");
+}
+
+if (settingsChangePasswordBtn) settingsChangePasswordBtn.onclick = doPasswordChangeFlow;
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+if (logoutBtn) {
+    logoutBtn.onclick = async function () {
+        if (!window.confirm("Sign out of Cyber Core?")) return;
+        if (supabaseClient) await supabaseClient.auth.signOut();
+        currentUser = null;
+        currentProfile = null;
+        currentAccountEmail = "";
+        currentAccountPhone = "";
+        googleOAuthLogin = false;
+        githubOAuthLogin = false;
+        closeSecurityCenter();
+        showLogin();
+    };
+}
+
+/* =====================================================
+   REMOVE ACCOUNT (settings — permanent deletion)
+===================================================== */
+
+async function cleanupCurrentUserFiles() {
+    if (!supabaseClient || !currentUser) return;
+    try {
+        var result = await supabaseClient.from("security_items").select("file_path").eq("user_id", currentUser.id);
+        if (!result.error) {
+            var items = result.data || [];
+            for (var i = 0; i < items.length; i++) {
+                if (items[i] && items[i].file_path) await cleanupRemoteFile(items[i].file_path);
+            }
+        }
+        await supabaseClient.from("security_items").delete().eq("user_id", currentUser.id);
+    } catch (error) { console.log("cleanupCurrentUserFiles error:", error); }
+}
+
+async function cleanupCurrentUserStorage() {
+    if (!supabaseClient || !currentUser) return;
+    try {
+        var listResult = await supabaseClient.storage.from(STORAGE_BUCKET).list(currentUser.id, { limit: 1000, offset: 0 });
+        if (listResult.error) { console.log("Storage list cleanup error:", listResult.error.message); return; }
+
+        var files = listResult.data || [];
+        if (files.length === 0) return;
+
+        var paths = [];
+        for (var i = 0; i < files.length; i++) {
+            if (files[i] && files[i].name) paths.push(currentUser.id + "/" + files[i].name);
+        }
+
+        if (paths.length > 0) {
+            var removeResult = await supabaseClient.storage.from(STORAGE_BUCKET).remove(paths);
+            if (removeResult.error) console.log("Storage cleanup error:", removeResult.error.message);
+        }
+    } catch (error) { console.log("Storage cleanup exception:", error); }
+}
+
+async function cleanupCurrentUserProfile() {
+    if (!supabaseClient || !currentUser) return;
+    try {
+        var result = await supabaseClient.from("profiles").delete().eq("id", currentUser.id);
+        if (result.error) console.log("Profile cleanup error:", result.error.message);
+    } catch (error) { console.log("Profile cleanup exception:", error); }
+}
+
+async function deleteCurrentAuthUser() {
+    if (!supabaseClient || !currentUser) return { error: new Error("No active user.") };
+    try {
+        var result = await supabaseClient.functions.invoke("delete-user", { body: { user_id: currentUser.id } });
+        if (result.error) return { error: result.error };
+        return { data: result.data || null, error: null };
+    } catch (error) {
+        return { error: error };
+    }
+}
+
+async function doRemoveAccountFlow() {
+    if (!supabaseClient || !currentUser) { if (removeAccountMessage) removeAccountMessage.textContent = "❌ Please login first."; return; }
+    if (!window.confirm("This will PERMANENTLY delete your account and all saved data.\n\nAre you sure you want to continue?")) return;
+
+    var password = window.prompt("Enter your password to confirm account deletion:");
+    if (password === null) return;
+    if (!password) { if (removeAccountMessage) removeAccountMessage.textContent = "Password is required."; return; }
+
+    if (removeAccountMessage) removeAccountMessage.textContent = "Verifying...";
+
+    var verify = await supabaseClient.auth.signInWithPassword({ email: currentUser.email, password: password });
+    if (verify.error) { if (removeAccountMessage) removeAccountMessage.textContent = "❌ Password is incorrect."; return; }
+
+    if (removeAccountMessage) removeAccountMessage.textContent = "Removing account data...";
+
+    var emailToForget = currentUser.email;
+
+    await cleanupCurrentUserFiles();
+    await cleanupCurrentUserStorage();
+    await cleanupCurrentUserProfile();
+
+    var del = await deleteCurrentAuthUser();
+    if (del.error) { if (removeAccountMessage) removeAccountMessage.textContent = "❌ " + del.error.message; return; }
+
+    removeRememberedAccount(emailToForget);
+
+    currentUser = null;
+    currentProfile = null;
+    currentAccountEmail = "";
+    currentAccountPhone = "";
+    googleOAuthLogin = false;
+    githubOAuthLogin = false;
+
+    if (dashboard) dashboard.style.display = "none";
+    document.body.style.overflow = "";
+    closeSecurityCenter();
+
+    showLogin();
+    message.textContent = "✔️ Account removed successfully.";
+}
+
+if (removeAccountBtn) removeAccountBtn.onclick = doRemoveAccountFlow;
+
+/* =====================================================
+   SECURITY STATUS CONTENT (shared by panel + page)
+===================================================== */
+
+function buildSecurityStatus() {
+    if (!currentUser) return { account: "NOT LOGGED IN", session: "—", storage: "—" };
+    var provider = getOAuthProvider(currentUser);
+    var method = provider === "google" ? "GOOGLE" : provider === "github" ? "GITHUB" : "PASSWORD";
+    return {
+        account: "ACTIVE (" + method + ")",
+        session: "SECURE",
+        storage: formatFileSize(getTrackedStorageUsage()) + " / " + USER_STORAGE_LIMIT_GB + " GB"
+    };
+}
+
+function buildActivityRowsHTML(limit) {
+    var history = getLoginHistory();
+    var rows = [];
+    var max = Math.min(history.length, limit || 5);
+
+    for (var i = 0; i < max; i++) {
+        var item = history[i] || {};
+        rows.push(
+            '<div class="security-activity-item"><div class="security-activity-email">' + escapeHTML(item.email || "") +
+            '</div><div class="security-activity-time">' + escapeHTML(item.date || "") + " • " + escapeHTML(item.time || "") + "</div></div>"
+        );
+    }
+    return rows.join("");
+}
+
+function updateSecurityCenterPanel() {
+    var status = buildSecurityStatus();
+    if (securityStatusAccount) securityStatusAccount.textContent = status.account;
+    if (securityStatusSession) securityStatusSession.textContent = status.session;
+    if (securityStatusStorage) securityStatusStorage.textContent = status.storage;
+
+    var rowsHtml = buildActivityRowsHTML(5);
+    if (securityCenterActivity) securityCenterActivity.innerHTML = rowsHtml;
+    if (securityCenterActivityEmpty) securityCenterActivityEmpty.style.display = rowsHtml ? "none" : "block";
+}
+
+function updateSecurityPage() {
+    var status = buildSecurityStatus();
+    if (securityAccountStatus) {
+        securityAccountStatus.textContent = "Account: " + status.account + " • Session: " + status.session + " • Storage: " + status.storage;
+    }
+    var rowsHtml = buildActivityRowsHTML(10);
+    if (securityActivityList) securityActivityList.innerHTML = rowsHtml || '<div class="security-alert">No recent security activity.</div>';
+}
+
+/* =====================================================
+   SECURITY CENTER (slide-out panel)
+===================================================== */
+
+function openSecurityCenter() {
+    if (!securityCenterPanel || !securityCenterOverlay) return;
+    updateSecurityCenterPanel();
+    securityCenterPanel.classList.add("show-security-panel");
+    securityCenterOverlay.classList.add("show-security-overlay");
+}
+
+function closeSecurityCenter() {
+    if (securityCenterPanel) securityCenterPanel.classList.remove("show-security-panel");
+    if (securityCenterOverlay) securityCenterOverlay.classList.remove("show-security-overlay");
+}
+
+function setupSecurityCenter() {
+    if (securityCenterInitialized) return;
+    securityCenterInitialized = true;
+
+    if (securityMenuButton) {
+        securityMenuButton.onclick = function () {
+            if (securityCenterPanel && securityCenterPanel.classList.contains("show-security-panel")) closeSecurityCenter();
+            else openSecurityCenter();
+        };
+    }
+
+    if (securityCenterOverlay) securityCenterOverlay.onclick = function () { closeSecurityCenter(); };
+    if (securityCenterClose) securityCenterClose.onclick = function () { closeSecurityCenter(); };
+
+    if (securityRefreshBtn) {
+        securityRefreshBtn.onclick = function () {
+            updateSecurityCenterPanel();
+            updateSecurityPage();
+            if (securityCenterMessage) securityCenterMessage.textContent = "✔️ Security status refreshed.";
+        };
+    }
+
+    if (securityLogoutBtn) {
+        securityLogoutBtn.onclick = async function () {
+            if (!window.confirm("Sign out of Cyber Core?")) return;
+            if (supabaseClient) await supabaseClient.auth.signOut();
+            currentUser = null;
+            currentProfile = null;
+            currentAccountEmail = "";
+            currentAccountPhone = "";
+            googleOAuthLogin = false;
+            githubOAuthLogin = false;
+            closeSecurityCenter();
+            showLogin();
+        };
+    }
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && securityCenterPanel && securityCenterPanel.classList.contains("show-security-panel")) closeSecurityCenter();
+    });
+}
+
+/* =====================================================
+   DASHBOARD + NAVIGATION
+===================================================== */
+
+function activateHome() {
+    var navItems = document.querySelectorAll(".magic-nav .nav-item");
+    var pages = document.querySelectorAll(".dashboard-page");
+
+    for (var i = 0; i < navItems.length; i++) navItems[i].classList.remove("active");
+    for (var j = 0; j < pages.length; j++) pages[j].classList.remove("active-page");
+
+    var homeNav = document.querySelector('.nav-item[data-page="homePage"]');
+    var homePage = document.getElementById("homePage");
+
+    if (homeNav) homeNav.classList.add("active");
+    if (homePage) homePage.classList.add("active-page");
+}
+
+function setupNavigation() {
+    var navItems = document.querySelectorAll(".magic-nav .nav-item");
+    var pages = document.querySelectorAll(".dashboard-page");
+
+    for (var i = 0; i < navItems.length; i++) {
+        (function (currentNav) {
+            currentNav.onclick = async function () {
+                var pageId = currentNav.getAttribute("data-page");
+
+                for (var j = 0; j < navItems.length; j++) navItems[j].classList.remove("active");
+                for (var k = 0; k < pages.length; k++) pages[k].classList.remove("active-page");
+
+                currentNav.classList.add("active");
+
+                var target = document.getElementById(pageId);
+                if (target) {
+                    target.classList.add("active-page");
+                    var scrollArea = target.querySelector(".home-scroll, .profile-scroll, .add-scroll, .setting-scroll");
+                    if (scrollArea) scrollArea.scrollTop = 0;
+                }
+
+                if (pageId === "homePage") { displayLoginHistory(); await updateStorage(); }
+                if (pageId === "addPage") { await loadSecurityItems(); await updateStorage(); }
+                if (pageId === "profilePage") { await updateProfile(); displayAccounts(); }
+                if (pageId === "securityPage") { updateSecurityPage(); }
+            };
+        })(navItems[i]);
+    }
+}
+
+async function showDashboard() {
+    if (!dashboard || !currentUser) { showLogin(); return; }
+
+    if (container) container.style.display = "none";
+    dashboard.style.display = "block";
+    document.body.style.overflow = "hidden";
+
+    setupSecurityCenter();
+    activateHome();
+
+    await updateProfile();
+    displayLoginHistory();
+    await updateStorage();
+    updateSecurityPage();
+
+    var homeScroll = document.querySelector("#homePage .home-scroll");
+    if (homeScroll) homeScroll.scrollTop = 0;
+}
+
+/* =====================================================
+   SESSION HANDLING
 ===================================================== */
 
 async function checkExistingSession() {
+    if (!supabaseClient) { showLogin(); message.textContent = "❌ Supabase could not be loaded."; return; }
 
-    if (!supabaseClient) {
+    if (isOAuthCallback()) {
+        var callbackHandled = await handleOAuthCallbackSession();
+        if (callbackHandled) return;
+    }
 
-        showRegister();
+    var sessionResult = await supabaseClient.auth.getSession();
 
-        message.textContent =
-            "❌ Supabase could not be loaded.";
-
+    if (sessionResult.error) {
+        console.log("Session check error:", sessionResult.error.message);
+        showLogin();
+        message.textContent = "Please login to continue❗";
         return;
     }
 
-    if (
-        isOAuthCallback()
-    ) {
+    var session = sessionResult.data && sessionResult.data.session ? sessionResult.data.session : null;
 
-        var callbackHandled =
-            await handleOAuthCallbackSession();
-
-        if (
-            callbackHandled
-        ) {
-
-            return;
-        }
+    if (session && session.user && isOAuthUser(session.user)) {
+        var provider = getOAuthProvider(session.user);
+        if (provider === "google") { googleOAuthLogin = true; githubOAuthLogin = false; await handleOAuthUser(session.user, "google"); return; }
+        if (provider === "github") { githubOAuthLogin = true; googleOAuthLogin = false; await handleOAuthUser(session.user, "github"); return; }
     }
 
-    var sessionResult =
-        await supabaseClient.auth
-            .getSession();
+    if (session && session.user) {
+        currentUser = session.user;
+        currentAccountEmail = session.user.email || "";
+        currentAccountPhone = session.user.phone || "";
+        verifiedEmail = currentAccountEmail;
+        verifiedPhone = currentAccountPhone;
+        googleOAuthLogin = false;
+        githubOAuthLogin = false;
 
-    if (
-        sessionResult.error
-    ) {
+        rememberAccount(currentAccountEmail, currentAccountPhone);
+        await createOrUpdateProfile(currentUser, currentAccountPhone);
 
-        console.log(
-            "Session check error:",
-            sessionResult.error.message
-        );
-
-        showLogin();
-
-        message.textContent =
-            "Please login to continue❗";
-
+        message.textContent = "✔️ Session restored❗";
+        await showDashboard();
         return;
     }
 
-    var session =
-        sessionResult.data &&
-        sessionResult.data.session
-            ? sessionResult.data.session
-            : null;
+    currentUser = null;
+    currentProfile = null;
+    currentAccountEmail = "";
+    currentAccountPhone = "";
+    googleOAuthLogin = false;
+    githubOAuthLogin = false;
 
-    if (
-        session &&
-        session.user &&
-        isOAuthUser(
-            session.user
-        )
-    ) {
+    var accounts = getRememberedAccounts();
 
-        var provider =
-            getOAuthProvider(
-                session.user
-            );
-
-        if (
-            provider ===
-            "google"
-        ) {
-
-            googleOAuthLogin =
-                true;
-
-            githubOAuthLogin =
-                false;
-
-            await handleGoogleUser(
-                session.user
-            );
-
-            return;
-        }
-
-        if (
-            provider ===
-            "github"
-        ) {
-
-            githubOAuthLogin =
-                true;
-
-            googleOAuthLogin =
-                false;
-
-            await handleGithubUser(
-                session.user
-            );
-
-            return;
-        }
-    }
-
-    if (session) {
-
-        await supabaseClient.auth
-            .signOut();
-    }
-
-    currentUser =
-        null;
-
-    currentProfile =
-        null;
-
-    currentAccountEmail =
-        "";
-
-    currentAccountPhone =
-        "";
-
-    googleOAuthLogin =
-        false;
-
-    githubOAuthLogin =
-        false;
-
-    var accounts =
-        getRememberedAccounts();
-
-    if (
-        accounts.length >
-        0
-    ) {
-
+    if (accounts.length > 0) {
         showLogin();
-
-        if (loginEmail) {
-
-            loginEmail.value =
-                accounts[
-                    accounts.length - 1
-                ].email ||
-                "";
-        }
-
-        if (loginPhone) {
-
-            loginPhone.value =
-                accounts[
-                    accounts.length - 1
-                ].phone ||
-                "";
-        }
-
-        if (loginPassword) {
-
-            loginPassword.value =
-                "";
-        }
-
-        message.textContent =
-            "Welcome back❗Please Login ♻️";
-
+        var last = accounts[accounts.length - 1];
+        if (loginEmail) loginEmail.value = last.email || "";
+        if (loginPhone) loginPhone.value = last.phone || "";
+        if (loginPassword) loginPassword.value = "";
+        message.textContent = "Welcome back❗ Please Login.";
     } else {
-
         showLogin();
-
-        message.textContent =
-            "Please login to continue❗";
+        message.textContent = "Please login to continue❗";
     }
 }
-
-/* =====================================================
-AUTH STATE
-===================================================== */
 
 if (supabaseClient) {
-
-    supabaseClient.auth
-        .onAuthStateChange(
-            function (
-                event,
-                session
-            ) {
-
-                if (
-                    session &&
-                    session.user
-                ) {
-
-                    currentUser =
-                        session.user;
-
-                    if (
-                        securityCenterInitialized
-                    ) {
-
-                        updateSecurityCenter();
-                    }
-
-                } else {
-
-                    currentUser =
-                        null;
-
-                    closeSecurityCenter();
-                }
-            }
-        );
+    supabaseClient.auth.onAuthStateChange(function (event, session) {
+        if (session && session.user) {
+            currentUser = session.user;
+            if (securityCenterInitialized) updateSecurityCenterPanel();
+        } else {
+            currentUser = null;
+            closeSecurityCenter();
+        }
+    });
 }
 
 /* =====================================================
-START
+   START
 ===================================================== */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", async function () {
+    setupNavigation();
+    setupSecurityCenter();
+    displayLoginHistory();
 
-        checkExistingSession();
+    await checkExistingSession();
 
-        waitForHCaptchaAndRender(
-            30
-        );
+    waitForHCaptchaAndRender(30);
+});
 
-    }
-);
+/* =====================================================
+   PWA SERVICE WORKER
+===================================================== */
+
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./service-worker.js")
+            .then(function (registration) { console.log("Service worker registered:", registration); })
+            .catch(function (error) { console.log("Service worker registration failed:", error); });
+    });
+}
