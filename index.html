@@ -1,41 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
 <title>Cyber Core | Cyber Security Data Base</title>
 
 <meta name="description"
       content="Cyber Core is a secure cyber security data platform for managing protected files, account security, login history and digital security resources.">
 
-<meta name="application-name" content="Cyber Core">
-<meta name="theme-color" content="#0b0f0b">
-<meta name="robots" content="index, follow">
+<meta name="application-name"
+      content="Cyber Core">
+
+<meta name="theme-color"
+      content="#0b0f0b">
+
+<meta name="robots"
+      content="index, follow">
+
 <meta name="google-site-verification"
       content="V8brM0on6J73A5A85WVPk4rG6wxfj22fjNIJQnB0fI0">
 
-<link rel="canonical" href="https://diluka-ui.github.io/cyber-core/">
-<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
-<link rel="manifest" href="./manifest.json">
+<link rel="canonical"
+      href="https://diluka-ui.github.io/cyber-core/">
+
+<link rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="favicon.png">
+
+<link rel="apple-touch-icon"
+      href="favicon.png">
+
+<link rel="manifest"
+      href="./manifest.json">
 
 <meta property="og:title"
-      content="Cyber Core | Cyber Security Data Base">
+      content="Cyber Security Data Base">
+
 <meta property="og:description"
       content="Cyber Core - Future Cyber Security Data Base">
+
 <meta property="og:image"
       content="https://diluka-ui.github.io/cyber-core/cyber-core-logo.jpg">
+
 <meta property="og:url"
       content="https://diluka-ui.github.io/cyber-core/">
-<meta property="og:type" content="website">
 
-<meta name="twitter:card" content="summary">
+<meta property="og:type"
+      content="website">
+
+<meta name="twitter:card"
+      content="summary">
+
 <meta name="twitter:title"
-      content="Cyber Core | Cyber Security Data Base">
+      content="Cyber Security Data Base">
+
 <meta name="twitter:description"
       content="Cyber Core - Future Cyber Security Data Base">
+
 <meta name="twitter:image"
       content="https://diluka-ui.github.io/cyber-core/cyber-core-logo.jpg">
+
 
 <script type="application/ld+json">
 {
@@ -48,303 +78,1610 @@
 }
 </script>
 
-<link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet"
+      href="style.css">
+
+
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Chakra+Petch:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Oxanium:wght@400;600;700&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=VT323&display=swap"
       rel="stylesheet">
+
 </head>
+
 
 <body>
 
+
+<!-- =====================================================
+     BACKGROUND MUSIC
+     ===================================================== -->
+
 <audio id="backgroundMusic" loop>
-  <source src="song.mp3" type="audio/mpeg">
+
+    <source src="song.mp3"
+            type="audio/mpeg">
+
 </audio>
 
-<!-- LOGIN / REGISTER -->
-<div id="authContainer">
 
-  <div id="loginBox">
-    <h1>CYBER CORE</h1>
-    <p>Cyber Security Data Base</p>
+<!-- =====================================================
+     LOGIN / REGISTER CONTAINER
+     ===================================================== -->
 
-    <input id="loginEmail" type="email" placeholder="Email">
-    <input id="loginPhone" type="tel" placeholder="Phone Number">
-    <input id="loginPassword" type="password" placeholder="Password">
+<div class="container">
 
-    <div class="h-captcha"
-         data-sitekey="YOUR_HCAPTCHA_SITE_KEY">
+
+    <h1>
+        Cyber Core
+    </h1>
+
+
+    <p>
+        CYBER SECURITY SYSTEM
+    </p>
+
+
+    <!-- =================================================
+         REGISTER
+         ================================================= -->
+
+    <div id="registerBox">
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Enter Email Address"
+            autocomplete="email">
+
+        <input
+            type="tel"
+            id="phone"
+            placeholder="Enter Phone Number"
+            autocomplete="tel">
+
+        <button
+            id="sendBtn"
+            type="button">
+
+            SEND OTP
+
+        </button>
+
     </div>
 
-    <button id="loginBtn">LOGIN</button>
 
-    <div class="social-login">
-      <button id="googleLoginBtn">CONTINUE WITH GOOGLE</button>
-      <button id="githubLoginBtn">CONTINUE WITH GITHUB</button>
+    <!-- =================================================
+         OTP
+         ================================================= -->
+
+    <div id="otpBox">
+
+        <div id="timer">
+            OTP expires in: 60s
+        </div>
+
+
+        <div class="otp-inputs">
+
+            <input
+                class="otp-digit"
+                id="otp1"
+                type="text"
+                maxlength="1"
+                inputmode="numeric">
+
+            <input
+                class="otp-digit"
+                id="otp2"
+                type="text"
+                maxlength="1"
+                inputmode="numeric">
+
+            <input
+                class="otp-digit"
+                id="otp3"
+                type="text"
+                maxlength="1"
+                inputmode="numeric">
+
+            <input
+                class="otp-digit"
+                id="otp4"
+                type="text"
+                maxlength="1"
+                inputmode="numeric">
+
+            <input
+                class="otp-digit"
+                id="otp5"
+                type="text"
+                maxlength="1"
+                inputmode="numeric">
+
+            <input
+                class="otp-digit"
+                id="otp6"
+                type="text"
+                maxlength="1"
+                inputmode="numeric">
+
+        </div>
+
+
+        <input
+            id="otp"
+            type="text"
+            style="display:none;">
+
+
+        <button
+            id="verifyBtn"
+            type="button">
+
+            VERIFY OTP
+
+        </button>
+
     </div>
 
-    <button id="createAccountBtn">CREATE NEW ACCOUNT</button>
+
+    <!-- =================================================
+         CREATE PASSWORD
+         ================================================= -->
+
+    <div id="passwordBox">
+
+        <h2>
+            CREATE PASSWORD
+        </h2>
+
+
+        <input
+            type="password"
+            id="newPassword"
+            placeholder="Create Password"
+            autocomplete="new-password">
+
+
+        <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Confirm Password"
+            autocomplete="new-password">
+
+
+        <button
+            id="savePasswordBtn"
+            type="button">
+
+            SAVE PASSWORD
+
+        </button>
+
+    </div>
+
+
+    <!-- =================================================
+         LOGIN
+         ================================================= -->
+
+    <div id="loginBox">
+
+
+        <input
+            type="email"
+            id="loginEmail"
+            placeholder="Enter Email Address"
+            autocomplete="email">
+
+
+        <input
+            type="tel"
+            id="loginPhone"
+            placeholder="Enter Phone Number"
+            autocomplete="tel">
+
+
+        <input
+            type="password"
+            id="loginPassword"
+            placeholder="Enter Password"
+            autocomplete="current-password">
+
+
+        <button
+            id="loginBtn"
+            type="button">
+
+            LOGIN
+
+        </button>
+
+
+        <!-- =============================================
+             SOCIAL LOGIN
+             ============================================= -->
+
+        <div class="social-login-section">
+
+
+            <div class="social-divider">
+
+                <span></span>
+
+                <div class="social-or">
+                    OR
+                </div>
+
+                <span></span>
+
+            </div>
+
+
+            <!-- GOOGLE -->
+
+            <button
+                id="googleLoginBtn"
+                class="social-login-btn google-login-btn"
+                type="button">
+
+
+                <span class="social-logo-wrapper google-logo-bg">
+
+                    <svg
+                        class="social-logo google-logo"
+                        viewBox="0 0 24 24"
+                        width="20"
+                        height="20"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+
+                        <path
+                            fill="#4285F4"
+                            d="M21.35 12.27c0-.79-.07-1.55-.2-2.27H12v4.3h5.23a4.47 4.47 0 0 1-1.94 2.93v2.44h3.14c1.84-1.7 2.92-4.21 2.92-7.4z">
+                        </path>
+
+                        <path
+                            fill="#34A853"
+                            d="M12 21.99c2.63 0 4.84-.87 6.45-2.32l-3.14-2.44c-.87.58-1.98.93-3.31.93-2.54 0-4.7-1.72-5.47-4.03H3.29v2.52A9.74 9.74 0 0 0 12 21.99z">
+                        </path>
+
+                        <path
+                            fill="#FBBC05"
+                            d="M6.53 14.13A5.85 5.85 0 0 1 6.22 12c0-.74.13-1.46.31-2.13V7.35H3.29A9.99 9.99 0 0 0 2 12c0 1.61.38 3.13 1.29 4.65l3.24-2.52z">
+                        </path>
+
+                        <path
+                            fill="#EA4335"
+                            d="M12 5.84c1.43 0 2.72.49 3.73 1.45l2.8-2.8C16.84 2.93 14.63 2 12 2a9.74 9.74 0 0 0-8.71 5.35l3.24 2.52c.77-2.31 2.93-4.03 5.47-4.03z">
+                        </path>
+
+                    </svg>
+
+                </span>
+
+
+                <span class="social-login-text">
+                    Continue with Google
+                </span>
+
+
+                <span class="social-button-arrow">
+                    ›
+                </span>
+
+            </button>
+
+
+            <!-- GITHUB -->
+
+            <button
+                id="githubLoginBtn"
+                class="social-login-btn github-login-btn"
+                type="button">
+
+
+                <span class="social-logo-wrapper github-logo-bg">
+
+                    <svg
+                        class="social-logo github-logo"
+                        viewBox="0 0 24 24"
+                        width="20"
+                        height="20"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true">
+
+                        <path
+                            fill="#111111"
+                            d="M12 2C6.48 2 2 6.58 2 12.24c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49v-1.72c-2.78.62-3.37-1.2-3.37-1.2-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .08 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.86.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.15-4.56-5.08 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05A9.1 9.1 0 0 1 12 6.76c.85 0 1.71.12 2.51.36 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.07.36.32.68.95.68 1.92v2.85c0 .27.18.59.69.49A10.26 10.26 0 0 0 22 12.24C22 6.58 17.52 2 12 2z">
+                        </path>
+
+                    </svg>
+
+                </span>
+
+
+                <span class="social-login-text">
+                    Continue with GitHub
+                </span>
+
+
+                <span class="social-button-arrow">
+                    ›
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <button
+            id="createAccountBtn"
+            type="button">
+
+            CREATE NEW ACCOUNT
+
+        </button>
+
+
+    </div>
+
+
+    <!-- =================================================
+         MESSAGE
+         ================================================= -->
 
     <div id="message"></div>
-  </div>
 
-  <!-- REGISTER -->
-  <div id="registerBox" style="display:none;">
-    <h1>CREATE ACCOUNT</h1>
 
-    <input id="email" type="email" placeholder="Email">
-    <input id="phone" type="tel" placeholder="Phone Number">
+    <!-- =================================================
+         HCAPTCHA
+         ================================================= -->
 
-    <div class="h-captcha"
-         data-sitekey="YOUR_HCAPTCHA_SITE_KEY">
-    </div>
+    <div id="hcaptchaRegisterContainer"></div>
 
-    <button id="sendBtn">SEND OTP</button>
-  </div>
-
-  <!-- OTP -->
-  <div id="otpBox" style="display:none;">
-    <h1>VERIFY OTP</h1>
-
-    <div class="otp-container">
-      <input id="otp1" maxlength="1">
-      <input id="otp2" maxlength="1">
-      <input id="otp3" maxlength="1">
-      <input id="otp4" maxlength="1">
-      <input id="otp5" maxlength="1">
-      <input id="otp6" maxlength="1">
-    </div>
-
-    <input id="otp" type="hidden">
-
-    <button id="verifyBtn">VERIFY OTP</button>
-  </div>
-
-  <!-- PASSWORD -->
-  <div id="passwordBox" style="display:none;">
-    <h1>CREATE PASSWORD</h1>
-
-    <input id="newPassword"
-           type="password"
-           placeholder="New Password">
-
-    <input id="confirmPassword"
-           type="password"
-           placeholder="Confirm Password">
-
-    <button id="savePasswordBtn">SAVE PASSWORD</button>
-  </div>
+    <div id="hcaptchaLoginContainer"></div>
 
 </div>
 
 
-<!-- DASHBOARD -->
-<div id="dashboard" style="display:none;">
+<!-- =====================================================
+     CYBER CORE DASHBOARD
+     ===================================================== -->
 
-  <div id="dashboard-badge">
-    CYBER CORE
-  </div>
+<div id="dashboard">
 
-  <button id="securityMenuButton">
-    SECURITY
-  </button>
 
-  <!-- HOME -->
-  <section id="homePage" class="dashboard-page">
+    <!-- =================================================
+         SYSTEM ONLINE
+         ================================================= -->
 
-    <div class="dashboard-card">
-      <h2>DATA BASE</h2>
-      <p>Secure Cyber Security Data Base</p>
+    <div class="dashboard-badge">
+        SYSTEM ONLINE
     </div>
 
-    <div class="dashboard-card">
-      <h2>LOGIN HISTORY</h2>
-      <div id="loginHistoryList"></div>
+
+    <!-- =================================================
+         SECURITY CENTER BUTTON
+         ================================================= -->
+
+    <button
+        id="securityMenuButton"
+        type="button"
+        aria-label="Security Center">
+
+        ◉
+
+    </button>
+
+
+    <!-- =================================================
+         DASHBOARD CONTENT
+         ================================================= -->
+
+    <div class="dashboard-content">
+
+
+        <!-- =================================================
+             DASHBOARD PAGE CONTAINER
+             ================================================= -->
+
+        <div id="dashboardPage">
+
+
+            <!-- =============================================
+                 HOME
+                 ============================================= -->
+
+            <section
+                id="homePage"
+                class="dashboard-page active-page">
+
+
+                <div class="home-scroll">
+
+
+                    <!-- DATA BASE -->
+
+                    <div class="home-master-glass">
+
+                        <div class="home-box-title">
+                            DATA BASE
+                        </div>
+
+                        <div class="home-box-subtitle">
+                            CYBER SECURITY DATA BASE
+                        </div>
+
+                    </div>
+
+
+                    <div class="home-section-space"></div>
+
+
+                    <!-- LOGIN HISTORY (collapsible) -->
+
+                    <div class="home-glass-box">
+
+                        <button
+                            id="loginHistoryToggleBtn"
+                            class="home-glass-button"
+                            type="button">
+
+                            <span>LOGIN HISTORY</span>
+
+                            <span
+                                id="loginHistoryArrow"
+                                class="home-button-arrow">
+                                ›
+                            </span>
+
+                        </button>
+
+
+                        <div
+                            id="loginHistoryPanel"
+                            class="home-collapse-panel">
+
+                            <div id="homeLoginHistory"
+                                 class="history-list">
+                            </div>
+
+                            <div
+                                id="loginHistoryEmpty"
+                                class="home-box-text">
+
+                                No login history available.
+
+                            </div>
+
+                            <button
+                                id="clearHistoryBtn"
+                                class="small-glass-button"
+                                type="button">
+
+                                CLEAR HISTORY
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SYSTEM TOURTRIAL VIDEO (hidden player, title only) -->
+
+                    <div class="home-glass-box video-card">
+
+                        <div class="home-box-title">
+                            SYSTEM TOURTRIAL VIDEO
+                        </div>
+
+                        <div class="home-box-line"></div>
+
+                        <video
+                            id="accountDevelopVideo"
+                            class="account-video"
+                            controls
+                            playsinline
+                            preload="metadata">
+
+                            <source
+                                src="login video.mp4"
+                                type="video/mp4">
+
+                        </video>
+
+                    </div>
+
+
+                    <!-- CHANGE PASSWORD (collapsible) -->
+
+                    <div class="home-glass-box">
+
+                        <button
+                            id="changePasswordToggleBtn"
+                            class="home-glass-button"
+                            type="button">
+
+                            <span>CHANGE PASSWORD</span>
+
+                            <span
+                                id="changePasswordArrow"
+                                class="home-button-arrow">
+                                ›
+                            </span>
+
+                        </button>
+
+
+                        <div
+                            id="changePasswordPanel"
+                            class="home-collapse-panel">
+
+                            <input
+                                type="password"
+                                id="currentPasswordField"
+                                class="dashboard-input"
+                                placeholder="Current Password"
+                                autocomplete="current-password">
+
+                            <input
+                                type="password"
+                                id="newPasswordField"
+                                class="dashboard-input"
+                                placeholder="New Password"
+                                autocomplete="new-password">
+
+                            <input
+                                type="password"
+                                id="confirmNewPasswordField"
+                                class="dashboard-input"
+                                placeholder="Confirm New Password"
+                                autocomplete="new-password">
+
+                            <button
+                                id="savePasswordChangeBtn"
+                                class="small-glass-button"
+                                type="button">
+
+                                SAVE PASSWORD
+
+                            </button>
+
+                            <div
+                                id="changePasswordHomeMessage"
+                                class="inner-message">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STORAGE -->
+
+                    <div class="home-glass-box">
+
+
+                        <div class="home-box-title">
+                            STORAGE
+                        </div>
+
+
+                        <div class="home-box-line"></div>
+
+
+                        <div class="storage-info">
+
+                            <span>
+                                USED STORAGE
+                            </span>
+
+                            <strong id="storageUsed">
+                                0 MB
+                            </strong>
+
+                        </div>
+
+
+                        <div class="storage-bar">
+
+                            <div
+                                id="storageProgress"
+                                class="storage-progress">
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="storageDetails"
+                            class="storage-details">
+
+                            Storage information loading...
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 SEARCH PAGE
+                 ============================================= -->
+
+            <section
+                id="searchPage"
+                class="dashboard-page">
+
+
+                <div class="add-scroll">
+
+
+                    <div class="add-glass-box">
+
+
+                        <div class="add-box-title">
+                            SEARCH SAVED DATA
+                        </div>
+
+
+                        <div class="add-box-line"></div>
+
+
+                        <input
+                            id="searchQueryInput"
+                            class="dashboard-input"
+                            type="text"
+                            placeholder="Search by title or category">
+
+
+                        <div
+                            id="searchEmptyMessage"
+                            class="add-file-name">
+
+                            Type to search your saved data.
+
+                        </div>
+
+
+                        <div
+                            id="searchResultsList"
+                            class="security-items-list">
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 ADD PAGE
+                 ============================================= -->
+
+            <section
+                id="addPage"
+                class="dashboard-page">
+
+
+                <div class="add-scroll">
+
+
+                    <div class="add-glass-box">
+
+
+                        <div class="add-box-title">
+                            ADD SECURE DATA
+                        </div>
+
+
+                        <div class="add-box-line"></div>
+
+
+                        <label
+                            for="securityFileInput"
+                            class="add-file-label">
+
+                            SELECT FILE
+
+                        </label>
+
+
+                        <input
+                            id="securityFileInput"
+                            type="file"
+                            style="display:none;">
+
+
+                        <div
+                            id="selectedFileName"
+                            class="add-file-name">
+
+                            No file selected.
+
+                        </div>
+
+
+                        <div class="add-title-space"></div>
+
+
+                        <div class="add-box-title">
+                            FILE TITLE
+                        </div>
+
+
+                        <div class="add-box-line"></div>
+
+
+                        <input
+                            id="securityFileTitle"
+                            class="dashboard-input"
+                            type="text"
+                            placeholder="Enter File Title">
+
+
+                        <div class="add-title-space"></div>
+
+
+                        <div class="add-box-title">
+                            CATEGORY
+                        </div>
+
+
+                        <div class="add-box-line"></div>
+
+
+                        <select
+                            id="securityFileCategory"
+                            class="add-category">
+
+                            <option value="General">
+                                General
+                            </option>
+
+                            <option value="Security">
+                                Security
+                            </option>
+
+                            <option value="Documents">
+                                Documents
+                            </option>
+
+                            <option value="Videos">
+                                Videos
+                            </option>
+
+                            <option value="Images">
+                                Images
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            id="securityAddFileBtn"
+                            class="small-glass-button"
+                            type="button">
+
+                            ADD TO DATABASE
+
+                        </button>
+
+
+                        <div
+                            id="securityAddMessage"
+                            class="inner-message">
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SAVED FILES -->
+
+                    <div class="add-glass-box">
+
+
+                        <div class="add-box-title">
+                            SAVED DATA
+                        </div>
+
+
+                        <div class="add-box-line"></div>
+
+
+                        <div
+                            id="securityItemsList"
+                            class="security-items-list">
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 SETTINGS PAGE
+                 ============================================= -->
+
+            <section
+                id="settingsPage"
+                class="dashboard-page">
+
+
+                <div class="setting-scroll">
+
+
+                    <!-- ACCOUNT SETTINGS -->
+
+                    <div class="setting-glass-box">
+
+
+                        <div class="page-title">
+                            ACCOUNT SETTINGS
+                        </div>
+
+
+                        <div class="page-text">
+                            Manage your Cyber Core account settings.
+                        </div>
+
+
+                        <div class="setting-section-line"></div>
+
+
+                        <button
+                            id="logoutBtn"
+                            class="home-glass-button"
+                            type="button">
+
+                            <span>
+                                LOGOUT
+                            </span>
+
+                            <span>
+                                ›
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- ACCOUNT DANGER ZONE -->
+
+                    <div class="setting-glass-box">
+
+
+                        <div class="page-title">
+                            ACCOUNT MANAGEMENT
+                        </div>
+
+
+                        <div class="page-text">
+                            Permanent account management options.
+                        </div>
+
+
+                        <div class="setting-section-line"></div>
+
+
+                        <button
+                            id="removeAccountBtn"
+                            class="remove-account-btn"
+                            type="button">
+
+                            REMOVE ACCOUNT
+
+                        </button>
+
+
+                        <div
+                            id="removeAccountMessage"
+                            class="inner-message">
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 PROFILE PAGE
+                 ============================================= -->
+
+            <section
+                id="profilePage"
+                class="dashboard-page">
+
+
+                <div class="profile-scroll">
+
+
+                    <!-- PROFILE INFORMATION -->
+
+                    <div class="profile-glass-box">
+
+
+                        <div class="profile-box-title">
+                            PROFILE
+                        </div>
+
+
+                        <div class="profile-box-line"></div>
+
+
+                        <div
+                            id="profileDisplayName"
+                            class="profile-value">
+
+                            CYBER CORE USER
+
+                        </div>
+
+
+                        <div
+                            id="profileDisplayEmail"
+                            class="profile-value">
+
+                        </div>
+
+
+                        <div
+                            id="profileDisplayPhone"
+                            class="profile-value">
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PROFILE PICTURE -->
+
+                    <div class="profile-glass-box profile-picture-box">
+
+
+                        <div class="profile-box-title">
+                            PROFILE PICTURE
+                        </div>
+
+
+                        <div class="profile-box-line"></div>
+
+
+                        <div class="profile-picture-wrapper">
+
+
+                            <img
+                                id="profilePicture"
+                                alt="Profile Picture">
+
+
+                            <span
+                                id="profilePicturePlaceholder">
+
+                                👤
+
+                            </span>
+
+                        </div>
+
+
+                        <label
+                            for="profilePictureInput"
+                            class="profile-upload-button">
+
+                            UPLOAD PROFILE PICTURE
+
+                        </label>
+
+
+                        <input
+                            id="profilePictureInput"
+                            type="file"
+                            accept="image/*"
+                            style="display:none;">
+
+                    </div>
+
+
+                    <!-- EDIT PROFILE -->
+
+                    <div class="profile-glass-box">
+
+
+                        <div class="profile-box-title">
+                            EDIT PROFILE
+                        </div>
+
+
+                        <div class="profile-box-line"></div>
+
+
+                        <div class="profile-edit-label">
+                            NAME
+                        </div>
+
+
+                        <input
+                            id="profileNameInput"
+                            class="dashboard-input"
+                            type="text"
+                            placeholder="Enter Name">
+
+
+                        <div class="profile-edit-label">
+                            BIRTHDAY
+                        </div>
+
+
+                        <input
+                            id="profileBirthdayInput"
+                            class="dashboard-input birthday-input"
+                            type="date">
+
+
+                        <div class="profile-edit-label">
+                            BIO
+                        </div>
+
+
+                        <input
+                            id="profileBioInput"
+                            class="dashboard-input"
+                            type="text"
+                            placeholder="Enter Bio">
+
+
+                        <button
+                            id="saveProfileBtn"
+                            class="small-glass-button"
+                            type="button">
+
+                            SAVE PROFILE
+
+                        </button>
+
+
+                        <div
+                            id="profileMessage"
+                            class="inner-message">
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACCOUNT SWITCHING -->
+
+                    <div class="profile-glass-box">
+
+
+                        <div class="profile-box-title">
+                            ACCOUNTS
+                        </div>
+
+
+                        <div class="profile-box-line"></div>
+
+
+                        <div
+                            id="accountList"
+                            class="account-list">
+
+                        </div>
+
+
+                        <button
+                            id="addAccountProfileBtn"
+                            class="profile-glass-button"
+                            type="button">
+
+                            <span>
+                                ADD / SWITCH ACCOUNT
+                            </span>
+
+                            <span class="profile-arrow">
+                                ›
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+
+        <!-- =================================================
+             MAGIC NAVIGATION
+             ================================================= -->
+
+        <nav
+            id="magicNav"
+            class="magic-nav">
+
+
+            <!-- HOME -->
+
+            <button
+                id="homeNavBtn"
+                class="nav-item active"
+                type="button"
+                data-page="homePage">
+
+
+                <span class="nav-icon">
+
+                    <img
+                        src="home.png"
+                        alt="Home">
+
+                </span>
+
+
+                <span class="nav-label">
+                    HOME
+                </span>
+
+            </button>
+
+
+            <!-- SEARCH -->
+
+            <button
+                id="searchNavBtn"
+                class="nav-item"
+                type="button"
+                data-page="searchPage">
+
+
+                <span class="nav-icon">
+
+                    <img
+                        src="search.png"
+                        alt="Search">
+
+                </span>
+
+
+                <span class="nav-label">
+                    SEARCH
+                </span>
+
+            </button>
+
+
+            <!-- ADD -->
+
+            <button
+                id="addNavBtn"
+                class="nav-item"
+                type="button"
+                data-page="addPage">
+
+
+                <span class="nav-icon">
+
+                    <img
+                        src="add.png"
+                        alt="Add">
+
+                </span>
+
+
+                <span class="nav-label">
+                    ADD
+                </span>
+
+            </button>
+
+
+            <!-- SETTINGS -->
+
+            <button
+                id="settingsNavBtn"
+                class="nav-item"
+                type="button"
+                data-page="settingsPage">
+
+
+                <span class="nav-icon">
+
+                    <img
+                        src="setting.png"
+                        alt="Settings">
+
+                </span>
+
+
+                <span class="nav-label">
+                    SETTINGS
+                </span>
+
+            </button>
+
+
+            <!-- PROFILE -->
+
+            <button
+                id="profileNavBtn"
+                class="nav-item"
+                type="button"
+                data-page="profilePage">
+
+
+                <span class="nav-icon">
+
+                    <img
+                        src="profile.png"
+                        alt="Profile">
+
+                </span>
+
+
+                <span class="nav-label">
+                    PROFILE
+                </span>
+
+            </button>
+
+
+        </nav>
+
+
     </div>
 
-    <!-- SYSTEM TOURTRIAL VIDEO (hidden player, title only) -->
-    <div class="dashboard-card">
-      <h2>SYSTEM TOURTRIAL VIDEO</h2>
 
-      <video id="loginVideo"
-             controls
-             playsinline
-             style="width:100%;">
-        <source src="login video.mp4" type="video/mp4">
-      </video>
+    <!-- =================================================
+         SECURITY CENTER OVERLAY
+         ================================================= -->
+
+    <div
+        id="securityCenterOverlay">
+
+
+        <div
+            id="securityCenterPanel">
+
+
+            <div class="security-center-header">
+
+
+                <div>
+
+                    <div class="security-center-title">
+                        SECURITY CENTER
+                    </div>
+
+                    <div class="security-center-subtitle">
+                        CYBER CORE PROTECTION
+                    </div>
+
+                </div>
+
+
+                <button
+                    id="securityCenterClose"
+                    class="security-center-close"
+                    type="button">
+
+                    ×
+
+                </button>
+
+
+            </div>
+
+
+            <!-- SECURITY STATUS -->
+
+            <div class="security-center-card">
+
+
+                <div class="security-center-card-title">
+                    SYSTEM STATUS
+                </div>
+
+
+                <div class="security-center-line"></div>
+
+
+                <div class="security-status-row">
+
+                    <span class="security-status-label">
+                        Account
+                    </span>
+
+                    <span
+                        id="securityStatusAccount"
+                        class="security-status-value">
+
+                        Active
+
+                    </span>
+
+                </div>
+
+
+                <div class="security-status-row">
+
+                    <span class="security-status-label">
+                        Session
+                    </span>
+
+                    <span
+                        id="securityStatusSession"
+                        class="security-status-value security-status-secure">
+
+                        Secure
+
+                    </span>
+
+                </div>
+
+
+                <div class="security-status-row">
+
+                    <span class="security-status-label">
+                        Storage
+                    </span>
+
+                    <span
+                        id="securityStatusStorage"
+                        class="security-status-value">
+
+                        Protected
+
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- ACTIVITY -->
+
+            <div class="security-center-card">
+
+
+                <div class="security-center-card-title">
+                    RECENT ACTIVITY
+                </div>
+
+
+                <div class="security-center-line"></div>
+
+
+                <div
+                    id="securityCenterActivity">
+
+                </div>
+
+
+                <div
+                    id="securityCenterActivityEmpty"
+                    class="security-alert">
+
+                    No recent security activity.
+
+                </div>
+
+            </div>
+
+
+            <!-- SECURITY ACTIONS -->
+
+            <div class="security-center-card">
+
+
+                <div class="security-center-card-title">
+                    SECURITY ACTIONS
+                </div>
+
+
+                <div class="security-center-line"></div>
+
+
+                <button
+                    id="securityRefreshBtn"
+                    class="security-center-action"
+                    type="button">
+
+                    REFRESH SECURITY STATUS
+
+                </button>
+
+
+                <button
+                    id="securityLogoutBtn"
+                    class="security-center-action"
+                    type="button">
+
+                    SECURE LOGOUT
+
+                </button>
+
+
+                <div
+                    id="securityCenterMessage"
+                    class="security-center-message">
+
+                </div>
+
+            </div>
+
+
+        </div>
+
     </div>
 
-    <div class="dashboard-card">
-      <h2>CHANGE PASSWORD</h2>
-      <button id="changePasswordBtn">
-        CHANGE PASSWORD
-      </button>
-    </div>
-
-    <div class="dashboard-card">
-      <h2>STORAGE</h2>
-      <div id="storageInfo"></div>
-    </div>
-
-  </section>
-
-
-  <!-- SEARCH -->
-  <section id="searchPage"
-           class="dashboard-page"
-           style="display:none;">
-
-    <h2>SEARCH</h2>
-
-    <input id="searchQueryInput"
-           type="text"
-           placeholder="Search files...">
-
-    <div id="searchResultsList"></div>
-
-  </section>
-
-
-  <!-- ADD -->
-  <section id="addPage"
-           class="dashboard-page"
-           style="display:none;">
-
-    <h2>ADD DATA</h2>
-
-    <input id="fileInput"
-           type="file">
-
-    <input id="fileTitle"
-           type="text"
-           placeholder="File Title">
-
-    <input id="fileCategory"
-           type="text"
-           placeholder="Category">
-
-    <button id="addFileBtn">
-      ADD FILE
-    </button>
-
-    <div id="savedFilesList"></div>
-
-  </section>
-
-
-  <!-- SETTINGS -->
-  <section id="settingsPage"
-           class="dashboard-page"
-           style="display:none;">
-
-    <h2>SETTINGS</h2>
-
-    <button id="logoutBtn">
-      LOGOUT
-    </button>
-
-    <button id="removeAccountBtn">
-      REMOVE ACCOUNT
-    </button>
-
-  </section>
-
-
-  <!-- PROFILE -->
-  <section id="profilePage"
-           class="dashboard-page"
-           style="display:none;">
-
-    <h2>PROFILE</h2>
-
-    <div id="profilePictureContainer">
-      <img id="profilePicture"
-           src=""
-           alt="Profile">
-    </div>
-
-    <input id="profileName"
-           type="text"
-           placeholder="Name">
-
-    <input id="profileBirthday"
-           type="date">
-
-    <textarea id="profileBio"
-              placeholder="Bio"></textarea>
-
-    <input id="profilePictureInput"
-           type="file"
-           accept="image/*">
-
-    <button id="saveProfileBtn">
-      SAVE PROFILE
-    </button>
-
-    <div id="accountSwitcher"></div>
-
-  </section>
-
-
-  <!-- MAGIC NAVIGATION -->
-  <nav id="magicNav">
-
-    <button id="homeNavBtn">
-      <img src="home.png" alt="Home">
-    </button>
-
-    <button id="searchNavBtn">
-      <img src="search.png" alt="Search">
-    </button>
-
-    <button id="addNavBtn">
-      <img src="add.png" alt="Add">
-    </button>
-
-    <button id="settingsNavBtn">
-      <img src="setting.png" alt="Settings">
-    </button>
-
-    <button id="profileNavBtn">
-      <img src="profile.png" alt="Profile">
-    </button>
-
-  </nav>
 
 </div>
 
 
-<!-- SECURITY CENTER -->
-<div id="securityCenter"
-     style="display:none;">
+<!-- =====================================================
+     BACKGROUND MUSIC + VIDEO CONTROL
+     ===================================================== -->
 
-  <div id="securityCenterContent">
+<script>
 
-    <h2>SECURITY CENTER</h2>
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    <div id="securityStatus"></div>
+        var music =
+            document.getElementById(
+                "backgroundMusic"
+            );
 
-    <div id="securityActivity"></div>
-
-    <div id="securityActions"></div>
-
-    <button id="closeSecurityCenter">
-      CLOSE
-    </button>
-
-  </div>
-
-</div>
+        var video =
+            document.getElementById(
+                "accountDevelopVideo"
+            );
 
 
-<!-- HCAPTCHA -->
-<script src="https://js.hcaptcha.com/1/api.js"
-        async
-        defer></script>
+        if (music) {
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+            music.volume = 1;
 
-<!-- CYBER CORE SCRIPT -->
+            music.play().catch(
+                function () {}
+            );
+
+        }
+
+
+        function startMusic() {
+
+            if (!music) {
+                return;
+            }
+
+            music.play().catch(
+                function () {}
+            );
+
+        }
+
+
+        document.addEventListener(
+            "click",
+            startMusic,
+            {
+                once:true
+            }
+        );
+
+
+        document.addEventListener(
+            "touchstart",
+            startMusic,
+            {
+                once:true
+            }
+        );
+
+
+        if (
+            video &&
+            music
+        ) {
+
+            video.addEventListener(
+                "play",
+                function () {
+
+                    music.pause();
+
+                }
+            );
+
+
+            video.addEventListener(
+                "pause",
+                function () {
+
+                    music.play().catch(
+                        function () {}
+                    );
+
+                }
+            );
+
+
+            video.addEventListener(
+                "ended",
+                function () {
+
+                    music.play().catch(
+                        function () {}
+                    );
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+
+<!-- =====================================================
+     HCAPTCHA
+     ===================================================== -->
+
+<script
+    src="https://js.hcaptcha.com/1/api.js"
+    async
+    defer>
+</script>
+
+
+<!-- =====================================================
+     SUPABASE
+     ===================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+
+
+<!-- =====================================================
+     CYBER CORE JAVASCRIPT
+     ===================================================== -->
+
 <script src="script.js?v=3"></script>
+
 
 </body>
 </html>
