@@ -490,7 +490,7 @@
 
 
             <!-- =============================================
-                 HOME  (redesigned per spec)
+                 HOME
                  ============================================= -->
 
             <section
@@ -582,12 +582,12 @@
                         <video
                             id="accountDevelopVideo"
                             class="account-video"
-                            style="display:none;"
+                            controls
                             playsinline
-                            preload="none">
+                            preload="metadata">
 
                             <source
-                                src="login-video.mp4"
+                                src="login video.mp4"
                                 type="video/mp4">
 
                         </video>
@@ -700,6 +700,59 @@
                             class="storage-details">
 
                             Storage information loading...
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 SEARCH PAGE
+                 ============================================= -->
+
+            <section
+                id="searchPage"
+                class="dashboard-page">
+
+
+                <div class="add-scroll">
+
+
+                    <div class="add-glass-box">
+
+
+                        <div class="add-box-title">
+                            SEARCH SAVED DATA
+                        </div>
+
+
+                        <div class="add-box-line"></div>
+
+
+                        <input
+                            id="searchQueryInput"
+                            class="dashboard-input"
+                            type="text"
+                            placeholder="Search by title or category">
+
+
+                        <div
+                            id="searchEmptyMessage"
+                            class="add-file-name">
+
+                            Type to search your saved data.
+
+                        </div>
+
+
+                        <div
+                            id="searchResultsList"
+                            class="security-items-list">
 
                         </div>
 
@@ -853,6 +906,96 @@
                         <div
                             id="securityItemsList"
                             class="security-items-list">
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 SETTINGS PAGE
+                 ============================================= -->
+
+            <section
+                id="settingsPage"
+                class="dashboard-page">
+
+
+                <div class="setting-scroll">
+
+
+                    <!-- ACCOUNT SETTINGS -->
+
+                    <div class="setting-glass-box">
+
+
+                        <div class="page-title">
+                            ACCOUNT SETTINGS
+                        </div>
+
+
+                        <div class="page-text">
+                            Manage your Cyber Core account settings.
+                        </div>
+
+
+                        <div class="setting-section-line"></div>
+
+
+                        <button
+                            id="logoutBtn"
+                            class="home-glass-button"
+                            type="button">
+
+                            <span>
+                                LOGOUT
+                            </span>
+
+                            <span>
+                                ›
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- ACCOUNT DANGER ZONE -->
+
+                    <div class="setting-glass-box">
+
+
+                        <div class="page-title">
+                            ACCOUNT MANAGEMENT
+                        </div>
+
+
+                        <div class="page-text">
+                            Permanent account management options.
+                        </div>
+
+
+                        <div class="setting-section-line"></div>
+
+
+                        <button
+                            id="removeAccountBtn"
+                            class="remove-account-btn"
+                            type="button">
+
+                            REMOVE ACCOUNT
+
+                        </button>
+
+
+                        <div
+                            id="removeAccountMessage"
+                            class="inner-message">
 
                         </div>
 
@@ -1073,200 +1216,6 @@
             </section>
 
 
-            <!-- =============================================
-                 SETTINGS PAGE
-                 ============================================= -->
-
-            <section
-                id="settingsPage"
-                class="dashboard-page">
-
-
-                <div class="setting-scroll">
-
-
-                    <!-- ACCOUNT SETTINGS -->
-
-                    <div class="setting-glass-box">
-
-
-                        <div class="page-title">
-                            ACCOUNT SETTINGS
-                        </div>
-
-
-                        <div class="page-text">
-                            Manage your Cyber Core account settings.
-                        </div>
-
-
-                        <div class="setting-section-line"></div>
-
-
-                        <button
-                            id="settingsChangePasswordBtn"
-                            class="home-glass-button"
-                            type="button">
-
-                            <span>
-                                CHANGE PASSWORD
-                            </span>
-
-                            <span>
-                                ›
-                            </span>
-
-                        </button>
-
-
-                        <div class="setting-section-space"></div>
-
-
-                        <button
-                            id="logoutBtn"
-                            class="home-glass-button"
-                            type="button">
-
-                            <span>
-                                LOGOUT
-                            </span>
-
-                            <span>
-                                ›
-                            </span>
-
-                        </button>
-
-                    </div>
-
-
-                    <!-- ACCOUNT DANGER ZONE -->
-
-                    <div class="setting-glass-box">
-
-
-                        <div class="page-title">
-                            ACCOUNT MANAGEMENT
-                        </div>
-
-
-                        <div class="page-text">
-                            Permanent account management options.
-                        </div>
-
-
-                        <div class="setting-section-line"></div>
-
-
-                        <button
-                            id="removeAccountBtn"
-                            class="remove-account-btn"
-                            type="button">
-
-                            REMOVE ACCOUNT
-
-                        </button>
-
-
-                        <div
-                            id="removeAccountMessage"
-                            class="inner-message">
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-            </section>
-
-
-            <!-- =============================================
-                 SECURITY PAGE
-                 ============================================= -->
-
-            <section
-                id="securityPage"
-                class="dashboard-page">
-
-
-                <div class="home-scroll">
-
-
-                    <div class="home-glass-box">
-
-
-                        <div class="home-box-title">
-                            SECURITY
-                        </div>
-
-
-                        <div class="home-box-line"></div>
-
-
-                        <div class="home-box-text">
-                            CYBER CORE SECURITY CENTER
-                        </div>
-
-
-                        <div
-                            id="securityPageStatus"
-                            class="database-status-text">
-
-                            SECURITY SYSTEM ACTIVE
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="home-glass-box">
-
-
-                        <div class="home-box-title">
-                            ACCOUNT SECURITY
-                        </div>
-
-
-                        <div class="home-box-line"></div>
-
-
-                        <div
-                            id="securityAccountStatus"
-                            class="home-box-text">
-
-                            Account security status loading...
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="home-glass-box">
-
-
-                        <div class="home-box-title">
-                            SECURITY ACTIVITY
-                        </div>
-
-
-                        <div class="home-box-line"></div>
-
-
-                        <div
-                            id="securityActivityList">
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-            </section>
-
-
         </div>
 
 
@@ -1304,6 +1253,31 @@
             </button>
 
 
+            <!-- SEARCH -->
+
+            <button
+                id="searchNavBtn"
+                class="nav-item"
+                type="button"
+                data-page="searchPage">
+
+
+                <span class="nav-icon">
+
+                    <img
+                        src="search.png"
+                        alt="Search">
+
+                </span>
+
+
+                <span class="nav-label">
+                    SEARCH
+                </span>
+
+            </button>
+
+
             <!-- ADD -->
 
             <button
@@ -1329,6 +1303,31 @@
             </button>
 
 
+            <!-- SETTINGS -->
+
+            <button
+                id="settingsNavBtn"
+                class="nav-item"
+                type="button"
+                data-page="settingsPage">
+
+
+                <span class="nav-icon">
+
+                    <img
+                        src="setting.png"
+                        alt="Settings">
+
+                </span>
+
+
+                <span class="nav-label">
+                    SETTINGS
+                </span>
+
+            </button>
+
+
             <!-- PROFILE -->
 
             <button
@@ -1349,56 +1348,6 @@
 
                 <span class="nav-label">
                     PROFILE
-                </span>
-
-            </button>
-
-
-            <!-- SETTINGS -->
-
-            <button
-                id="settingsNavBtn"
-                class="nav-item"
-                type="button"
-                data-page="settingsPage">
-
-
-                <span class="nav-icon">
-
-                    <img
-                        src="settings.png"
-                        alt="Settings">
-
-                </span>
-
-
-                <span class="nav-label">
-                    SETTINGS
-                </span>
-
-            </button>
-
-
-            <!-- SECURITY -->
-
-            <button
-                id="securityNavBtn"
-                class="nav-item"
-                type="button"
-                data-page="securityPage">
-
-
-                <span class="nav-icon">
-
-                    <img
-                        src="security.png"
-                        alt="Security">
-
-                </span>
-
-
-                <span class="nav-label">
-                    SECURITY
                 </span>
 
             </button>
@@ -1731,7 +1680,7 @@ document.addEventListener(
      CYBER CORE JAVASCRIPT
      ===================================================== -->
 
-<script src="script.js"></script>
+<script src="script.js?v=3"></script>
 
 
 </body>
