@@ -3,14 +3,16 @@
 // PWA OFFLINE APP SHELL
 // =====================================================
 
-const CACHE_NAME = "cyber-core-v1";
+const CACHE_NAME = "cyber-core-v2";
+
+const BASE_PATH = "/cyber-core/";
 
 const APP_FILES = [
-    "./",
-    "./index.html",
-    "./style.css",
-    "./script.js",
-    "./favicon.png"
+    BASE_PATH,
+    BASE_PATH + "index.html",
+    BASE_PATH + "style.css",
+    BASE_PATH + "script.js?v=3",
+    BASE_PATH + "favicon.png"
 ];
 
 
@@ -58,15 +60,19 @@ self.addEventListener("activate", function (event) {
 
                     }
 
+                    return null;
+
                 })
 
             );
 
+        }).then(function () {
+
+            return self.clients.claim();
+
         })
 
     );
-
-    self.clients.claim();
 
 });
 
@@ -91,7 +97,7 @@ self.addEventListener("fetch", function (event) {
 
             return fetch(event.request).catch(function () {
 
-                return caches.match("./index.html");
+                return caches.match(BASE_PATH + "index.html");
 
             });
 
