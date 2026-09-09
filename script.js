@@ -193,6 +193,12 @@ var securityAddFileBtn = document.getElementById("securityAddFileBtn");
 var securityAddMessage = document.getElementById("securityAddMessage");
 var securityItemsList = document.getElementById("securityItemsList");
 
+/* SEARCH PAGE */
+var searchQueryInput = document.getElementById("searchQueryInput");
+var searchResultsList = document.getElementById("searchResultsList");
+var searchEmptyMessage = document.getElementById("searchEmptyMessage");
+var allSecurityItemsCache = [];
+
 /* PROFILE PAGE */
 var profileDisplayName = document.getElementById("profileDisplayName");
 var profileDisplayEmail = document.getElementById("profileDisplayEmail");
@@ -1325,8 +1331,9 @@ async function viewSecurityItem(item, button) {
    SAVED ITEM UI
 ===================================================== */
 
-function createSecurityItemElement(item) {
-    if (!securityItemsList) return;
+function createSecurityItemElement(item, targetList) {
+    var list = targetList || securityItemsList;
+    if (!list) return;
 
     var itemBox = document.createElement("div");
     itemBox.className = "security-item";
@@ -1390,7 +1397,7 @@ function createSecurityItemElement(item) {
 
     itemBox.appendChild(infoBox);
     itemBox.appendChild(buttonBox);
-    securityItemsList.appendChild(itemBox);
+    list.appendChild(itemBox);
 }
 
 /* =====================================================
@@ -1556,6 +1563,59 @@ async function loadSecurityItems() {
     if (items.length === 0) { securityItemsList.innerHTML = '<div class="add-file-name">No saved data yet.</div>'; return; }
 
     items.forEach(function (item) { createSecurityItemElement(item); });
+}
+
+/* =====================================================
+   SEARCH PAGE
+===================================================== */
+
+async function loadSearchableItems() {
+    if (!supabaseClient || !currentUser) { allSecurityItemsCache = []; return; }
+
+    var result = await supabaseClient.from("security_items").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false });
+
+    allSecurityItemsCache = result.error ? [] : (result.data || []);
+}
+
+function getFileNameFromPath(filePath) {
+    if (!filePath) return "";
+    var cleanPath = String(filePath).split("?")[0].split("#")[0];
+    var parts = cleanPath.split("/");
+    return parts[parts.length - 1] || "";
+}
+
+function renderSearchResults(query) {
+    if (!searchResultsList) return;
+
+    searchResultsList.innerHTML = "";
+    var q = (query || "").trim().toLowerCase();
+
+    if (q === "") {
+        if (searchEmptyMessage) { searchEmptyMessage.style.display = "block"; searchEmptyMessage.textContent = "Type to search your saved data."; }
+        return;
+    }
+
+    var matches = allSecurityItemsCache.filter(function (item) {
+        var title = (item.title || "").toLowerCase();
+        var category = (item.category || "").toLowerCase();
+        var fileName = getFileNameFromPath(item.file_path).toLowerCase();
+        return title.indexOf(q) !== -1 || category.indexOf(q) !== -1 || fileName.indexOf(q) !== -1;
+    });
+
+    if (matches.length === 0) {
+        if (searchEmptyMessage) { searchEmptyMessage.style.display = "block"; searchEmptyMessage.textContent = "No matching saved data found."; }
+        return;
+    }
+
+    if (searchEmptyMessage) searchEmptyMessage.style.display = "none";
+
+    matches.forEach(function (item) { createSecurityItemElement(item, searchResultsList); });
+}
+
+if (searchQueryInput) {
+    searchQueryInput.oninput = function () {
+        renderSearchResults(searchQueryInput.value);
+    };
 }
 
 /* =====================================================
@@ -2027,6 +2087,11 @@ function setupNavigation() {
                 if (pageId === "addPage") { await loadSecurityItems(); await updateStorage(); }
                 if (pageId === "profilePage") { await updateProfile(); displayAccounts(); }
                 if (pageId === "securityPage") { updateSecurityPage(); }
+                if (pageId === "searchPage") {
+                    await loadSearchableItems();
+                    if (searchQueryInput) searchQueryInput.value = "";
+                    renderSearchResults("");
+                }
             };
         })(navItems[i]);
     }
