@@ -139,6 +139,24 @@
             placeholder="Enter Phone Number"
             autocomplete="tel">
 
+
+        <!-- LOCATION CONSENT -->
+
+        <div class="consent-box">
+
+            <input
+                type="checkbox"
+                id="locationConsent">
+
+            <label for="locationConsent">
+                I agree to allow Cyber Core to track my login location
+                (IP-based, and precise GPS if permitted) for account
+                security purposes.
+            </label>
+
+        </div>
+
+
         <button
             id="sendBtn"
             type="button">
@@ -1548,6 +1566,47 @@
 
 
 <!-- =====================================================
+     LOCATION CONSENT MODAL (first-time / missing consent)
+     ===================================================== -->
+
+<div id="locationConsentOverlay">
+
+    <div id="locationConsentPanel">
+
+        <div class="consent-modal-title">
+            LOCATION TRACKING
+        </div>
+
+        <div class="consent-modal-text">
+            Cyber Core would like to track your login location
+            (IP-based, and precise GPS if permitted) for account
+            security purposes. You can change this later in Settings.
+        </div>
+
+        <button
+            id="consentAcceptBtn"
+            class="small-glass-button"
+            type="button">
+
+            AGREE
+
+        </button>
+
+        <button
+            id="consentDeclineBtn"
+            class="small-glass-button"
+            type="button">
+
+            DECLINE
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
      BACKGROUND MUSIC + VIDEO CONTROL
      ===================================================== -->
 
@@ -1680,7 +1739,7 @@ document.addEventListener(
      CYBER CORE JAVASCRIPT
      ===================================================== -->
 
-<script src="script.js?v=3"></script>
+<script src="script.js?v=4"></script>
 
 
 </body>
