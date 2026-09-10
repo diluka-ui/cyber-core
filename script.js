@@ -48,6 +48,9 @@ var hcaptchaRegisterWidgetId = null;
 var hcaptchaLoginWidgetId = null;
 var hcaptchaWidgetsRendered = false;
 
+/* LOCATION TRACKING CONFIG */
+var IPAPI_URL = "https://ipapi.co/json/";
+
 /* =====================================================
    HCAPTCHA HELPERS
 ===================================================== */
@@ -126,6 +129,7 @@ var googleOAuthLogin = false;
 var githubOAuthLogin = false;
 var oauthHandling = false;
 var securityCenterInitialized = false;
+var locationConsentPendingUserId = null;
 
 /* =====================================================
    ELEMENTS — matched to the actual HTML
@@ -136,6 +140,7 @@ var container = document.querySelector(".container");
 var registerBox = document.getElementById("registerBox");
 var email = document.getElementById("email");
 var phone = document.getElementById("phone");
+var locationConsentCheckbox = document.getElementById("locationConsent");
 var sendBtn = document.getElementById("sendBtn");
 
 var otpBox = document.getElementById("otpBox");
@@ -162,6 +167,11 @@ var message = document.getElementById("message");
 
 var dashboard = document.getElementById("dashboard");
 var securityMenuButton = document.getElementById("securityMenuButton");
+
+/* LOCATION CONSENT MODAL */
+var locationConsentOverlay = document.getElementById("locationConsentOverlay");
+var consentAcceptBtn = document.getElementById("consentAcceptBtn");
+var consentDeclineBtn = document.getElementById("consentDeclineBtn");
 
 /* HOME PAGE */
 var homeLoginHistory = document.getElementById("homeLoginHistory");
@@ -348,6 +358,139 @@ function displayLoginHistory() {
             escapeHTML(item.date) + " • " + escapeHTML(item.time);
         homeLoginHistory.appendChild(row);
     }
+}
+
+/* =====================================================
+   LOCATION TRACKING (IP + GPS) WITH CONSENT
+===================================================== */
+
+function getPreciseLocation() {
+    return new Promise(function (resolve) {
+        if (!navigator.geolocation) { resolve(null); return; }
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                resolve({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                });
+            },
+            function () { resolve(null); },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    });
+}
+
+async function getIPLocation() {
+    try {
+        var response = await fetch(IPAPI_URL);
+        var data = await response.json();
+        return {
+            city: data.city || "",
+            region: data.region || "",
+            country: data.country_name || "",
+            latitude: typeof data.latitude === "number" ? data.latitude : null,
+            longitude: typeof data.longitude === "number" ? data.longitude : null
+        };
+    } catch (error) {
+        console.log("IP location error:", error);
+        return { city: "", region: "", country: "", latitude: null, longitude: null };
+    }
+}
+
+async function saveLocationConsent(userId, consentGiven) {
+    if (!supabaseClient || !userId) return;
+    try {
+        var existing = await supabaseClient.from("location_consents").select("id").eq("user_id", userId).maybeSingle();
+
+        if (existing.data) {
+            await supabaseClient.from("location_consents").update({
+                consent_given: consentGiven,
+                consent_date: new Date().toISOString()
+            }).eq("user_id", userId);
+        } else {
+            await supabaseClient.from("location_consents").insert({
+                user_id: userId,
+                consent_given: consentGiven
+            });
+        }
+    } catch (error) {
+        console.log("Save location consent error:", error);
+    }
+}
+
+async function getLocationConsent(userId) {
+    if (!supabaseClient || !userId) return null;
+    try {
+        var result = await supabaseClient.from("location_consents").select("consent_given").eq("user_id", userId).maybeSingle();
+        if (result.error || !result.data) return null;
+        return result.data.consent_given === true;
+    } catch (error) {
+        console.log("Get location consent error:", error);
+        return null;
+    }
+}
+
+async function logLoginLocation(userId) {
+    if (!supabaseClient || !userId) return;
+    try {
+        var consent = await getLocationConsent(userId);
+        if (consent !== true) return;
+
+        var ipLocation = await getIPLocation();
+        var gpsLocation = await getPreciseLocation();
+
+        await supabaseClient.from("login_locations").insert({
+            user_id: userId,
+            latitude: gpsLocation ? gpsLocation.latitude : ipLocation.latitude,
+            longitude: gpsLocation ? gpsLocation.longitude : ipLocation.longitude,
+            city: ipLocation.city,
+            region: ipLocation.region,
+            country: ipLocation.country,
+            location_source: gpsLocation ? "gps" : "ip"
+        });
+    } catch (error) {
+        console.log("Log login location error:", error);
+    }
+}
+
+async function handleLocationConsentForUser(userId) {
+    if (!supabaseClient || !userId) return;
+    var consent = await getLocationConsent(userId);
+
+    if (consent === null) {
+        showLocationConsentModal(userId);
+    } else if (consent === true) {
+        await logLoginLocation(userId);
+    }
+}
+
+function showLocationConsentModal(userId) {
+    locationConsentPendingUserId = userId;
+    if (locationConsentOverlay) locationConsentOverlay.classList.add("show-consent-overlay");
+}
+
+function closeLocationConsentModal() {
+    locationConsentPendingUserId = null;
+    if (locationConsentOverlay) locationConsentOverlay.classList.remove("show-consent-overlay");
+}
+
+if (consentAcceptBtn) {
+    consentAcceptBtn.onclick = async function () {
+        var userId = locationConsentPendingUserId;
+        closeLocationConsentModal();
+        if (!userId) return;
+        await saveLocationConsent(userId, true);
+        await logLoginLocation(userId);
+    };
+}
+
+if (consentDeclineBtn) {
+    consentDeclineBtn.onclick = async function () {
+        var userId = locationConsentPendingUserId;
+        closeLocationConsentModal();
+        if (!userId) return;
+        await saveLocationConsent(userId, false);
+    };
 }
 
 /* =====================================================
@@ -575,6 +718,7 @@ function resetRegistrationForm() {
     if (phone) phone.value = "";
     if (newPassword) newPassword.value = "";
     if (confirmPassword) confirmPassword.value = "";
+    if (locationConsentCheckbox) locationConsentCheckbox.checked = false;
     clearOTP();
     timeLeft = 60;
     if (timer) timer.textContent = "OTP expires in: 60s";
@@ -646,6 +790,11 @@ if (sendBtn) {
         if (enteredEmail === "") { message.textContent = "Please enter your Email❗"; return; }
         if (!enteredEmail.includes("@") || !enteredEmail.includes(".")) { message.textContent = "Please enter a valid Email❗"; return; }
         if (enteredPhone === "") { message.textContent = "Please enter your Phone Number❗"; return; }
+
+        if (locationConsentCheckbox && !locationConsentCheckbox.checked) {
+            message.textContent = "❌ Please agree to location tracking to create an account.";
+            return;
+        }
 
         for (var i = 0; i < accounts.length; i++) {
             if (accounts[i] && accounts[i].email && accounts[i].email.toLowerCase() === enteredEmail.toLowerCase()) {
@@ -746,6 +895,9 @@ if (savePasswordBtn) {
             if (signupResult.error) { savePasswordBtn.disabled = false; message.textContent = "❌ " + signupResult.error.message; return; }
             if (!signupResult.data.user) { savePasswordBtn.disabled = false; message.textContent = "❌ Account could not be created."; return; }
 
+            /* Save location consent while the fresh session is still active */
+            await saveLocationConsent(signupResult.data.user.id, true);
+
             rememberAccount(verifiedEmail, verifiedPhone);
 
             if (signupResult.data.session) { await supabaseClient.auth.signOut(); }
@@ -827,6 +979,8 @@ if (loginBtn) {
         message.textContent = "✔️ LOGIN SUCCESSFUL❗";
 
         await showDashboard();
+
+        handleLocationConsentForUser(currentUser.id);
     };
 }
 
@@ -906,6 +1060,9 @@ async function handleOAuthUser(user, provider) {
     }
 
     await showDashboard();
+
+    handleLocationConsentForUser(user.id);
+
     oauthHandling = false;
 }
 
@@ -2159,6 +2316,8 @@ async function checkExistingSession() {
 
         message.textContent = "✔️ Session restored❗";
         await showDashboard();
+
+        handleLocationConsentForUser(currentUser.id);
         return;
     }
 
