@@ -198,6 +198,120 @@ h2{
 }
 
 /* =====================================================
+   LOCATION CONSENT (register form checkbox)
+   ===================================================== */
+
+.consent-box{
+    width:100%;
+    margin-bottom:20px;
+    padding:14px 16px;
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    background:rgba(0,0,0,.20);
+    border:1px solid rgba(0,255,0,.45);
+    border-radius:15px;
+    text-align:left;
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+}
+
+.consent-box input[type="checkbox"]{
+    width:20px !important;
+    height:20px !important;
+    min-width:20px;
+    margin:2px 0 0 !important;
+    padding:0 !important;
+    flex-shrink:0;
+    accent-color:#00ff00;
+    cursor:pointer;
+}
+
+.consent-box label{
+    color:#fff;
+    font-family:"Chakra Petch",sans-serif;
+    font-size:12px;
+    line-height:1.6;
+    cursor:pointer;
+}
+
+/* =====================================================
+   LOCATION CONSENT MODAL (post-login, social login users)
+   ===================================================== */
+
+#locationConsentOverlay{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:
+        opacity .25s ease,
+        visibility .25s ease;
+    z-index:2000000;
+}
+
+#locationConsentOverlay.show-consent-overlay{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+}
+
+#locationConsentPanel{
+    width:100%;
+    max-width:420px;
+    padding:28px 24px;
+    background:linear-gradient(
+        135deg,
+        rgba(255,255,255,.14),
+        rgba(0,0,0,.78)
+    );
+    border:1px solid rgba(0,255,0,.55);
+    border-radius:22px;
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    text-align:left;
+}
+
+.consent-modal-title{
+    color:#00ff00;
+    font-family:"Orbitron",sans-serif;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:2px;
+    margin-bottom:14px;
+}
+
+.consent-modal-text{
+    color:#fff;
+    font-family:"Chakra Petch",sans-serif;
+    font-size:13px;
+    line-height:1.7;
+    margin-bottom:20px;
+}
+
+#locationConsentPanel .small-glass-button{
+    margin-top:0;
+    margin-bottom:12px;
+}
+
+#locationConsentPanel .small-glass-button:last-child{
+    margin-bottom:0;
+}
+
+#consentDeclineBtn{
+    color:#ff5050;
+    border-color:rgba(255,80,80,.5);
+}
+
+/* =====================================================
    SOCIAL LOGIN
    ===================================================== */
 
@@ -1582,6 +1696,27 @@ h2{
     button{
         height:55px;
         font-size:15px;
+    }
+
+    .consent-box{
+        padding:12px 14px;
+    }
+
+    .consent-box label{
+        font-size:11px;
+    }
+
+    #locationConsentPanel{
+        padding:24px 18px;
+        border-radius:18px;
+    }
+
+    .consent-modal-title{
+        font-size:14px;
+    }
+
+    .consent-modal-text{
+        font-size:12px;
     }
 
     .social-login-section{
