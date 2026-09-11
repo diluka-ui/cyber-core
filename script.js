@@ -465,6 +465,10 @@ async function handleLocationConsentForUser(userId) {
 }
 
 function showLocationConsentModal(userId) {
+    /* Safety guard: never show this over the login/register screen.
+       It should only appear on top of the dashboard, after a
+       successful login. */
+    if (!dashboard || dashboard.style.display !== "block") return;
     locationConsentPendingUserId = userId;
     if (locationConsentOverlay) locationConsentOverlay.classList.add("show-consent-overlay");
 }
