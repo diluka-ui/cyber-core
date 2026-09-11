@@ -240,9 +240,9 @@ h2{
    ===================================================== */
 
 #locationConsentOverlay{
+    display:none;
     position:fixed;
     inset:0;
-    display:flex;
     align-items:center;
     justify-content:center;
     padding:20px;
@@ -259,6 +259,7 @@ h2{
 }
 
 #locationConsentOverlay.show-consent-overlay{
+    display:flex;
     opacity:1;
     visibility:visible;
     pointer-events:auto;
@@ -1943,7 +1944,7 @@ h2{
         bottom:5px !important;
     }
 
-    .nav-icon{
+    .nav-icon{r
         width:28px;
         height:28px;
     }
