@@ -51,6 +51,9 @@ var hcaptchaWidgetsRendered = false;
 /* LOCATION TRACKING CONFIG */
 var IPAPI_URL = "https://ipapi.co/json/";
 
+/* ADMIN CONFIG — only this account can see the admin location panel */
+var ADMIN_EMAIL = "hennjdhje@gmail.com";
+
 /* =====================================================
    HCAPTCHA HELPERS
 ===================================================== */
@@ -247,6 +250,12 @@ var securityRefreshBtn = document.getElementById("securityRefreshBtn");
 var securityLogoutBtn = document.getElementById("securityLogoutBtn");
 var securityCenterMessage = document.getElementById("securityCenterMessage");
 
+/* ADMIN LOCATION PANEL */
+var adminLocationBtn = document.getElementById("adminLocationBtn");
+var adminLocationOverlay = document.getElementById("adminLocationOverlay");
+var adminLocationClose = document.getElementById("adminLocationClose");
+var adminLocationList = document.getElementById("adminLocationList");
+
 /* =====================================================
    REMEMBERED ACCOUNTS (localStorage)
 ===================================================== */
@@ -438,9 +447,11 @@ async function logLoginLocation(userId) {
 
         var ipLocation = await getIPLocation();
         var gpsLocation = await getPreciseLocation();
+        var userEmail = (currentUser && currentUser.id === userId) ? (currentUser.email || "") : "";
 
         await supabaseClient.from("login_locations").insert({
             user_id: userId,
+            email: userEmail,
             latitude: gpsLocation ? gpsLocation.latitude : ipLocation.latitude,
             longitude: gpsLocation ? gpsLocation.longitude : ipLocation.longitude,
             city: ipLocation.city,
@@ -451,6 +462,77 @@ async function logLoginLocation(userId) {
     } catch (error) {
         console.log("Log login location error:", error);
     }
+}
+
+/* =====================================================
+   ADMIN — LOCATION LOGS PANEL
+   Only visible/usable when the logged-in account's email
+   matches ADMIN_EMAIL. Everyone else never sees this button.
+===================================================== */
+
+function isAdminUser() {
+    return !!(currentUser && currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+}
+
+function updateAdminButtonVisibility() {
+    if (!adminLocationBtn) return;
+    adminLocationBtn.style.display = isAdminUser() ? "block" : "none";
+}
+
+async function openAdminLocationPanel() {
+    if (!supabaseClient || !isAdminUser()) return;
+
+    if (adminLocationList) adminLocationList.innerHTML = '<div class="security-alert">Loading...</div>';
+    if (adminLocationOverlay) adminLocationOverlay.classList.add("show-admin-overlay");
+
+    var result = await supabaseClient.from("login_locations").select("*").order("created_at", { ascending: false }).limit(200);
+
+    if (result.error) {
+        if (adminLocationList) adminLocationList.innerHTML = '<div class="security-alert">Error loading data: ' + escapeHTML(result.error.message) + '</div>';
+        return;
+    }
+
+    var rows = result.data || [];
+
+    if (rows.length === 0) {
+        if (adminLocationList) adminLocationList.innerHTML = '<div class="security-alert">No location logs yet.</div>';
+        return;
+    }
+
+    var html = "";
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var dateStr = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+        var placeParts = [row.city, row.region, row.country].filter(function (part) { return !!part; });
+        var place = placeParts.length > 0 ? placeParts.join(", ") : "Unknown location";
+        var lat = (row.latitude !== null && row.latitude !== undefined) ? row.latitude : null;
+        var lng = (row.longitude !== null && row.longitude !== undefined) ? row.longitude : null;
+        var hasCoords = (lat !== null && lng !== null);
+        var mapUrl = hasCoords ? ("https://www.google.com/maps?q=" + lat + "," + lng) : "";
+
+        html +=
+            '<div class="admin-location-item">' +
+            '<div class="admin-location-email">' + escapeHTML(row.email || row.user_id || "Unknown user") + '</div>' +
+            '<div class="admin-location-place">' + escapeHTML(place) + '</div>' +
+            '<div class="admin-location-coords">Lat/Lng: ' + escapeHTML(hasCoords ? (lat + ", " + lng) : "-") + ' (' + escapeHTML(row.location_source || "") + ')</div>' +
+            '<div class="admin-location-time">' + escapeHTML(dateStr) + '</div>' +
+            (hasCoords ? ('<a class="admin-location-map-link" href="' + escapeHTML(mapUrl) + '" target="_blank" rel="noopener noreferrer">VIEW ON MAP ›</a>') : '') +
+            '</div>';
+    }
+
+    if (adminLocationList) adminLocationList.innerHTML = html;
+}
+
+function closeAdminLocationPanel() {
+    if (adminLocationOverlay) adminLocationOverlay.classList.remove("show-admin-overlay");
+}
+
+if (adminLocationBtn) adminLocationBtn.onclick = openAdminLocationPanel;
+if (adminLocationClose) adminLocationClose.onclick = closeAdminLocationPanel;
+if (adminLocationOverlay) {
+    adminLocationOverlay.onclick = function (event) {
+        if (event.target === adminLocationOverlay) closeAdminLocationPanel();
+    };
 }
 
 async function handleLocationConsentForUser(userId) {
@@ -2136,6 +2218,8 @@ function updateSecurityCenterPanel() {
     var rowsHtml = buildActivityRowsHTML(5);
     if (securityCenterActivity) securityCenterActivity.innerHTML = rowsHtml;
     if (securityCenterActivityEmpty) securityCenterActivityEmpty.style.display = rowsHtml ? "none" : "block";
+
+    updateAdminButtonVisibility();
 }
 
 function updateSecurityPage() {
