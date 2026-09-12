@@ -14,6 +14,8 @@ var SUPABASE_URL = "https://zlysjkpstaushfjgnvxi.supabase.co";
 var SUPABASE_PUBLISHABLE_KEY = "sb_publishable_45K-dyeWhUXpjOioTgPw_A_7R-t1gKu";
 var supabaseClient = null;
 
+var CYBER_CORE_AI_FUNCTION_URL = "https://zlysjkpstaushfjgnvxi.supabase.co/functions/v1/cyber-core-ai";
+
 if (window.supabase && typeof window.supabase.createClient === "function") {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
         auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
@@ -249,6 +251,11 @@ var securityCenterActivityEmpty = document.getElementById("securityCenterActivit
 var securityRefreshBtn = document.getElementById("securityRefreshBtn");
 var securityLogoutBtn = document.getElementById("securityLogoutBtn");
 var securityCenterMessage = document.getElementById("securityCenterMessage");
+var aiChatMessages = document.getElementById("aiChatMessages");
+var aiChatInput = document.getElementById("aiChatInput");
+var aiChatSendBtn = document.getElementById("aiChatSendBtn");
+var aiChatStatus = document.getElementById("aiChatStatus");
+var aiChatInitialized = false;
 
 /* ADMIN LOCATION PANEL */
 var adminLocationBtn = document.getElementById("adminLocationBtn");
@@ -2287,6 +2294,94 @@ function setupSecurityCenter() {
     document.addEventListener("keydown", function (event) {
         if (event.key === "Escape" && securityCenterPanel && securityCenterPanel.classList.contains("show-security-panel")) closeSecurityCenter();
     });
+
+    setupAIChat();
+}
+
+/* =====================================================
+   AI ASSISTANT (Security Center chat card)
+===================================================== */
+
+function appendAIChatMessage(role, text) {
+    if (!aiChatMessages) return;
+    var bubble = document.createElement("div");
+    bubble.className = role === "user" ? "ai-chat-msg ai-chat-msg-user" : "ai-chat-msg ai-chat-msg-bot";
+    bubble.textContent = text;
+    aiChatMessages.appendChild(bubble);
+    aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+}
+
+async function sendAIChatMessage() {
+    if (!aiChatInput) return;
+    var message = aiChatInput.value.trim();
+    if (!message) return;
+
+    if (!supabaseClient) {
+        if (aiChatStatus) aiChatStatus.textContent = "⚠️ Assistant unavailable.";
+        return;
+    }
+
+    appendAIChatMessage("user", message);
+    aiChatInput.value = "";
+    if (aiChatSendBtn) aiChatSendBtn.disabled = true;
+    if (aiChatStatus) aiChatStatus.textContent = "Thinking...";
+
+    try {
+        var sessionResult = await supabaseClient.auth.getSession();
+        var accessToken = sessionResult && sessionResult.data && sessionResult.data.session
+            ? sessionResult.data.session.access_token
+            : null;
+
+        if (!accessToken) {
+            if (aiChatStatus) aiChatStatus.textContent = "⚠️ Please log in to use the assistant.";
+            if (aiChatSendBtn) aiChatSendBtn.disabled = false;
+            return;
+        }
+
+        var response = await fetch(CYBER_CORE_AI_FUNCTION_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + accessToken
+            },
+            body: JSON.stringify({ message: message })
+        });
+
+        var data = await response.json();
+
+        if (!response.ok) {
+            appendAIChatMessage("bot", "⚠️ " + (data && data.error ? data.error : "Something went wrong."));
+        } else {
+            appendAIChatMessage("bot", data && data.reply ? data.reply : "No response was returned.");
+        }
+
+        if (aiChatStatus) aiChatStatus.textContent = "";
+    } catch (error) {
+        appendAIChatMessage("bot", "⚠️ Connection error. Please try again.");
+        if (aiChatStatus) aiChatStatus.textContent = "";
+    }
+
+    if (aiChatSendBtn) aiChatSendBtn.disabled = false;
+}
+
+function setupAIChat() {
+    if (aiChatInitialized) return;
+    aiChatInitialized = true;
+
+    if (aiChatSendBtn) {
+        aiChatSendBtn.onclick = function () {
+            sendAIChatMessage();
+        };
+    }
+
+    if (aiChatInput) {
+        aiChatInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendAIChatMessage();
+            }
+        });
+    }
 }
 
 /* =====================================================
