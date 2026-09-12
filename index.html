@@ -80,7 +80,7 @@
 
 
 <link rel="stylesheet"
-      href="style.css?v=2">
+      href="style.css?v=4">
 
 
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Chakra+Petch:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Oxanium:wght@400;600;700&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=VT323&display=swap"
@@ -1548,6 +1548,17 @@
                 </button>
 
 
+                <button
+                    id="adminLocationBtn"
+                    class="security-center-action admin-action"
+                    type="button"
+                    style="display:none;">
+
+                    ADMIN — LOCATION LOGS
+
+                </button>
+
+
                 <div
                     id="securityCenterMessage"
                     class="security-center-message">
@@ -1561,6 +1572,44 @@
 
     </div>
 
+
+</div>
+
+
+<!-- =====================================================
+     ADMIN — LOGIN LOCATIONS PANEL
+     Only shown when the logged-in account is the admin.
+     ===================================================== -->
+
+<div id="adminLocationOverlay">
+
+    <div id="adminLocationPanel">
+
+        <div class="admin-location-header">
+
+            <div class="admin-location-title">
+                ADMIN — LOGIN LOCATIONS
+            </div>
+
+            <button
+                id="adminLocationClose"
+                class="security-center-close"
+                type="button">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="adminLocationList"
+            class="admin-location-list">
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -1739,7 +1788,7 @@ document.addEventListener(
      CYBER CORE JAVASCRIPT
      ===================================================== -->
 
-<script src="script.js?v=5"></script>
+<script src="script.js?v=7"></script>
 
 
 </body>
