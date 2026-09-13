@@ -2354,7 +2354,18 @@ async function sendAIChatMessage() {
         var data = await response.json();
 
         if (!response.ok) {
-            appendAIChatMessage("bot", "⚠️ " + (data && data.error ? data.error : "Something went wrong."));
+            var errMsg = data && data.error ? data.error : "Something went wrong.";
+            var detailMsg = "";
+            if (data && data.details) {
+                if (data.details.error && data.details.error.message) {
+                    detailMsg = data.details.error.message;
+                } else if (typeof data.details === "string") {
+                    detailMsg = data.details;
+                } else {
+                    try { detailMsg = JSON.stringify(data.details); } catch (e) { detailMsg = ""; }
+                }
+            }
+            appendAIChatMessage("bot", "⚠️ " + errMsg + (detailMsg ? " — " + detailMsg : ""));
         } else {
             appendAIChatMessage("bot", data && data.reply ? data.reply : "No response was returned.");
         }
