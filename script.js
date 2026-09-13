@@ -2265,7 +2265,11 @@ function setupSecurityCenter() {
         };
     }
 
-    if (securityCenterOverlay) securityCenterOverlay.onclick = function () { closeSecurityCenter(); };
+    if (securityCenterOverlay) {
+        securityCenterOverlay.onclick = function (event) {
+            if (event.target === securityCenterOverlay) closeSecurityCenter();
+        };
+    }
     if (securityCenterClose) securityCenterClose.onclick = function () { closeSecurityCenter(); };
 
     if (securityRefreshBtn) {
