@@ -1842,7 +1842,10 @@ h2{
 
 .ai-chat-input{
     flex:1;
+    width:auto;
+    height:auto;
     min-height:40px;
+    margin-bottom:0;
     padding:8px 12px;
     background:rgba(0,0,0,.35);
     border:1px solid rgba(0,255,0,.34);
@@ -1858,6 +1861,10 @@ h2{
 }
 
 .ai-chat-send-btn{
+    width:auto;
+    height:auto;
+    min-height:40px;
+    margin-bottom:0;
     min-width:64px;
     padding:8px 12px;
     background:linear-gradient(
