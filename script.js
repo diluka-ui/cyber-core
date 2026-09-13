@@ -2315,10 +2315,112 @@ function appendAIChatMessage(role, text) {
     aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
 }
 
+var ACTION_CONFIRM_REQUIRED = ["change_password", "delete_account"];
+var pendingAIAction = null;
+
+function describeAIAction(name) {
+    if (name === "logout") return "log you out";
+    if (name === "refresh_security_status") return "refresh your security status";
+    if (name === "update_profile_bio") return "update your profile bio";
+    if (name === "change_password") return "start the password change process";
+    if (name === "delete_account") return "PERMANENTLY delete your account";
+    if (name === "clear_login_history") return "clear your login history";
+    if (name === "view_login_history") return "show your login history";
+    if (name === "search_security_items") return "search your saved files";
+    if (name === "delete_security_item") return "delete a saved file";
+    if (name === "open_admin_panel") return "open the admin location panel";
+    return name;
+}
+
+async function findSecurityItemByTitle(title) {
+    if ((!allSecurityItemsCache || allSecurityItemsCache.length === 0) && typeof loadSearchableItems === "function") {
+        await loadSearchableItems();
+    }
+    var lower = (title || "").toLowerCase().trim();
+    if (!lower || !allSecurityItemsCache) return null;
+    for (var i = 0; i < allSecurityItemsCache.length; i++) {
+        var it = allSecurityItemsCache[i];
+        if (it && it.title && it.title.toLowerCase().indexOf(lower) !== -1) return it;
+    }
+    return null;
+}
+
+async function executeAIAction(name, args) {
+    args = args || {};
+    if (name === "logout") {
+        if (logoutBtn) logoutBtn.click();
+        return "Okay, logging you out.";
+    }
+    if (name === "refresh_security_status") {
+        if (securityRefreshBtn) securityRefreshBtn.click();
+        return "Security status refreshed.";
+    }
+    if (name === "update_profile_bio") {
+        if (profileBioInput) profileBioInput.value = args.bio || "";
+        if (saveProfileBtn) saveProfileBtn.click();
+        return "Updating your profile bio.";
+    }
+    if (name === "change_password") {
+        if (typeof doPasswordChangeFlow === "function") doPasswordChangeFlow();
+        return "Opening the password change flow — follow the prompts to confirm.";
+    }
+    if (name === "delete_account") {
+        if (typeof doRemoveAccountFlow === "function") doRemoveAccountFlow();
+        return "Opening account deletion — follow the prompts to confirm.";
+    }
+    if (name === "clear_login_history") {
+        if (clearHistoryBtn) clearHistoryBtn.click();
+        return "Clearing your login history — confirm in the popup if asked.";
+    }
+    if (name === "view_login_history") {
+        if (loginHistoryToggleBtn) loginHistoryToggleBtn.click();
+        return "Here's your login history panel.";
+    }
+    if (name === "search_security_items") {
+        var query = args.query || "";
+        if (typeof loadSearchableItems === "function") await loadSearchableItems();
+        if (typeof renderSearchResults === "function") renderSearchResults(query);
+        var matches = (allSecurityItemsCache || []).filter(function (it) {
+            return it && it.title && it.title.toLowerCase().indexOf(query.toLowerCase()) !== -1;
+        });
+        if (matches.length === 0) return "No saved files matched \"" + query + "\".";
+        var titles = matches.slice(0, 5).map(function (it) { return it.title; }).join(", ");
+        return "Found " + matches.length + " match(es): " + titles;
+    }
+    if (name === "delete_security_item") {
+        var item = await findSecurityItemByTitle(args.title || "");
+        if (!item) return "I couldn't find a saved file titled \"" + (args.title || "") + "\".";
+        if (typeof deleteSecurityItem === "function") deleteSecurityItem(item);
+        return "Opening delete confirmation for \"" + item.title + "\".";
+    }
+    if (name === "open_admin_panel") {
+        if (typeof isAdminUser === "function" && !isAdminUser()) return "This is an admin-only action and your account isn't an admin.";
+        if (adminLocationBtn) adminLocationBtn.click();
+        else if (typeof openAdminLocationPanel === "function") openAdminLocationPanel();
+        return "Opening the admin location panel.";
+    }
+    return "I don't know how to do that yet.";
+}
+
 async function sendAIChatMessage() {
     if (!aiChatInput) return;
     var message = aiChatInput.value.trim();
     if (!message) return;
+
+    if (pendingAIAction) {
+        appendAIChatMessage("user", message);
+        aiChatInput.value = "";
+        var lower = message.trim().toLowerCase();
+        var isYes = lower === "yes" || lower === "y" || lower === "ow" || lower === "ඔව්" || lower === "confirm" || lower === "proceed";
+        var action = pendingAIAction;
+        pendingAIAction = null;
+        if (isYes) {
+            appendAIChatMessage("bot", await executeAIAction(action.name, action.args));
+        } else {
+            appendAIChatMessage("bot", "Okay, cancelled.");
+        }
+        return;
+    }
 
     if (!supabaseClient) {
         if (aiChatStatus) aiChatStatus.textContent = "⚠️ Assistant unavailable.";
@@ -2366,6 +2468,15 @@ async function sendAIChatMessage() {
                 }
             }
             appendAIChatMessage("bot", "⚠️ " + errMsg + (detailMsg ? " — " + detailMsg : ""));
+        } else if (data && data.functionCall && data.functionCall.name) {
+            var fnName = data.functionCall.name;
+            var fnArgs = data.functionCall.args || {};
+            if (ACTION_CONFIRM_REQUIRED.indexOf(fnName) !== -1) {
+                pendingAIAction = { name: fnName, args: fnArgs };
+                appendAIChatMessage("bot", "⚠️ I'll " + describeAIAction(fnName) + ". Type 'yes' to confirm, or anything else to cancel.");
+            } else {
+                appendAIChatMessage("bot", await executeAIAction(fnName, fnArgs));
+            }
         } else {
             appendAIChatMessage("bot", data && data.reply ? data.reply : "No response was returned.");
         }
