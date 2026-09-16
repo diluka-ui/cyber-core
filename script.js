@@ -492,9 +492,17 @@ async function openAdminLocationPanel() {
     if (adminLocationList) adminLocationList.innerHTML = '<div class="security-alert">Loading...</div>';
     if (adminLocationOverlay) adminLocationOverlay.classList.add("show-admin-overlay");
 
-    var result = await supabaseClient.from("login_locations").select("*").order("created_at", { ascending: false }).limit(200);
+    var result;
+    try {
+        result = await supabaseClient.from("login_locations").select("*").order("created_at", { ascending: false }).limit(200);
+    } catch (error) {
+        console.log("Admin location fetch exception:", error);
+        if (adminLocationList) adminLocationList.innerHTML = '<div class="security-alert">Error loading data: ' + escapeHTML(error && error.message ? error.message : "Request failed (network or permissions).") + '</div>';
+        return;
+    }
 
     if (result.error) {
+        console.log("Admin location fetch error:", result.error);
         if (adminLocationList) adminLocationList.innerHTML = '<div class="security-alert">Error loading data: ' + escapeHTML(result.error.message) + '</div>';
         return;
     }
